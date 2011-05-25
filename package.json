@@ -1,0 +1,26 @@
+{
+  "author": "Mark Cavage <mark.cavage@joyent.com>",
+  "name": "sdc-clients",
+  "description": "Contains node.js client libraries for SDC REST APIs.",
+  "version": "6.1.0",
+  "homepage": "http://www.joyent.com",
+  "repository": {
+    "type": "git",
+    "url": "git@git.joyent.com:node-sdc-clients.git"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "restify": ">=0.1.16"
+  },
+  "devDependencies": {
+    "jshint": ">=0.2.1",
+    "whiskey": ">=0.3.3"
+  },
+  "scripts": {
+    "pretest": "./node_modules/.bin/jshint lib tst",
+    "test": "./node_modules/.bin/whiskey --timeout 500 -t \"`find tst -name *.test.js | xargs`\""
+  },
+  "engines": {
+    "node": "0.4"
+  }
+}
