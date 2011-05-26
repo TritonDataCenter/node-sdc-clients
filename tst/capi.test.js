@@ -3,7 +3,7 @@
 var log = require('restify').log;
 var uuid = require('node-uuid');
 
-var Capi = require('../lib/capi');
+var Capi = require('../lib/index').CAPI;
 
 
 
