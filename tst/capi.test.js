@@ -1,11 +1,9 @@
 // Copyright 2011 Joyent, Inc.  All rights reserved.
 
-var log = require('restify').log;
 var uuid = require('node-uuid');
 
-var Capi = require('../lib/index').CAPI;
-
-
+var sdcClients = require('../lib/index');
+var Capi = sdcClients.CAPI;
 
 var capi = null;
 var key = {
@@ -20,7 +18,7 @@ var mdObj = {
 
 
 exports.setUp = function(test, assert) {
-  log.level(log.Level.Trace);
+  sdcClients.setLogLevel('trace');
   capi = new Capi({
     url: 'http://10.99.99.11:8080',
     username: 'admin',
