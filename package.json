@@ -13,7 +13,7 @@
   "dependencies": {
     "lru-cache": ">=1.0.2",
     "node-uuid": ">=1.1.0",
-    "restify": ">=0.1.17",
+    "restify": ">=0.1.18",
     "sprintf": ">=0.1.1"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst",
-    "test": "./node_modules/.bin/whiskey --timeout 5000 --concurrency 1 -t \"`find tst -name *.test.js | xargs`\""
+    "test": "./node_modules/.bin/whiskey --concurrency 1 -t \"`find tst -name *.test.js | xargs`\""
   },
   "engines": {
     "node": "0.4"
