@@ -12,7 +12,7 @@ What APIs? Currently, CA (cloud analytics) and CAPI.
     var CAPI = new clients.CAPI({
         url: "http://10.99.99.11",
         username: "admin",
-        password: "admin's password",
+        password: "admin's password"
     });
     CAPI.authenticate(username, password, function(err, customer) {});
 
