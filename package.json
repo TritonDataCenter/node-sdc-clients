@@ -22,7 +22,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst",
-    "test": "./node_modules/.bin/whiskey --timeout 600000 --concurrency 1 -t \"`find tst -name *.test.js | xargs`\""
+    "test": "./node_modules/.bin/whiskey --timeout 900000 --concurrency 1 -t \"`find tst -name *.test.js | xargs`\""
   },
   "engines": {
     "node": "0.4"

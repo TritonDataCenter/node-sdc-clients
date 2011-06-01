@@ -17,6 +17,7 @@ var zoneName = process.env.MAPI_ZONE_NAME;
 
 var createAlias = uuid();
 var createdZone = null;
+var createdVM = null;
 
 ///--- Tests
 
@@ -27,7 +28,7 @@ exports.setUp = function(test, assert) {
     username: 'admin',
     password: 'tot@ls3crit',
     retryOptions: {
-      retries: 5,
+      retries: 1,
       minTimeout: 1000
     }
   });
@@ -318,6 +319,86 @@ exports.test_delete_zone = function(test, assert) {
         test.finish();
       });
     }, 45 * 1000);
+  });
+};
+
+
+exports.test_list_vms = function(test, assert) {
+  mapi.listVMs(customer, function(err, vms) {
+    assert.ifError(err);
+    assert.ok(vms);
+    log.debug('mapi.test: list_vms => %o', vms);
+    test.finish();
+  });
+};
+
+
+exports.test_get_vm_not_found = function(test, assert) {
+  mapi.getVM(customer, uuid(), function(err, vm) {
+    assert.ok(err);
+    assert.ok(!vm);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    log.debug('mapi.test: get_vm_not_found => %o', err);
+    test.finish();
+  });
+};
+
+
+exports.test_get_vm_bad_tenant = function(test, assert) {
+  mapi.getVM(uuid(), uuid(), function(err, vm) {
+    assert.ok(err);
+    assert.ok(!vm);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    log.debug('mapi.test: get_vm_not_found => %o', err);
+    test.finish();
+  });
+};
+
+
+exports.test_create_vm = function(test, assert) {
+  var name = 'a' + uuid().substr(0,6);
+  var opts = {
+    dataset: 'b66fb52a-6a8a-11e0-94cd-b347300c5a06',
+    networks: 'external',
+    alias: name,
+    hostname: name
+  };
+  opts['package'] = 'regular_128';
+  mapi.createVM(customer, opts, function(err, vm) {
+    log.debug('mapi.test: create_vm => e=%o, vm=%o', err, vm);
+    assert.ifError(err);
+    assert.ok(vm);
+    assert.equal(opts.alias, vm.alias);
+    createdVM = vm.name;
+    setTimeout(function() {
+      test.finish();
+    }, 120 * 1000);
+  });
+};
+
+
+// Blocked on PROV-831
+// exports.test_shutdown_vm = function(test, assert) {
+//   mapi.shutdownVM(customer, createdVM, function(err) {
+//     log.debug('mapi.test: shutdown_vm => e=%o', err);
+//     assert.ifError(err);
+//     setTimeout(function() {
+//       test.finish();
+//     }, 120 * 1000);
+//   });
+// };
+
+
+exports.test_delete_vm = function(test, assert) {
+  mapi.deleteVM(customer, createdVM, function(err) {
+    log.debug('mapi.test: shutdown_vm => e=%o', err);
+    assert.ifError(err);
+    assert.ok(vm);
+    test.finish();
   });
 };
 
