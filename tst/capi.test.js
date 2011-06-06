@@ -224,6 +224,41 @@ exports.test_del_metadata = function(test, assert) {
 };
 
 
+exports.test_put_limits = function(test, assert) {
+  capi.putLimit('930896af-bf8c-48d4-885c-6573a94b1853',
+                'coal',
+                'smartos',
+                4,
+                function(err) {
+    assert.ifError(err);
+    test.finish();
+  });
+};
+
+
+exports.test_list_limits = function(test, assert) {
+  capi.listLimits('930896af-bf8c-48d4-885c-6573a94b1853',
+                  function(err, limits) {
+    assert.ifError(err);
+    assert.ok(limits);
+    assert.equal(limits[0].type, 'smartos');
+    assert.equal(limits[0].value, 4);
+    test.finish();
+  });
+};
+
+
+exports.test_del_limit = function(test, assert) {
+  capi.deleteLimit('930896af-bf8c-48d4-885c-6573a94b1853',
+                   'coal',
+                   'smartos',
+                   function(err) {
+    assert.ifError(err);
+    test.finish();
+  });
+};
+
+
 exports.tearDown = function(test, assert) {
   test.finish();
 };
