@@ -25,3 +25,8 @@ What APIs? Currently, CA (cloud analytics) and CAPI.
 See the inline jsdoc. We should generate HTML docs from those. Have any
 suggestions for that?
 
+# Tests
+
+Run the tests like this
+
+    ./node_modules/.bin/whiskey --timeout 5000 --concurrency 1 --tests "`find tst | grep test.js | xargs`"
