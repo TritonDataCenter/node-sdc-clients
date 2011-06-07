@@ -22,7 +22,7 @@ var createdVM = null;
 ///--- Tests
 
 exports.setUp = function(test, assert) {
-  log.level(log.Level.Trace);
+  //log.level(log.Level.Trace);
   mapi = new MAPI({
     url: 'http://10.99.99.8:8080',
     username: 'admin',
