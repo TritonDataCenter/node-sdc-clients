@@ -273,16 +273,23 @@ exports.test_create_zone = function(test, assert) {
 };
 
 
+exports.test_invalid_zone_state = function(test, assert) {
+  mapi.deleteZone(customer, createdZone, function(err) {
+    assert.ok(err);
+    assert.equal(err.httpCode, 409);
+    assert.equal(err.restCode, 'InvalidState');
+    assert.ok(err.message);
+    log.debug('mapi.test: invalid_zone_state err => %o', err);
+    test.finish();
+  });
+};
+
 exports.test_shutdown_zone = function(test, assert) {
   mapi.shutdownZone(customer, createdZone, function(err) {
     assert.ifError(err);
     setTimeout(function() {
       mapi.shutdownZone(customer, createdZone, function(err) {
-        assert.ok(err);
-        assert.equal(err.httpCode, 409);
-        assert.equal(err.restCode, 'InvalidState');
-        assert.ok(err.message);
-        log.debug('mapi.test: shutdown_zone err => %o', err);
+        assert.ifError(err);
         test.finish();
       });
     }, 45 * 1000);
