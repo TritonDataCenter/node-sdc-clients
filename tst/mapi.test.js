@@ -330,6 +330,16 @@ exports.test_delete_zone = function(test, assert) {
 };
 
 
+exports.test_count_vms_all = function(test, assert) {
+  mapi.countVMs(customer, function(err, count) {
+    assert.ifError(err);
+    assert.isDefined(count);
+    log.debug('mapi.test: count_vms => %o', count);
+    test.finish();
+  });
+};
+
+
 exports.test_list_vms = function(test, assert) {
   mapi.listVMs(customer, function(err, vms) {
     assert.ifError(err);
@@ -365,14 +375,16 @@ exports.test_get_vm_bad_tenant = function(test, assert) {
   });
 };
 
-
+// NOTE: This test requires not only a provisionable HVM node
+// but also a customer with SSH Key in place.
 exports.test_create_vm = function(test, assert) {
   var name = 'a' + uuid().substr(0,6);
   var opts = {
-    dataset: 'b66fb52a-6a8a-11e0-94cd-b347300c5a06',
+    dataset_uuid: '6f6b0a2e-8dcd-11e0-9d84-000c293238eb',
     networks: 'external',
     alias: name,
-    hostname: name
+    hostname: name,
+    root_authorized_keys: 'ssh-dss AAAAB3NzaC1kc3MAAACBAJaDBDG/Wtn6aHgTVVLKF0FydITVdtdzlDp0fgnsD9Z7q4/bNWb83Hmlk2/ppfNJlABX2Yrn9f3iO1KbAz/qZ4YgxxDjStdGnPVTbhcrZe6a/dGYWWNJXwX4nFR5st+DuFTbAGPGaN1qujhNLJXuCnxd7ITwmUXACZxGGJhordmpAAAAFQCUooiLG2dN5KwPqyimuvyqmP9GQQAAAIEAken9e9IyyySxFr1SPRc+AelmkvefVE38B93K9Aj0/tJD10OA3T9s4pX/+hhTUt4TgKFO3NYq26q845erLRoKIPEQxBB9f+H0CdDdXpRpvMa/BS3NwYWEGApkKvrjO65NX5mEWlqVu0xkARqTOdlA6xNOa2IrXrICfTHQ/3GU5IgAAACBAIxylgDff72uBfdiGrgO5wZ/Qvxv6CLpm3RWshPBnSv0jcoQVtxuiBK+jpEAneA7dLwJEYnX60CPMoo5Rr6sch3YJGbnpNKQQPXiVvX3slNBReVqv6riMsyAju2BEE2azb0o0fE3qkIWbv0/Gc2sKLJK16zDqbccPlHyBfl3xWtL pedro@joyent.com'
   };
   opts['package'] = 'regular_128';
   mapi.createVM(customer, opts, function(err, vm) {
