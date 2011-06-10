@@ -21,7 +21,7 @@
     "whiskey": ">=0.3.3"
   },
   "scripts": {
-    "pretest": "./node_modules/.bin/jshint lib tst",
+    "pretest": "./node_modules/.bin/jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
     "test": "./node_modules/.bin/whiskey --timeout 900000 --concurrency 1 -t \"`find tst -name *.test.js | xargs`\""
   },
   "engines": {
