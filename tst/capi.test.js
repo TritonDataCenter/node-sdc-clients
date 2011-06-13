@@ -36,11 +36,11 @@ exports.setUp = function(test, assert) {
 };
 
 
-exports.test_get_account_and_cached = function(test, assert) {
-  capi.getAccount('admin', function(err, account) {
+exports.test_get_account_by_name_and_cached = function(test, assert) {
+  capi.getAccountByName('admin', function(err, account) {
     assert.ifError(err);
     assert.ok(account);
-    capi.getAccount('admin', function(err, account) {
+    capi.getAccountByName('admin', function(err, account) {
       assert.ifError(err);
       assert.ok(account);
       test.finish();
@@ -49,8 +49,38 @@ exports.test_get_account_and_cached = function(test, assert) {
 };
 
 
-exports.test_get_account_invalid_name = function(test, assert) {
-  capi.getAccount(uuid(), function(err, account) {
+exports.test_get_account_by_name_invalid_name = function(test, assert) {
+  capi.getAccountByName(uuid(), function(err, account) {
+    assert.ok(err);
+    assert.ok(!account);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+exports.test_get_account_and_cached = function(test, assert) {
+  capi.getAccountByName('admin', function(err, account) {  // Get UUID first.
+    var uuid = account.uuid;
+
+    capi.getAccount(uuid, function(err, account) {
+      assert.ifError(err);
+      assert.ok(account);
+      assert.equal(account.uuid, uuid);
+      assert.equal(account.login, "admin");
+      capi.getAccount(uuid, function(err, account) {
+        assert.ifError(err);
+        assert.ok(account);
+        test.finish();
+      });
+    });
+
+  });
+};
+
+exports.test_get_account_invalid_uuid = function(test, assert) {
+  capi.getAccountByName("foobar", function(err, account) {
     assert.ok(err);
     assert.ok(!account);
     assert.equal(err.httpCode, 404);
