@@ -11,6 +11,7 @@ var CloudAPI = sdcClients.CloudAPI;
 var LOGIN = 'admin';
 var KNAME = 'rsa-1';
 var client = null;
+var stubClient = null;
 var publicKey = null;
 var privateKey = null;
 
@@ -567,11 +568,219 @@ exports.test_list_datacenters_404 = function(test, assert) {
 
 
 exports.test_create_datacenter_client_no_acct_param = function(test, assert) {
+  // NoOp this shit to test API parameterization...
+  // We're going to use the client in some of the machines test.
+  process.env.SDC_TESTING = true;
+
   client.createClientForDatacenter('coal', function(err, newClient) {
     assert.ifError(err);
     assert.ok(newClient);
     assert.ok(newClient.listDatacenters);
+    stubClient = newClient;
     test.finish();
+  });
+};
+
+
+///--- Machines Tests
+
+exports.stub_test_create_machine_no_params = function(test, assert) {
+  assert.ok(stubClient);
+  stubClient.createMachine(function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    test.finish();
+  });
+};
+
+
+exports.stub_test_create_machine_no_account = function(test, assert) {
+  assert.ok(stubClient);
+  stubClient.createMachine({}, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    test.finish();
+  });
+};
+
+
+exports.stub_test_create_machine = function(test, assert) {
+  assert.ok(stubClient);
+  stubClient.createMachine(LOGIN, {}, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    test.finish();
+  });
+};
+
+
+exports.stub_test_create_machine_opts_string = function(test, assert) {
+  assert.ok(stubClient);
+  var opts = {
+    dataset: 'stub'
+  };
+  opts['package'] = 'regular_128';
+  stubClient.createMachine(LOGIN, opts, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    test.finish();
+  });
+};
+
+
+exports.stub_test_create_machine_opts_obj = function(test, assert) {
+  assert.ok(stubClient);
+  var opts = {
+    dataset: {
+      id: 'stub'
+    }
+  };
+  opts['package'] = {
+    name: 'regular_128'
+  };
+  stubClient.createMachine(LOGIN, opts, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    test.finish();
+  });
+};
+
+
+// Do real machine creation tests
+
+if (!process.env.SDC_TESTING)
+exports.test_create_machine_acct_404 = function(test, assert) {
+  client.createMachine(uuid(), {}, function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+if (!process.env.SDC_TESTING)
+exports.test_create_machine = function(test, assert) {
+  var opts = {
+    name: 'unitTest'
+  };
+  client.createMachine(opts, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    assert.ok(machine.id);
+    assert.equal(machine.name, 'unitTest');
+    assert.equal(machine.type, 'smartmachine');
+    assert.equal(machine.owner, 'admin');
+    assert.equal(machine.state, 'provisioning');
+    assert.ok(machine.memory);
+    assert.ok(machine.disk);
+    assert.ok(machine.ips);
+    test.finish();
+  });
+};
+
+
+exports.test_list_machines = function(test, assert) {
+  var opts = {
+    type: 'smartmachine'
+  };
+  client.listMachines(opts, function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    assert.ok(machines[0].id);
+    assert.equal(machines[0].type, 'smartmachine');
+    assert.ok(machines[0].owner);
+    assert.ok(machines[0].state);
+    assert.ok(machines[0].memory);
+    assert.ok(machines[0].disk);
+    assert.ok(machines[0].ips);
+    test.finish();
+  });
+};
+
+
+exports.test_get_machine_by_object = function(test, assert) {
+  client.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    assert.ok(machines[0].id);
+    client.getMachine(machines[0], function(err, machine) {
+      assert.ifError(err);
+      assert.ok(machine);
+      assert.equal(machines[0].id, machine.id);
+      assert.equal(machines[0].type, machine.type);
+      assert.equal(machines[0].owner, machine.owner);
+      assert.equal(machines[0].name, machine.name);
+      assert.equal(machines[0].disk, machine.disk);
+      assert.ok(machine.state);
+      assert.ok(machine.ips);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_machine_by_id = function(test, assert) {
+  client.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    assert.ok(machines[0].id);
+    client.getMachine(machines[0].id, function(err, machine) {
+      assert.ifError(err);
+      assert.ok(machine);
+      assert.equal(machines[0].id, machine.id);
+      assert.equal(machines[0].type, machine.type);
+      assert.equal(machines[0].owner, machine.owner);
+      assert.equal(machines[0].name, machine.name);
+      assert.equal(machines[0].disk, machine.disk);
+      assert.ok(machine.state);
+      assert.ok(machine.ips);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_machine_404 = function(test, assert) {
+  client.getMachine(uuid(), function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_shutdown_machine = function(test, assert) {
+  client.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    assert.ok(machines[0].id);
+    client.stopMachine(machines[0], function(err) {
+      assert.ifError(err);
+      setTimeout(function() {
+        test.finish();
+      }, 3000);
+    });
+  });
+};
+
+
+exports.test_delete_machine = function(test, assert) {
+  client.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    assert.ok(machines[0].id);
+    client.deleteMachine(machines[0], function(err) {
+      assert.ifError(err);
+      test.finish();
+    });
   });
 };
 
