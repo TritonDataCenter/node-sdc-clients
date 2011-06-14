@@ -398,7 +398,6 @@ exports.test_list_packages_no_acct_param = function(test, assert) {
     assert.ok(packages);
     assert.ok(packages.length);
     assert.ok(packages[0].name);
-    assert.ok(packages[0].cpu);
     assert.ok(packages[0].memory);
     assert.ok(packages[0].disk);
     assert.ok((packages[0]['default'] !== undefined));
@@ -413,7 +412,6 @@ exports.test_list_packages = function(test, assert) {
     assert.ok(packages);
     assert.ok(packages.length);
     assert.ok(packages[0].name);
-    assert.ok(packages[0].cpu);
     assert.ok(packages[0].memory);
     assert.ok(packages[0].disk);
     assert.ok((packages[0]['default'] !== undefined));
@@ -531,6 +529,49 @@ exports.test_get_package_by_name_404 = function(test, assert) {
       assert.ok(err.message);
       test.finish();
     });
+  });
+};
+
+
+///--- Datacenters Tests
+
+exports.test_list_datacenters_no_acct_param = function(test, assert) {
+  client.listDatacenters(function(err, datacenters) {
+    assert.ifError(err);
+    assert.ok(datacenters);
+    assert.ok(datacenters.coal);
+    test.finish();
+  });
+};
+
+
+exports.test_list_datacenters = function(test, assert) {
+  client.listDatacenters(LOGIN, function(err, datacenters) {
+    assert.ifError(err);
+    assert.ok(datacenters);
+    assert.ok(datacenters.coal);
+    test.finish();
+  });
+};
+
+
+exports.test_list_datacenters_404 = function(test, assert) {
+  client.listDatacenters(uuid(), function(err, datacenters) {
+    assert.ok(err);
+    assert.ok(!datacenters);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_create_datacenter_client_no_acct_param = function(test, assert) {
+  client.createClientForDatacenter('coal', function(err, newClient) {
+    assert.ifError(err);
+    assert.ok(newClient);
+    assert.ok(newClient.listDatacenters);
+    test.finish();
   });
 };
 
