@@ -22,6 +22,8 @@ function _trim(str) {
 
 
 
+///--- Start Tests
+
 exports.setUp = function(test, assert) {
   sdcClients.setLogLevel('debug');
   client = new CloudAPI({
@@ -270,6 +272,270 @@ exports.test_get_key_404 = function(test, assert) {
   });
 };
 
+
+///--- Datasets Tests
+
+exports.test_list_datasets_no_acct_param = function(test, assert) {
+  client.listDatasets(function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    assert.ok(datasets[0].name);
+    assert.ok(datasets[0].id);
+    assert.ok(datasets[0].os);
+    assert.ok(datasets[0].version);
+    assert.ok((datasets[0]['default'] !== undefined));
+    test.finish();
+  });
+};
+
+
+exports.test_list_datasets = function(test, assert) {
+  client.listDatasets(LOGIN, function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    assert.ok(datasets[0].name);
+    assert.ok(datasets[0].id);
+    assert.ok(datasets[0].os);
+    assert.ok(datasets[0].version);
+    assert.ok((datasets[0]['default'] !== undefined));
+    test.finish();
+  });
+};
+
+
+exports.test_list_datasets_404 = function(test, assert) {
+  client.listDatasets(uuid(), function(err, datasets) {
+    assert.ok(err);
+    assert.ok(!datasets);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_get_dataset_no_acct_param = function(test, assert) {
+  client.listDatasets(function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    client.getDataset(datasets[0], function(err, dataset) {
+      assert.ifError(err);
+      assert.ok(dataset);
+      assert.ok(datasets[0].name, datasets.name);
+      assert.ok(datasets[0].id, dataset.id);
+      assert.ok(datasets[0].os, dataset.os);
+      assert.ok(datasets[0].version, dataset.version);
+      assert.equal(datasets[0]['default'], dataset['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_dataset_no_acct_param_by_name = function(test, assert) {
+  client.listDatasets(function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    client.getDataset(datasets[0].id, function(err, dataset) {
+      assert.ifError(err);
+      assert.ok(dataset);
+      assert.ok(datasets[0].name, datasets.name);
+      assert.ok(datasets[0].id, dataset.id);
+      assert.ok(datasets[0].os, dataset.os);
+      assert.ok(datasets[0].version, dataset.version);
+      assert.equal(datasets[0]['default'], dataset['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_dataset_by_name = function(test, assert) {
+  client.listDatasets(function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    client.getDataset(LOGIN, datasets[0].id, function(err, dataset) {
+      assert.ifError(err);
+      assert.ok(dataset);
+      assert.ok(datasets[0].name, datasets.name);
+      assert.ok(datasets[0].id, dataset.id);
+      assert.ok(datasets[0].os, dataset.os);
+      assert.ok(datasets[0].version, dataset.version);
+      assert.equal(datasets[0]['default'], dataset['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_dataset_by_name_acct_404 = function(test, assert) {
+  client.listDatasets(function(err, datasets) {
+    assert.ifError(err);
+    assert.ok(datasets);
+    assert.ok(datasets.length);
+    client.getDataset(uuid(), datasets[0].id, function(err, dataset) {
+      assert.ok(err);
+      assert.ok(!dataset);
+      assert.equal(err.code, 'ResourceNotFound');
+      assert.ok(err.message);
+      test.finish();
+    });
+  });
+};
+
+
+
+///--- Packages Tests
+
+exports.test_list_packages_no_acct_param = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    assert.ok(packages[0].name);
+    assert.ok(packages[0].cpu);
+    assert.ok(packages[0].memory);
+    assert.ok(packages[0].disk);
+    assert.ok((packages[0]['default'] !== undefined));
+    test.finish();
+  });
+};
+
+
+exports.test_list_packages = function(test, assert) {
+  client.listPackages(LOGIN, function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    assert.ok(packages[0].name);
+    assert.ok(packages[0].cpu);
+    assert.ok(packages[0].memory);
+    assert.ok(packages[0].disk);
+    assert.ok((packages[0]['default'] !== undefined));
+    test.finish();
+  });
+};
+
+
+exports.test_list_packages_404 = function(test, assert) {
+  client.listPackages(uuid(), function(err, packages) {
+    assert.ok(err);
+    assert.ok(!packages);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_get_package_no_acct_param = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(packages[0], function(err, pkg) {
+      assert.ifError(err);
+      assert.ok(pkg);
+      assert.equal(packages[0].name, pkg.name);
+      assert.equal(packages[0].memory, pkg.memory);
+      assert.equal(packages[0].disk, pkg.disk);
+      assert.equal(packages[0]['default'], pkg['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_package_no_acct_param_by_name = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(packages[0].name, function(err, pkg) {
+      assert.ifError(err);
+      assert.ok(pkg);
+      assert.equal(packages[0].name, pkg.name);
+      assert.equal(packages[0].memory, pkg.memory);
+      assert.equal(packages[0].disk, pkg.disk);
+      assert.equal(packages[0]['default'], pkg['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_package_by_name = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(LOGIN, packages[0].name, function(err, pkg) {
+      assert.ifError(err);
+      assert.ok(pkg);
+      assert.equal(packages[0].name, pkg.name);
+      assert.equal(packages[0].memory, pkg.memory);
+      assert.equal(packages[0].disk, pkg.disk);
+      assert.equal(packages[0]['default'], pkg['default']);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_package_by_name_acct_404 = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(uuid(), packages[0].name, function(err, pkg) {
+      assert.ok(err);
+      assert.ok(!pkg);
+      assert.equal(err.code, 'ResourceNotFound');
+      assert.ok(err.message);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_package_by_name_404 = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(uuid(), function(err, pkg) {
+      assert.ok(err);
+      assert.ok(!pkg);
+      assert.equal(err.code, 'ResourceNotFound');
+      assert.ok(err.message);
+      test.finish();
+    });
+  });
+};
+
+
+exports.test_get_package_by_name_404 = function(test, assert) {
+  client.listPackages(function(err, packages) {
+    assert.ifError(err);
+    assert.ok(packages);
+    assert.ok(packages.length);
+    client.getPackage(uuid(), function(err, pkg) {
+      assert.ok(err);
+      assert.ok(!pkg);
+      assert.equal(err.code, 'ResourceNotFound');
+      assert.ok(err.message);
+      test.finish();
+    });
+  });
+};
+
+
+///--- Tests Done
 
 exports.tearDown = function(test, assert) {
   client.listKeys(function(err, keys) {
