@@ -75,6 +75,20 @@ exports.test_get_account = function(test, assert) {
 };
 
 
+exports.test_get_account_by_object = function(test, assert) {
+  client.getAccount(function(err, account) {
+    client.getAccount(account, function(err, account) {
+      assert.ifError(err);
+      assert.ok(account);
+      assert.equal(account.id, '930896af-bf8c-48d4-885c-6573a94b1853');
+      assert.equal(account.firstName, 'Admin');
+      assert.equal(account.lastName, 'User');
+      assert.equal(account.email, 'user@joyent.com');
+      test.finish();
+    });
+  });
+};
+
 exports.test_get_account_404 = function(test, assert) {
   client.getAccount(uuid(), function(err, account) {
     assert.ok(err);
