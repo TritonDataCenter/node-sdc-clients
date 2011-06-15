@@ -10,11 +10,12 @@ var CloudAPI = sdcClients.CloudAPI;
 
 var LOGIN = 'admin';
 var KNAME = 'rsa-1';
+
 var client = null;
 var stubClient = null;
 var publicKey = null;
 var privateKey = null;
-
+var inst = null;
 
 
 function _trim(str) {
@@ -755,6 +756,7 @@ exports.test_get_machine_404 = function(test, assert) {
 };
 
 
+if (!process.env.SDC_TESTING)
 exports.test_shutdown_machine = function(test, assert) {
   client.listMachines(function(err, machines) {
     assert.ifError(err);
@@ -771,6 +773,7 @@ exports.test_shutdown_machine = function(test, assert) {
 };
 
 
+if (!process.env.SDC_TESTING)
 exports.test_delete_machine = function(test, assert) {
   client.listMachines(function(err, machines) {
     assert.ifError(err);
@@ -781,6 +784,103 @@ exports.test_delete_machine = function(test, assert) {
       assert.ifError(err);
       test.finish();
     });
+  });
+};
+
+
+///--- Analytics Tests
+
+exports.test_get_metrics = function(test, assert) {
+  client.describeAnalytics(function(err, metrics) {
+    assert.ifError(err);
+    assert.ok(metrics);
+    test.finish();
+  });
+};
+
+
+exports.test_create_inst = function(test, assert) {
+  var opts = {
+    module: 'fs',
+    stat: 'logical_ops',
+    decomposition: 'latency'
+  };
+  client.createInstrumentation(LOGIN, opts, function(err, newInst) {
+    assert.ifError(err);
+    inst = newInst;
+    assert.ok(inst);
+    assert.ok(inst.id);
+    test.finish();
+  });
+};
+
+
+exports.test_get_inst = function(test, assert) {
+  client.getInstrumentation(inst, function(err, inst2) {
+    assert.ifError(err);
+    assert.ok(inst);
+    assert.equal(inst.id, inst.id);
+    test.finish();
+  });
+};
+
+
+exports.test_list_inst = function(test, assert) {
+  client.listInstrumentations(function(err, insts) {
+    assert.ifError(err);
+    assert.ok(insts);
+    assert.ok(insts.length);
+    test.finish();
+  });
+};
+
+
+exports.test_list_inst_404 = function(test, assert) {
+  client.listInstrumentations(uuid(), function(err, insts) {
+    assert.ok(err);
+    assert.ok(!insts);
+    assert.equal(err.code, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_get_inst_value = function(test, assert) {
+  client.getInstrumentationValue(inst, function(err, value) {
+    assert.ifError(err);
+    assert.ok(value);
+    test.finish();
+  });
+};
+
+
+exports.test_get_inst_hmap = function(test, assert) {
+  client.getInstrumentationHeatmap(inst, function(err, hmap) {
+    assert.ifError(err);
+    assert.ok(hmap.image);
+    test.finish();
+  });
+};
+
+
+exports.test_get_inst_hmap_details = function(test, assert) {
+  var opts = {
+    x: 4,
+    y: 5
+  };
+  client.getInstrumentationHeatmapDetails(inst, opts, function(err, hmap) {
+    assert.ifError(err);
+    assert.ok(hmap.image);
+    test.finish();
+  });
+};
+
+
+exports.test_del_inst = function(test, assert) {
+  client.deleteInstrumentation(inst, function(err) {
+    assert.ifError(err);
+    test.finish();
   });
 };
 
