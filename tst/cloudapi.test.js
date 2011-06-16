@@ -663,7 +663,7 @@ exports.stub_test_create_machine_opts_obj = function(test, assert) {
 
 // Do real machine creation tests
 
-if (!process.env.SDC_TESTING)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_create_machine_acct_404 = function(test, assert) {
   client.createMachine(uuid(), {}, function(err, machine) {
     assert.ok(err);
@@ -674,7 +674,7 @@ exports.test_create_machine_acct_404 = function(test, assert) {
   });
 };
 
-if (!process.env.SDC_TESTING)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_create_machine = function(test, assert) {
   var opts = {
     name: 'unitTest'
@@ -770,7 +770,7 @@ exports.test_get_machine_404 = function(test, assert) {
 };
 
 
-if (!process.env.SDC_TESTING)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_shutdown_machine = function(test, assert) {
   client.listMachines(function(err, machines) {
     assert.ifError(err);
@@ -787,7 +787,7 @@ exports.test_shutdown_machine = function(test, assert) {
 };
 
 
-if (!process.env.SDC_TESTING)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_delete_machine = function(test, assert) {
   client.listMachines(function(err, machines) {
     assert.ifError(err);

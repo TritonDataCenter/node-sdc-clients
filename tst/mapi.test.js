@@ -252,7 +252,7 @@ exports.test_get_zone_not_found = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_create_zone = function(test, assert) {
   var opts = {
     dataset_uuid: datasetUuid,
@@ -274,7 +274,7 @@ exports.test_create_zone = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_invalid_zone_state = function(test, assert) {
   mapi.deleteZone(customer, createdZone, function(err) {
     assert.ok(err);
@@ -287,7 +287,7 @@ exports.test_invalid_zone_state = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_shutdown_zone = function(test, assert) {
   mapi.shutdownZone(customer, createdZone, function(err) {
     assert.ifError(err);
@@ -301,7 +301,7 @@ exports.test_shutdown_zone = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_start_zone = function(test, assert) {
   mapi.startupZone(customer, createdZone, function(err) {
     assert.ifError(err);
@@ -312,7 +312,7 @@ exports.test_start_zone = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_reboot_zone = function(test, assert) {
   mapi.rebootZone(customer, createdZone, function(err) {
     assert.ifError(err);
@@ -323,7 +323,7 @@ exports.test_reboot_zone = function(test, assert) {
 };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_delete_zone = function(test, assert) {
   mapi.shutdownZone(customer, createdZone, function(err) {
     assert.ifError(err);
@@ -385,7 +385,7 @@ exports.test_get_vm_bad_tenant = function(test, assert) {
 
 // NOTE: This test requires not only a provisionable HVM node
 // but also a customer with SSH Key in place.
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_create_vm = function(test, assert) {
   var name = 'a' + uuid().substr(0,6);
   var opts = {
@@ -421,7 +421,7 @@ exports.test_create_vm = function(test, assert) {
 // };
 
 
-if (!process.env.MAPI_NO_PROVISION)
+if (!process.env.NO_PROVISION_TESTS)
 exports.test_delete_vm = function(test, assert) {
   mapi.deleteVM(customer, createdVM, function(err) {
     log.debug('mapi.test: shutdown_vm => e=%o', err);
