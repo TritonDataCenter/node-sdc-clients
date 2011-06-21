@@ -174,6 +174,17 @@ exports.test_delete_instrumentation_bad = function(test, assert) {
 };
 
 
+// exports.test_clone_instrumentation = function(test, assert) {
+//   ca.cloneInstrumentation(customer, instrumentation, function(err, inst) {
+//     assert.ifError(err);
+//     ca.deleteInstrumentation(customer, inst, function(err) {
+//       assert.ifError(err);
+//       test.finish();
+//     });
+//   });
+// };
+
+
 exports.test_delete_instrumentation = function(test, assert) {
   ca.deleteInstrumentation(customer, instrumentation, function(err) {
     assert.ifError(err);

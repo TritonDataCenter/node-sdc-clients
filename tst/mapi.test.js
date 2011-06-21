@@ -52,13 +52,15 @@ exports.test_list_datasets = function(test, assert) {
 
 
 exports.test_get_dataset = function(test, assert) {
-  // MAPI works with both uuid and id, so i'm kind of lying here
-  // and just using the "guaranteed to be at least 1" dataset monotonic id.
-  mapi.getDataset(customer, 1, function(err, dataset) {
+  mapi.listDatasets(customer, function(err, datasets) {
     assert.ifError(err);
-    assert.ok(dataset);
-    log.debug('mapi.test: get_dataset => %o', dataset);
-    test.finish();
+    assert.ok(datasets.length);
+    mapi.getDataset(customer, datasets[0].uuid, function(err, dataset) {
+      assert.ifError(err);
+      assert.ok(dataset);
+      log.debug('mapi.test: get_dataset => %o', dataset);
+      test.finish();
+    });
   });
 };
 
