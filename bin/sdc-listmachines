@@ -24,11 +24,13 @@ var Options = {
   "offset": Number,
   "state": String,
   "type": String,
+  "tombstone": Number,
   "url": url
 };
 
 var ShortOptions = {
   "a": ["--account"],
+  "b": ["--tombstone"],
   "d": ["--debug"],
   "e": ["--dataset"],
   "h": ["--help"],
@@ -57,6 +59,7 @@ if (parsed.memory) opts.memory = parsed.memory;
 if (parsed.name) opts.name = parsed.name;
 if (parsed.offset) opts.offset = parsed.offset;
 if (parsed.state) opts.state = parsed.state;
+if (parsed.tombstone) opts.tombstone = parsed.tombstone;
 if (parsed.type) opts.type = parsed.type;
 
 var client = common.newClient(parsed);
