@@ -14,6 +14,7 @@ var common = require('../lib/cli_common');
 
 var Options = {
   "account": String,
+  "clone": Number,
   "debug": Boolean,
   "decomposition": String,
   "help": Boolean,
@@ -27,6 +28,7 @@ var Options = {
 
 var ShortOptions = {
   "a": ["--account"],
+  "c": ["--clone"],
   "d": ["--debug"],
   "h": ["--help"],
   "?": ["--help"],
@@ -57,6 +59,9 @@ if (parsed.decomposition)
 
 if (parsed.predicate)
   opts.predicate = parsed.predicate;
+
+if (parsed.clone)
+  opts.clone = parsed.clone;
 
 var client = common.newClient(parsed);
 client.createInstrumentation(opts, common.callback);
