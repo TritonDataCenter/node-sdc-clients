@@ -12,6 +12,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "lru-cache": ">=1.0.2",
+    "nopt": ">=1.0.5",
     "restify": ">=0.2.3",
     "sprintf": ">=0.1.1"
   },
