@@ -34,6 +34,7 @@ var ShortOptions = {
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions);
-var client = common.newClient(parsed);
-client.describeAnalytics(common.callback);
+common.parseArguments(Options, ShortOptions, function(parsred) {
+  var client = common.newClient(parsed);
+  client.describeAnalytics(common.callback);
+});

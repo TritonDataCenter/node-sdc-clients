@@ -44,24 +44,27 @@ var ShortOptions = {
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions);
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  var opts = {};
+  if (parsed.module)
+    opts.module = parsed.module;
+
+  if (parsed.stat)
+    opts.stat = parsed.stat;
+
+  if (parsed.decomposition)
+    opts.decomposition = parsed.decomposition;
+
+  if (parsed.predicate)
+    opts.predicate = parsed.predicate;
+
+  if (parsed.clone)
+    opts.clone = parsed.clone;
+
+  var client = common.newClient(parsed);
+  client.createInstrumentation(opts, common.callback);
+});
 
 
-var opts = {};
-if (parsed.module)
-  opts.module = parsed.module;
 
-if (parsed.stat)
-  opts.stat = parsed.stat;
 
-if (parsed.decomposition)
-  opts.decomposition = parsed.decomposition;
-
-if (parsed.predicate)
-  opts.predicate = parsed.predicate;
-
-if (parsed.clone)
-  opts.clone = parsed.clone;
-
-var client = common.newClient(parsed);
-client.createInstrumentation(opts, common.callback);

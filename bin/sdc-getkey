@@ -36,9 +36,10 @@ var usageStr = common.buildUsageString(Options) + ' key_name';
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions, usageStr);
-if (parsed.argv.remain.length < 1)
-  common.usage(usageStr, 1, 'key_name required');
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'key_name required');
 
-var client = common.newClient(parsed);
-client.getKey(parsed.argv.remain[0], common.callback);
+  var client = common.newClient(parsed);
+  client.getKey(parsed.argv.remain[0], common.callback);
+}, usageStr);

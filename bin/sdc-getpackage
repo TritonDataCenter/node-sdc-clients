@@ -36,9 +36,10 @@ var usageStr = common.buildUsageString(Options) + ' package';
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions, usageStr);
-if (parsed.argv.remain.length < 1)
-  common.usage(usageStr, 1, 'package required');
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'package required');
 
-var client = common.newClient(parsed);
-client.getPackage(parsed.argv.remain[0], common.callback);
+  var client = common.newClient(parsed);
+  client.getPackage(parsed.argv.remain[0], common.callback);
+}, usageStr);

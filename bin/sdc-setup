@@ -156,7 +156,13 @@ prompt('Username (login): ', process.env.USER, function(err, username) {
         username: username,
         password: password
       });
+
+      // So that SSH agent support automagically works (if using the CLI),
+      // pick the name to be the same as what SSH Agent will pass in the
+      // comment field (well, the file name, not the full path).
+      var keyName = file.split('/');
       var opts = {
+        name: keyName[keyName.length - 1].split('.')[0],
         key: key
       }
       client.createKey(opts, function(err, key) {

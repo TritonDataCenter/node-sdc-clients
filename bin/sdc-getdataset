@@ -36,9 +36,10 @@ var usageStr = common.buildUsageString(Options) + ' dataset';
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions, usageStr);
-if (parsed.argv.remain.length < 1)
-  common.usage(usageStr, 1, 'dataset required');
+common.parseArguments(Options, ShortOptions, function(req) {
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'dataset required');
 
-var client = common.newClient(parsed);
-client.getDataset(parsed.argv.remain[0], common.callback);
+  var client = common.newClient(parsed);
+  client.getDataset(parsed.argv.remain[0], common.callback);
+}, usageStr);

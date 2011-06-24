@@ -51,17 +51,21 @@ function loadNewKey(key) {
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions, usageStr);
-if (parsed.argv.remain.length < 1)
-  common.usage(usageStr, 1, 'ssh_key required');
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  common.parseArguments(Options, ShortOptions, usageStr);
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'ssh_key required');
 
+  var opts = {
+    key: loadNewKey(parsed.argv.remain[0])
+  };
+  if (parsed.name) {
+    opts.name = parsed.name;
+  } else {
+    var name = parsed.argv.remain[0].split('/');
+    opts.name = name[name.length - 1];
+  }
 
-var opts = {
-  key: loadNewKey(parsed.argv.remain[0])
-};
-if (parsed.name)
-  opts.name = parsed.name;
-
-
-var client = common.newClient(parsed);
-client.createKey(opts, common.callback);
+  var client = common.newClient(parsed);
+  client.createKey(opts, common.callback);
+}, usageStr);

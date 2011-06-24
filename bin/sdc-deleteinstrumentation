@@ -36,11 +36,12 @@ var usageStr = common.buildUsageString(Options) + ' instrumentation_id';
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions, usageStr);
-if (parsed.argv.remain.length < 1)
-  common.usage(usageStr, 1, 'instrumentation required');
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'instrumentation required');
 
-var id = parseInt(parsed.argv.remain[0], 10);
-var client = common.newClient(parsed);
+  var id = parseInt(parsed.argv.remain[0], 10);
+  var client = common.newClient(parsed);
 
-client.deleteInstrumentation(id, common.callback);
+  client.deleteInstrumentation(id, common.callback);
+}, usageStr);

@@ -50,17 +50,19 @@ var ShortOptions = {
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions);
+common.parseArguments(Options, ShortOptions, function(parsed) {
 
-var opts = {}
-if (parsed.dataset) opts.dataset = parsed.dataet;
-if (parsed.limit) opts.limit = parsed.limit;
-if (parsed.memory) opts.memory = parsed.memory;
-if (parsed.name) opts.name = parsed.name;
-if (parsed.offset) opts.offset = parsed.offset;
-if (parsed.state) opts.state = parsed.state;
-if (parsed.tombstone) opts.tombstone = parsed.tombstone;
-if (parsed.type) opts.type = parsed.type;
+  var opts = {}
+  if (parsed.dataset) opts.dataset = parsed.dataet;
+  if (parsed.limit) opts.limit = parsed.limit;
+  if (parsed.memory) opts.memory = parsed.memory;
+  if (parsed.name) opts.name = parsed.name;
+  if (parsed.offset) opts.offset = parsed.offset;
+  if (parsed.state) opts.state = parsed.state;
+  if (parsed.tombstone) opts.tombstone = parsed.tombstone;
+  if (parsed.type) opts.type = parsed.type;
 
-var client = common.newClient(parsed);
-client.listMachines(opts, common.callback);
+  var client = common.newClient(parsed);
+  client.listMachines(opts, common.callback);
+
+});

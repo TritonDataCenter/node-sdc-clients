@@ -40,12 +40,12 @@ var ShortOptions = {
 
 ///--- Mainline
 
-var parsed = common.parseArguments(Options, ShortOptions);
+common.parseArguments(Options, ShortOptions, function(parsed) {
+  var opts = {}
+  if (parsed.dataset) opts.dataset = parsed.dataet;
+  if (parsed.name) opts.name = parsed.name;
+  if (parsed['package']) opts['package'] = parsed['package'];
 
-var opts = {}
-if (parsed.dataset) opts.dataset = parsed.dataet;
-if (parsed.name) opts.name = parsed.name;
-if (parsed['package']) opts['package'] = parsed['package'];
-
-var client = common.newClient(parsed);
-client.createMachine(opts, common.callback);
+  var client = common.newClient(parsed);
+  client.createMachine(opts, common.callback);
+});
