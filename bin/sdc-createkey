@@ -52,7 +52,7 @@ function loadNewKey(key) {
 ///--- Mainline
 
 common.parseArguments(Options, ShortOptions, function(parsed) {
-  common.parseArguments(Options, ShortOptions, usageStr);
+
   if (parsed.argv.remain.length < 1)
     common.usage(usageStr, 1, 'ssh_key required');
 
