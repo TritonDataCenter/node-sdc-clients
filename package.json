@@ -11,22 +11,22 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "lru-cache": ">=1.0.2",
-    "nopt": ">=1.0.5",
-    "restify": ">=0.3.5",
-    "sprintf": ">=0.1.1",
-    "ssh-agent": ">=0.1.0"
+    "lru-cache": "1.0.2",
+    "nopt": "1.0.5",
+    "restify": "0.3.6",
+    "sprintf": "0.1.1",
+    "ssh-agent": "0.1.0"
   },
   "devDependencies": {
-    "node-uuid": ">=1.1.0",
-    "jshint": ">=0.2.1",
-    "whiskey": ">=0.3.3"
+    "node-uuid": "1.1.0",
+    "jshint": "0.2.3",
+    "whiskey": "0.4.0"
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
     "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --quiet --timeout 30000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
   },
   "engines": {
-    "node": "0.4"
+    "node": "~0.4.9"
   }
 }
