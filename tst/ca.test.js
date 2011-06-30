@@ -140,7 +140,10 @@ exports.test_get_heatmap_bad = function(test, assert) {
 
 
 exports.test_get_heatmap_details = function(test, assert) {
-  ca.getHeatmapDetails(customer, instrumentation, 10, 20, function(err, hmap) {
+  ca.getHeatmapDetails(customer,
+                       instrumentation,
+                       {x:10,y:20},
+                       function(err, hmap) {
     assert.ifError(err);
     assert.ok(hmap);
     log.debug('ca.test: test_get_heatmap_details => %o', hmap);
@@ -150,7 +153,7 @@ exports.test_get_heatmap_details = function(test, assert) {
 
 
 exports.test_get_heatmap_details_bad = function(test, assert) {
-  ca.getHeatmapDetails(customer, uuid(), 10, 20, function(err, heatmap) {
+  ca.getHeatmapDetails(customer, uuid(), {x:10,y:20}, function(err, heatmap) {
     assert.ok(err);
     assert.ok(!heatmap);
     assert.equal(err.httpCode, 404);

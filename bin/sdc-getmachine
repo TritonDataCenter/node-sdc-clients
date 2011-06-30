@@ -30,16 +30,16 @@ var ShortOptions = {
   "u": ["--url"]
 };
 
-var usageStr = common.buildUsageString(Options);
-usageStr += ' machine';
+var usageStr = common.buildUsageString(Options) + ' machine(id)';
+
 
 
 ///--- Mainline
 
 common.parseArguments(Options, ShortOptions, function(parsed) {
   if (parsed.argv.remain.length < 1)
-    common.usage(usageStr, 1, 'machine required');
+    common.usage(usageStr, 1, 'machine(id) required');
 
   var client = common.newClient(parsed);
-  client.rebootMachine(parsed.argv.remain[0], common.callback);
+  client.getMachine(parsed.argv.remain[0], common.callback);
 }, usageStr);

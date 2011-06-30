@@ -685,7 +685,6 @@ exports.test_create_machine = function(test, assert) {
     assert.ok(machine.id);
     assert.equal(machine.name, 'unitTest');
     assert.equal(machine.type, 'smartmachine');
-    assert.equal(machine.owner, 'admin');
     assert.equal(machine.state, 'provisioning');
     assert.ok(machine.memory);
     assert.ok(machine.disk);
@@ -705,7 +704,6 @@ exports.test_list_machines = function(test, assert) {
     assert.ok(machines.length);
     assert.ok(machines[0].id);
     assert.equal(machines[0].type, 'smartmachine');
-    assert.ok(machines[0].owner);
     assert.ok(machines[0].state);
     assert.ok(machines[0].memory);
     assert.ok(machines[0].disk);
@@ -726,7 +724,6 @@ exports.test_get_machine_by_object = function(test, assert) {
       assert.ok(machine);
       assert.equal(machines[0].id, machine.id);
       assert.equal(machines[0].type, machine.type);
-      assert.equal(machines[0].owner, machine.owner);
       assert.equal(machines[0].name, machine.name);
       assert.equal(machines[0].disk, machine.disk);
       assert.ok(machine.state);
@@ -748,7 +745,6 @@ exports.test_get_machine_by_id = function(test, assert) {
       assert.ok(machine);
       assert.equal(machines[0].id, machine.id);
       assert.equal(machines[0].type, machine.type);
-      assert.equal(machines[0].owner, machine.owner);
       assert.equal(machines[0].name, machine.name);
       assert.equal(machines[0].disk, machine.disk);
       assert.ok(machine.state);

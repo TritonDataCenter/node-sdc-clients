@@ -24,7 +24,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
-    "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --timeout 30000 --concurrency 1 -t \"`find tst -name *.test.js | sort -r | xargs`\""
+    "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --quiet --timeout 30000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
   },
   "engines": {
     "node": "0.4"
