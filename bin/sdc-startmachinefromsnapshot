@@ -28,7 +28,7 @@ var ShortOptions = {
   "?": ["--help"],
   "i": ["--identity"],
   "k": ["--keyId"],
-  "s": ["--snapshot"],
+  "n": ["--snapshot"],
   "u": ["--url"]
 };
 
@@ -45,7 +45,7 @@ common.parseArguments(Options, ShortOptions, function(parsed) {
     common.usage(usageStr, 1, 'machine required');
 
   var client = common.newClient(parsed);
-  client.bootMachineFromSnapshot(parsed.argv.remain[0],
-                                 parsed.snapshot,
-                                 common.callback);
+  client.startMachineFromSnapshot(parsed.argv.remain[0],
+                                  parsed.snapshot,
+                                  common.callback);
 }, usageStr);
