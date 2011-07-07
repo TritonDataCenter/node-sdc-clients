@@ -54,11 +54,31 @@ exports.test_search_by_login = function(test, assert) {
     assert.ifError(err);
     assert.ok(accounts);
     assert.ok(accounts.length >= 1, 'Should find accounts');
-    var admin = accounts.filter(function (a) {
+    var admin = accounts.filter(function(a) {
       return a.login === 'admin';
     });
     assert.ok(admin.length === 1, 'Should only be one admin');
     test.finish();
+  });
+};
+
+
+exports.test_exact_search_by_email = function(test, assert) {
+  capi.findCustomer({ login: 'min' }, true, function(err, accounts) {
+    assert.ifError(err);
+    assert.ok(accounts);
+    assert.ok(accounts.length === 0 ||
+              accounts.length === 1, 'Should find 0 or 1 accounts');
+    if (accounts.length === 1) {
+      assert.equal(accounts[0].login, 'min');
+    }
+    capi.findCustomer({ login: 'admin' }, true, function(err, accounts) {
+      assert.ifError(err);
+      assert.ok(accounts);
+      assert.ok(accounts.length === 1, 'Should find 1 account');
+      assert.equal(accounts[0].login, 'admin');
+      test.finish();
+    })
   });
 };
 
