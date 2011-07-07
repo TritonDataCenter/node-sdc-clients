@@ -13,7 +13,7 @@
   "dependencies": {
     "lru-cache": "1.0.2",
     "nopt": "1.0.6",
-    "restify": "0.3.10",
+    "restify": "~0.3.12",
     "sprintf": "0.1.1",
     "ssh-agent": "0.1.0"
   },
@@ -23,8 +23,8 @@
     "whiskey": "0.4.0"
   },
   "scripts": {
-    "pretest": "./node_modules/.bin/jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
-    "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --quiet --timeout 30000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
+    "pretest": "jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
+    "test": "NO_PROVISION_TESTS=1 whiskey --quiet --timeout 30000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
   },
   "engines": {
     "node": "~0.4.9"
