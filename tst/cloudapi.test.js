@@ -694,6 +694,19 @@ exports.test_create_machine = function(test, assert) {
 };
 
 
+exports.test_count_machines = function(test, assert) {
+  var opts = {
+    type: 'smartmachine'
+  };
+  client.countMachines(opts, function(err, count) {
+    assert.ifError(err);
+    assert.ok(count);
+    assert.equal(typeof count, 'number');
+    test.finish();
+  });
+};
+
+
 exports.test_list_machines = function(test, assert) {
   var opts = {
     type: 'smartmachine'
