@@ -83,6 +83,23 @@ exports.test_exact_search_by_email = function(test, assert) {
 };
 
 
+exports.test_update_account = function(test, assert) {
+  capi.getAccountByName('admin', function(err, account) {
+    account.postal_code = '12345';
+    capi.updateAccount(account, function(err, account) {
+      assert.ifError(err);
+      assert.equal(account.postal_code, '12345');
+      account.postal_code = '94104';
+      capi.updateAccount(account, function(err, account) {
+        assert.ifError(err);
+        assert.equal(account.postal_code, '94104');
+        test.finish();
+      });
+    });
+  });
+};
+
+
 exports.test_get_account_by_name_and_cached = function(test, assert) {
   capi.getAccountByName('admin', function(err, account) {
     assert.ifError(err);
