@@ -2,7 +2,7 @@
 // -*- mode: js -*-
 // Copyright 2011 Joyent, Inc.  All rights reserved.
 
-var https = require('https');
+var fs = require('fs');
 var path = require('path');
 var url = require('url');
 
@@ -15,12 +15,9 @@ var common = require('../lib/cli_common');
 var Options = {
   "account": String,
   "debug": Boolean,
-  "dataset": String,
   "help": Boolean,
   "identity": path,
   "keyId": String,
-  "name": String,
-  "package": String,
   "tag": [String, Array],
   "url": url
 };
@@ -28,36 +25,41 @@ var Options = {
 var ShortOptions = {
   "a": ["--account"],
   "d": ["--debug"],
-  "e": ["--dataset"],
   "h": ["--help"],
   "?": ["--help"],
   "i": ["--identity"],
   "k": ["--keyId"],
-  "n": ["--name"],
-  "p": ["--package"],
   "t": ["--tag"],
   "u": ["--url"]
 };
+
+var usageStr = common.buildUsageString(Options);
+usageStr += ' machine';
 
 
 ///--- Mainline
 
 common.parseArguments(Options, ShortOptions, function(parsed) {
-  var opts = {}
-  if (parsed.dataset) opts.dataset = parsed.dataet;
-  if (parsed.name) opts.name = parsed.name;
-  if (parsed['package']) opts['package'] = parsed['package'];
-  if (parsed.tag) {
-    for (var i = 0; i < parsed.tag.length; i++) {
-      var tmp = parsed.tag[i].split('=');
-      if (!tmp || tmp.length !== 2) {
-        console.error(parsed.tag[i] + ' is an invalid tag; try foo=bar');
-        process.exit(1);
-      }
-      opts['tag.' + tmp[0]] = tmp[1];
+
+  if (parsed.argv.remain.length < 1)
+    common.usage(usageStr, 1, 'machine required');
+
+  var opts = {};
+  if (parsed.name)
+    opts.name = parsed.name;
+  if (!parsed.tag)
+    common.usage(usageStr, 1, '--tag required');
+
+  var tags = {};
+  for (var i = 0; i < parsed.tag.length; i++) {
+    var tmp = parsed.tag[i].split('=');
+    if (!tmp || tmp.length !== 2) {
+      console.error(parsed.tag[i] + ' is an invalid tag; try foo=bar');
+      process.exit(1);
     }
+    tags[tmp[0]] = tmp[1];
   }
 
   var client = common.newClient(parsed);
-  client.createMachine(opts, common.callback);
-});
+  client.addMachineTags(parsed.argv.remain[0], tags, common.callback);
+}, usageStr);
