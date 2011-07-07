@@ -36,6 +36,33 @@ exports.setUp = function(test, assert) {
 };
 
 
+exports.test_search_by_email = function(test, assert) {
+  capi.findCustomer({ email_address: 'user@joyent.com' },
+                    function(err, accounts) {
+    assert.ifError(err);
+    assert.ok(accounts);
+    assert.equal(accounts.length, 1, 'Should find one account');
+    assert.equal(accounts[0].login, 'admin',
+                 'Should find admin user.');
+    test.finish();
+  });
+};
+
+
+exports.test_search_by_login = function(test, assert) {
+  capi.findCustomer({ login: 'min' }, function(err, accounts) {
+    assert.ifError(err);
+    assert.ok(accounts);
+    assert.ok(accounts.length >= 1, 'Should find accounts');
+    var admin = accounts.filter(function (a) {
+      return a.login === 'admin';
+    });
+    assert.ok(admin.length === 1, 'Should only be one admin');
+    test.finish();
+  });
+};
+
+
 exports.test_get_account_by_name_and_cached = function(test, assert) {
   capi.getAccountByName('admin', function(err, account) {
     assert.ifError(err);
