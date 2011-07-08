@@ -83,8 +83,31 @@ exports.test_exact_search_by_email = function(test, assert) {
 };
 
 
+var rand = Date.now();
+var TEST_ACCOUNT = { login: 'testing_'+rand,
+                     password: 'testing_testing',
+                     password_confirmation: 'testing_testing',
+                     email_address: 'test-'+rand+'@joyent.com',
+                     first_name: 'Testy',
+                     last_name: 'Testingham',
+                     postal_code: '09876' };
+
+exports.test_create_account = function(test, assert) {
+  capi.createAccount(TEST_ACCOUNT, function(err, account) {
+    assert.ifError(err);
+    Object.keys(TEST_ACCOUNT).forEach(function (k) {
+      if (k.match(/^password/)) return;
+      console.error(k, TEST_ACCOUNT[k], account[k]);
+      assert.equal(TEST_ACCOUNT[k], account[k]);
+    });
+    test.finish();
+  });
+};
+
+
 exports.test_update_account = function(test, assert) {
-  capi.getAccountByName('admin', function(err, account) {
+  capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
+    assert.ifError(err);
     account.postal_code = '12345';
     capi.updateAccount(account, function(err, account) {
       assert.ifError(err);
@@ -98,6 +121,22 @@ exports.test_update_account = function(test, assert) {
     });
   });
 };
+
+// See: https://devhub.joyent.com/jira/browse/CAPI-58
+//
+// exports.test_delete_account = function(test, assert) {
+//   capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
+//     assert.ifError(err);
+//     capi.deleteAccount(account, function(err) {
+//       assert.ifError(err);
+//       // verify it's gone now.
+//       capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
+//         assert.notOk(account);
+//         test.finish();
+//       });
+//     });
+//   });
+// };
 
 
 exports.test_get_account_by_name_and_cached = function(test, assert) {
