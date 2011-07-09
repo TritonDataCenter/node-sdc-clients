@@ -27,9 +27,9 @@ function _trim(str) {
 ///--- Start Tests
 
 exports.setUp = function(test, assert) {
-  sdcClients.setLogLevel('debug');
+  sdcClients.setLogLevel('trace');
   client = new CloudAPI({
-    url: 'http://localhost:8080',
+    url: 'http://127.0.0.1:8080',
     username: 'admin',
     password: 'joypass123'
   });
@@ -690,6 +690,43 @@ exports.test_create_machine = function(test, assert) {
     assert.ok(machine.disk);
     assert.ok(machine.ips);
     test.finish();
+  });
+};
+
+
+exports.test_get_usage = function(test, assert) {
+  var year = new Date().getFullYear();
+  var month = new Date().getMonth() + 1;
+  if (month < 10) {
+    month = '0' + month;
+  }
+  client.getUsage(year + '-' + month,
+                  function (err, usage) {
+    assert.ifError(err);
+    assert.ok(usage);
+    console.error(usage);
+    test.finish();
+  });
+};
+
+
+exports.test_get_machine_usage = function(test, assert) {
+  client.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.ok(machines.length);
+    var year = new Date().getFullYear();
+    var month = new Date().getMonth() + 1;
+    if (month < 10) {
+      month = '0' + month;
+    }
+    client.getMachineUsage(machines[0], year + '-' + month,
+                           function (err, usage) {
+      assert.ifError(err);
+      assert.ok(usage);
+      console.error(usage);
+      test.finish();
+    });
   });
 };
 
