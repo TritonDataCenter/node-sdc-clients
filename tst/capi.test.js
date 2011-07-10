@@ -122,6 +122,20 @@ exports.test_update_account = function(test, assert) {
   });
 };
 
+
+exports.test_forgot_password = function(test, assert) {
+  capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
+    assert.ifError(err);
+    var existingRequest = account.forgot_password_code;
+    capi.requestPasswordReset(account, function(err, account) {
+      assert.notEqual(existingRequest, account.forgot_password_code);
+      test.finish();
+    });
+  });
+};
+
+
+
 // See: https://devhub.joyent.com/jira/browse/CAPI-58
 //
 // exports.test_delete_account = function(test, assert) {
