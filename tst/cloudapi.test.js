@@ -29,9 +29,10 @@ function _trim(str) {
 exports.setUp = function(test, assert) {
   sdcClients.setLogLevel('trace');
   client = new CloudAPI({
-    url: 'http://127.0.0.1:8080',
+    url: 'https://10.99.99.15',
     username: 'admin',
-    password: 'joypass123'
+    password: 'joypass123',
+    logLevel: 6
   });
 
   var keyFile = process.env.SSH_KEY;
@@ -120,15 +121,15 @@ exports.test_create_key_no_acct_param_no_name = function(test, assert) {
 
 exports.test_create_key_account_name = function(test, assert) {
   var object = {
-    name: 'cloudapi.test.js',
+    name: 'cloudapi_test_js',
     key: publicKey
   };
   client.createKey(LOGIN, object, function(err, key) {
     assert.ifError(err);
     assert.ok(key);
-    assert.equal(key.name, 'cloudapi.test.js');
+    assert.equal(key.name, 'cloudapi_test_js');
     assert.equal(key.key, publicKey);
-    client.deleteKey('cloudapi.test.js', function(err) {
+    client.deleteKey('cloudapi_test_js', function(err) {
       assert.ifError(err);
       test.finish();
     });
@@ -152,7 +153,7 @@ exports.test_create_key_plain_key = function(test, assert) {
 
 exports.test_create_key_account_404 = function(test, assert) {
   var object = {
-    name: 'cloudapi.test.js',
+    name: 'cloudapi_test_js',
     key: publicKey
   };
   client.createKey(uuid(), publicKey, function(err, key) {
@@ -763,6 +764,7 @@ exports.test_list_machines = function(test, assert) {
 };
 
 
+
 exports.test_get_machine_by_object = function(test, assert) {
   client.listMachines(function(err, machines) {
     assert.ifError(err);
@@ -917,19 +919,6 @@ exports.test_get_inst_value = function(test, assert) {
 
 exports.test_get_inst_hmap = function(test, assert) {
   client.getInstrumentationHeatmap(inst, function(err, hmap) {
-    assert.ifError(err);
-    assert.ok(hmap.image);
-    test.finish();
-  });
-};
-
-
-exports.test_get_inst_hmap_details = function(test, assert) {
-  var opts = {
-    x: 4,
-    y: 5
-  };
-  client.getInstrumentationHeatmapDetails(inst, opts, function(err, hmap) {
     assert.ifError(err);
     assert.ok(hmap.image);
     test.finish();
