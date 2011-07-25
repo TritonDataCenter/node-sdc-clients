@@ -1,3 +1,0 @@
-[submodule "lib/node-smartdc"]
-	path = lib/node-smartdc
-	url = git@git.joyent.com:node-smartdc.git

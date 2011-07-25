@@ -14,14 +14,14 @@
     "lru-cache": "1.0.2",
     "nopt": "1.0.6",
     "restify": "~0.3.15",
-    "sprintf": "0.1.1"
+    "sprintf": "0.1.1",
+    "smartdc": "~6.1.0"
   },
   "devDependencies": {
     "node-uuid": "1.1.0",
     "whiskey": "0.4.0"
   },
   "scripts": {
-    "postinstall": "git submodule init && git submodule update && cd lib/node-smartdc && npm install",
     "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -e lib/node-smartdc/node_modules -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
     "test": "NO_PROVISION_TESTS=1 whiskey --quiet --timeout 120000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
   },
