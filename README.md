@@ -30,7 +30,3 @@ suggestions for that?
 Run the tests like this
 
     ./node_modules/.bin/whiskey --timeout 5000 --concurrency 1 --tests "`find tst | grep test.js | xargs`"
-
-or just
-  
-    make test

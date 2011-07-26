@@ -104,6 +104,20 @@ exports.test_create_account = function(test, assert) {
   });
 };
 
+// PUBAPI-283, should translate errors now
+exports.test_create_account_err = function(test, assert) {
+  var bad_acct = {
+    login : 'badacct',
+    password : 'password',
+    password_confirmation : 'notthesame',
+    email_address : 'incorrect address',
+  }
+  capi.createAccount(bad_acct, function(err, account) {
+    assert.ok(err.message);
+    assert.equal(typeof err.message, 'string');
+    test.finish();
+  });
+};
 
 exports.test_update_account = function(test, assert) {
   capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
@@ -122,6 +136,20 @@ exports.test_update_account = function(test, assert) {
   });
 };
 
+// PUBAPI-283 - correctly translates err messages in updateAccount
+exports.test_update_account_password_err = function(test, assert) {
+  capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
+    assert.ifError(err);
+    account.password = 'a';
+    account.password_confirmation = 'a';
+    capi.updateAccount(account, function(err, account) {
+      assert.ok(err.message);
+      assert.equal(typeof err.message, 'string');
+      test.finish();
+    });
+  });
+}
+
 
 exports.test_forgot_password = function(test, assert) {
   capi.getAccountByName(TEST_ACCOUNT.login, function(err, account) {
@@ -133,8 +161,6 @@ exports.test_forgot_password = function(test, assert) {
     });
   });
 };
-
-
 
 // See: https://devhub.joyent.com/jira/browse/CAPI-58
 //
