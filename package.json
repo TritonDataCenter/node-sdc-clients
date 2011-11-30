@@ -11,15 +11,17 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "lru-cache": "1.0.2",
+    "http-signature": "0.9.6",
+    "ldapjs": "0.3.4",
+    "lru-cache": "1.0.4",
+    "node-uuid": "1.2.0",
     "nopt": "1.0.6",
-    "restify": "~0.4.3",
+    "restify": "0.4.4",
     "sprintf": "0.1.1",
-    "smartdc": "~6.1.0"
+    "smartdc": "6.5.0-1"
   },
   "devDependencies": {
-    "node-uuid": "1.1.0",
-    "whiskey": "0.4.0"
+    "whiskey": "0.6.1"
   },
   "scripts": {
     "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -e lib/node-smartdc/node_modules -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
