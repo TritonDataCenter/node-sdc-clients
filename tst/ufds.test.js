@@ -25,7 +25,7 @@ exports.setUp = function(test, assert) {
     bindDN: 'cn=root',
     bindPassword: 'secret'
   });
-  ufds.setLogLevel('Trace');
+  // ufds.setLogLevel('Trace');
   ufds.on('ready', function(bound) {
     assert.ok(bound);
     test.finish();
