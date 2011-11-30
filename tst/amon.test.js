@@ -12,14 +12,14 @@ var USER = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
 
 var CONTACT = {
   'name' : 'test-contact',
-  'medium' :  'email',
+  'medium' : 'email',
   'data' : 'foo@bar.com'
 };
 
 var CONTACT_2 = {
-   'name' : 'email',
-   'medium' : 'email',
-   'data' : '"Yunong Xiao" <yunong+amon@joyent.com>' 
+  'name' : 'email',
+  'medium' : 'email',
+  'data' : '"Yunong Xiao" <yunong+amon@joyent.com>'
 };
 
 var MONITOR = {
@@ -28,8 +28,8 @@ var MONITOR = {
 };
 
 var MONITOR_2 = {
-   'name': 'yunong-monitor', 
-   'contacts': [ 'email' ] 
+  'name': 'yunong-monitor',
+  'contacts': ['email']
 };
 
 var PROBE = {
@@ -65,12 +65,12 @@ exports.setUp = function(test, assert) {
   amon = new Amon({
     url: AMON_URL
   });
-  
+
   test.finish();
 };
 
 exports.test_get_user = function(test, assert) {
-  amon.getUser(USER, function(err, user){
+  amon.getUser(USER, function(err, user) {
     assert.ifError(err);
     test.finish();
   });
@@ -78,7 +78,7 @@ exports.test_get_user = function(test, assert) {
 
 exports.test_list_contacts = function(test, assert) {
   var c = CONTACT;
-  amon.listContacts(USER, function(err, contacts){
+  amon.listContacts(USER, function(err, contacts) {
     assert.ifError(err);
     assert.ok(contacts);
     assert.equal(contacts.length, 1, 'Found more than 1 contacts');
@@ -150,7 +150,7 @@ exports.test_create_probe = function(test, assert) {
     assert.equal(probe.monitor, PROBE.monitor);
     assert.equal(probe.zone, PROBE.zone);
     assert.equal(probe.urn, PROBE.urn);
-    assert.equal(probe.data.path, PROBE.data.path);                           
+    assert.equal(probe.data.path, PROBE.data.path);
     assert.equal(probe.data.regex, PROBE.data.regex);
     assert.equal(probe.data.threshold, PROBE.data.threshold);
     assert.equal(probe.data.period, PROBE.data.period);
@@ -169,7 +169,7 @@ exports.test_list_probes = function(test, assert) {
     assert.equal(probe.monitor, PROBE.monitor);
     assert.equal(probe.zone, PROBE.zone);
     assert.equal(probe.urn, PROBE.urn);
-    assert.equal(probe.data.path, PROBE.data.path);                           
+    assert.equal(probe.data.path, PROBE.data.path);
     assert.equal(probe.data.regex, PROBE.data.regex);
     assert.equal(probe.data.threshold, PROBE.data.threshold);
     assert.equal(probe.data.period, PROBE.data.period);
@@ -185,7 +185,7 @@ exports.test_get_probe = function(test, assert) {
     assert.equal(probe.monitor, PROBE.monitor);
     assert.equal(probe.zone, PROBE.zone);
     assert.equal(probe.urn, PROBE.urn);
-    assert.equal(probe.data.path, PROBE.data.path);                           
+    assert.equal(probe.data.path, PROBE.data.path);
     assert.equal(probe.data.regex, PROBE.data.regex);
     assert.equal(probe.data.threshold, PROBE.data.threshold);
     assert.equal(probe.data.period, PROBE.data.period);
@@ -199,7 +199,7 @@ exports.test_delete_probe = function(test, assert) {
     amon.getProbe(USER, MONITOR.name, PROBE.name, function(err) {
       assert.equal(err.httpCode, 404);
     });
-    
+
     test.finish();
   });
 };
@@ -218,7 +218,7 @@ exports.test_delete_monitor = function(test, assert) {
   amon.deleteMonitor(USER, MONITOR.name, function(err) {
     assert.ifError(err);
     amon.getMonitor(USER, MONITOR.name, function(err) {
-       assert.equal(err.httpCode, 404);
+      assert.equal(err.httpCode, 404);
     });
     test.finish();
   });
