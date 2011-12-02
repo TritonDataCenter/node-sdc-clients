@@ -2,7 +2,7 @@
 
 Where? <git@git.joyent.com:node-sdc-clients.git>
 Who? Mark Cavage.
-What APIs? Currently, CA (cloud analytics) and CAPI.
+What APIs? Currently, most of the SDC APIs.
 
 
 # Example?
