@@ -1,14 +1,14 @@
 var sys = require('sys');
 var sdcClients = require('../lib/index');
-var Amon = sdcClients.AMON;
-var querystring = require('querystring');
+var Amon = sdcClients.Amon;
 
 var amon = null;
 
 //TODO: change this to the actualy COAL URL once we move to COAL
 var AMON_URL = 'http://localhost:8080';
 
-var USER = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+// we hijack the admin user since it's always going to exist
+var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';
 
 var CONTACT = {
   'name' : 'test-contact',
@@ -34,7 +34,7 @@ var MONITOR_2 = {
 
 var PROBE = {
   'name': 'test-probe',
-  'user': USER,
+  'user': ADMIN_UUID,
   'monitor': MONITOR.name,
   'zone': 'global',
   'urn': 'amon:logscan',
@@ -48,7 +48,7 @@ var PROBE = {
 
 var PROBE_2 = {
   'name': 'test-probe-2',
-  'user': USER,
+  'user': ADMIN_UUID,
   'monitor': MONITOR.name,
   'zone': 'global',
   'urn': 'amon:logscan',
@@ -60,79 +60,111 @@ var PROBE_2 = {
   }
 };
 
+
+var cleanupAccount = function(test, assert) {
+  // delete all contacts
+  amon.listContacts(ADMIN_UUID, function(err, contacts) {
+    contacts.forEach(function(contacts) {
+      sys.puts(contacts.name);
+      amon.deleteContact(ADMIN_UUID, contacts.name, function(err) {
+        assert.ifError(err);
+      });
+    });
+  });
+  
+  amon.listMonitors(ADMIN_UUID, function(err, monitors) {
+    monitors.forEach(function(monitor) {
+      sys.puts(monitor.name);
+      // for each monitor, list and delete its probes
+      amon.listProbes(ADMIN_UUID, monitor.name, function(err, probes) {
+        // delete the probes
+        probes.forEach(function(probe) {
+          sys.puts(probe.name);
+          amon.deleteProbe(ADMIN_UUID, monitor.name, probe.name, function(err) {
+            assert.ifError(err);
+          });
+        });
+      });
+
+       // delete the monitors
+      amon.deleteMonitor(ADMIN_UUID, monitor.name, function(err) {
+          test.finish();
+      });
+    });
+  });
+};
+
 exports.setUp = function(test, assert) {
   sdcClients.setLogLevel('trace');
   amon = new Amon({
     url: AMON_URL
   });
-
+  
+  cleanupAccount(test, assert);
   test.finish();
 };
 
 exports.test_get_user = function(test, assert) {
-  amon.getUser(USER, function(err, user) {
+  amon.getUser(ADMIN_UUID, function(err, user) {
     assert.ifError(err);
     test.finish();
+  });
+};
+
+exports.test_contact_crud = function(test, assert) {
+  amon.putContact(ADMIN_UUID, CONTACT, function(err, contact) {
+    assert.ifError(err);
+    assert.ok(contact);
+    assert.equal(contact.name, CONTACT.name);
+    assert.equal(contact.medium, CONTACT.medium);
+    assert.equal(contact.data, CONTACT.data);
+
+    amon.getContact(ADMIN_UUID, CONTACT.name, function(err, contact) {
+      assert.ifError(err);
+      assert.ok(contact);
+      assert.equal(contact.name, CONTACT.name);
+      assert.equal(contact.medium, CONTACT.medium);
+      assert.equal(contact.data, CONTACT.data);
+      // TODO: update is currently broken server side. add update when it's
+      // fixed
+      amon.deleteContact(ADMIN_UUID, CONTACT.name, function(err) {
+        assert.ifError(err);
+        amon.getContact(ADMIN_UUID, CONTACT.name, function(err) {
+          assert.equal(err.httpCode, 404);
+        });
+        test.finish();
+      });
+    });
   });
 };
 
 exports.test_list_contacts = function(test, assert) {
-  var c = CONTACT;
-  amon.listContacts(USER, function(err, contacts) {
+  amon.putContact(ADMIN_UUID, CONTACT_2, function(err, contact) {
     assert.ifError(err);
-    assert.ok(contacts);
-    assert.equal(contacts.length, 1, 'Found more than 1 contacts');
-    assert.equal(contacts[0].name, CONTACT_2.name);
-    assert.equal(contacts[0].contact, CONTACT_2.contact);
-    test.finish();
-  });
-};
 
-exports.test_put_contact = function(test, assert) {
-  amon.putContact(USER, CONTACT, function(err, contact) {
-    assert.ifError(err);
-    assert.ok(contact);
-    assert.equal(contact.name, CONTACT.name);
-    assert.equal(contact.medium, CONTACT.medium);
-    assert.equal(contact.data, CONTACT.data);
-    test.finish();
-  });
-};
+    amon.putContact(ADMIN_UUID, CONTACT, function(err, contact) {
+      assert.ifError(err);
 
-exports.test_get_contact = function(test, assert) {
-  amon.getContact(USER, CONTACT.name, function(err, contact) {
-    assert.ifError(err);
-    assert.ok(contact);
-    assert.equal(contact.name, CONTACT.name);
-    assert.equal(contact.medium, CONTACT.medium);
-    assert.equal(contact.data, CONTACT.data);
-    test.finish();
-  });
-};
+      amon.listContacts(ADMIN_UUID, function(err, contacts) {
+        assert.ifError(err);
+        assert.ok(contacts);
+        assert.equal(contacts.length, 2, 'Found more than 2 contacts');
 
-exports.test_delete_contact = function(test, assert) {
-  amon.deleteContact(USER, CONTACT.name, function(err) {
-    assert.ifError(err);
-    amon.getContact(USER, CONTACT.name, function(err) {
-      assert.equal(err.httpCode, 404);
+        amon.deleteContact(ADMIN_UUID, CONTACT.name, function(err) {
+          assert.ifError(err);
+
+          amon.deleteContact(ADMIN_UUID, CONTACT_2.name, function(err) {
+            assert.ifError(err);
+            test.finish();
+          });
+        });
+      });
     });
-    test.finish();
-  });
-};
-
-exports.test_list_monitors = function(test, assert) {
-  amon.listMonitors(USER, function(err, monitors) {
-    assert.ifError(err);
-    assert.ok(monitors);
-    assert.equal(monitors.length, 1, 'Found more than 1 monitors');
-    assert.equal(monitors[0].name, MONITOR_2.name);
-    assert.equal(monitors[0].medium, MONITOR_2.medium);
-    test.finish();
   });
 };
 
 exports.test_put_monitor = function(test, assert) {
-  amon.putMonitor(USER, MONITOR, function(err, monitor) {
+  amon.putMonitor(ADMIN_UUID, MONITOR, function(err, monitor) {
     assert.ifError(err);
     assert.ok(monitor);
     assert.equal(monitor.name, MONITOR.name);
@@ -142,8 +174,7 @@ exports.test_put_monitor = function(test, assert) {
 };
 
 exports.test_put_probe = function(test, assert) {
-  amon.putProbe(USER, MONITOR.name, PROBE, function(err, probe) {
-    sys.puts(sys.inspect(probe));
+  amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE, function(err, probe) {
     assert.ifError(err);
     assert.ok(probe);
     assert.equal(probe.name, PROBE.name);
@@ -159,26 +190,25 @@ exports.test_put_probe = function(test, assert) {
 };
 
 exports.test_list_probes = function(test, assert) {
-  amon.listProbes(USER, MONITOR.name, function(err, probes) {
+  amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2, function(err, probe) {
     assert.ifError(err);
-    assert.ok(probes);
-    assert.equal(probes.length, 1);
-    var probe = probes[0];
     assert.ok(probe);
-    assert.equal(probe.name, PROBE.name);
-    assert.equal(probe.monitor, PROBE.monitor);
-    assert.equal(probe.zone, PROBE.zone);
-    assert.equal(probe.urn, PROBE.urn);
-    assert.equal(probe.data.path, PROBE.data.path);
-    assert.equal(probe.data.regex, PROBE.data.regex);
-    assert.equal(probe.data.threshold, PROBE.data.threshold);
-    assert.equal(probe.data.period, PROBE.data.period);
-    test.finish();
+    
+    amon.listProbes(ADMIN_UUID, MONITOR.name, function(err, probes) {
+      assert.ifError(err);
+      assert.ok(probes);
+      assert.equal(probes.length, 2);
+
+      amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name, function(err) {
+         assert.ifError(err);
+         test.finish();
+       });
+    });
   });
 };
 
 exports.test_get_probe = function(test, assert) {
-  amon.getProbe(USER, MONITOR.name, PROBE.name, function(err, probe) {
+  amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function(err, probe) {
     assert.ifError(err);
     assert.ok(probe);
     assert.equal(probe.name, PROBE.name);
@@ -194,9 +224,9 @@ exports.test_get_probe = function(test, assert) {
 };
 
 exports.test_delete_probe = function(test, assert) {
-  amon.deleteProbe(USER, MONITOR.name, PROBE.name, function(err) {
+  amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function(err) {
     assert.ifError(err);
-    amon.getProbe(USER, MONITOR.name, PROBE.name, function(err) {
+    amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function(err) {
       assert.equal(err.httpCode, 404);
     });
 
@@ -204,8 +234,23 @@ exports.test_delete_probe = function(test, assert) {
   });
 };
 
+exports.test_list_monitors = function(test, assert) {
+  amon.putMonitor(ADMIN_UUID, MONITOR_2, function(err, monitor) {
+    assert.ifError(err);
+    amon.listMonitors(ADMIN_UUID, function(err, monitors) {
+      assert.ifError(err);
+      assert.ok(monitors);
+      assert.equal(monitors.length, 2, 'Found more than 2 monitors');
+      amon.deleteMonitor(ADMIN_UUID, MONITOR_2.name, function(err) {
+        assert.ifError(err);
+        test.finish();
+      });
+    });
+  });
+};
+
 exports.test_get_monitor = function(test, assert) {
-  amon.getMonitor(USER, MONITOR.name, function(err, monitor) {
+  amon.getMonitor(ADMIN_UUID, MONITOR.name, function(err, monitor) {
     assert.ifError(err);
     assert.ok(monitor);
     assert.equal(monitor.name, MONITOR.name);
@@ -215,11 +260,17 @@ exports.test_get_monitor = function(test, assert) {
 };
 
 exports.test_delete_monitor = function(test, assert) {
-  amon.deleteMonitor(USER, MONITOR.name, function(err) {
+  amon.deleteMonitor(ADMIN_UUID, MONITOR.name, function(err) {
     assert.ifError(err);
-    amon.getMonitor(USER, MONITOR.name, function(err) {
+    amon.getMonitor(ADMIN_UUID, MONITOR.name, function(err) {
       assert.equal(err.httpCode, 404);
     });
     test.finish();
   });
+};
+
+exports.tearDown = function(test, assert) {
+  // delete all contacts, monitors and probes associated with admin-user
+  cleanupAccount();
+  test.finish();
 };
