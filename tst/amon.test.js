@@ -88,8 +88,8 @@ exports.test_list_contacts = function(test, assert) {
   });
 };
 
-exports.test_create_contact = function(test, assert) {
-  amon.createContact(USER, CONTACT, function(err, contact) {
+exports.test_put_contact = function(test, assert) {
+  amon.putContact(USER, CONTACT, function(err, contact) {
     assert.ifError(err);
     assert.ok(contact);
     assert.equal(contact.name, CONTACT.name);
@@ -131,8 +131,8 @@ exports.test_list_monitors = function(test, assert) {
   });
 };
 
-exports.test_create_monitor = function(test, assert) {
-  amon.createMonitor(USER, MONITOR, function(err, monitor) {
+exports.test_put_monitor = function(test, assert) {
+  amon.putMonitor(USER, MONITOR, function(err, monitor) {
     assert.ifError(err);
     assert.ok(monitor);
     assert.equal(monitor.name, MONITOR.name);
@@ -141,8 +141,8 @@ exports.test_create_monitor = function(test, assert) {
   });
 };
 
-exports.test_create_probe = function(test, assert) {
-  amon.createProbe(USER, MONITOR.name, PROBE, function(err, probe) {
+exports.test_put_probe = function(test, assert) {
+  amon.putProbe(USER, MONITOR.name, PROBE, function(err, probe) {
     sys.puts(sys.inspect(probe));
     assert.ifError(err);
     assert.ok(probe);
