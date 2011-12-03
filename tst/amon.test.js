@@ -1,6 +1,6 @@
 var sys = require('sys');
 var sdcClients = require('../lib/index');
-var Amon = sdcClients.Amon;
+var AMON = sdcClients.AMON;
 
 var amon = null;
 
@@ -96,7 +96,7 @@ var cleanupAccount = function(test, assert) {
 
 exports.setUp = function(test, assert) {
   sdcClients.setLogLevel('trace');
-  amon = new Amon({
+  amon = new AMON({
     url: AMON_URL
   });
   
