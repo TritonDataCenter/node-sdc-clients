@@ -71,7 +71,7 @@ var cleanupAccount = function(test, assert) {
       });
     });
   });
-  
+
   amon.listMonitors(ADMIN_UUID, function(err, monitors) {
     monitors.forEach(function(monitor) {
       sys.puts(monitor.name);
@@ -99,7 +99,7 @@ exports.setUp = function(test, assert) {
   amon = new AMON({
     url: AMON_URL
   });
-  
+
   cleanupAccount(test, assert);
   test.finish();
 };
@@ -193,7 +193,7 @@ exports.test_list_probes = function(test, assert) {
   amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2, function(err, probe) {
     assert.ifError(err);
     assert.ok(probe);
-    
+
     amon.listProbes(ADMIN_UUID, MONITOR.name, function(err, probes) {
       assert.ifError(err);
       assert.ok(probes);
