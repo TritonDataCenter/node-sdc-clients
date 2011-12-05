@@ -21,7 +21,7 @@ var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
 
 exports.setUp = function(test, assert) {
   ufds = new UFDS({
-    url: 'ldaps://localhost:1636',
+    url: 'ldaps://10.99.99.21',
     bindDN: 'cn=root',
     bindPassword: 'secret'
   });
