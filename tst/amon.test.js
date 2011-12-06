@@ -119,13 +119,6 @@ exports.setUp = function(test, assert) {
   cleanupAccount(test, assert);
 };
 
-exports.test_get_user = function(test, assert) {
-  amon.getUser(ADMIN_UUID, function(err, user) {
-    assert.ifError(err);
-    test.finish();
-  });
-};
-
 exports.test_put_monitor = function(test, assert) {
   amon.putMonitor(ADMIN_UUID, MONITOR, function(err, monitor) {
     assert.ifError(err);
