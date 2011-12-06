@@ -1,30 +1,23 @@
 var sys = require('sys');
 var sdcClients = require('../lib/index');
+var restify = require('restify');
 var AMON = sdcClients.AMON;
 
 var amon = null;
 
+
+//---- fixtures
+
 //TODO: change this to the actualy COAL URL once we move to COAL
 var AMON_URL = 'http://localhost:8080';
 
-// we hijack the admin user since it's always going to exist
+// We hijack the admin user since it's always going to exist.
+// TODO: Should use a test user. Might be *using* 'admin' user.
 var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';
-
-var CONTACT = {
-  'name' : 'test-contact',
-  'medium' : 'email',
-  'data' : 'foo@bar.com'
-};
-
-var CONTACT_2 = {
-  'name' : 'email',
-  'medium' : 'email',
-  'data' : '"Yunong Xiao" <yunong+amon@joyent.com>'
-};
 
 var MONITOR = {
   'name' : 'test-monitor',
-  'contacts': ['testcontact']
+  'contacts': ['email']
 };
 
 var MONITOR_2 = {
@@ -61,36 +54,59 @@ var PROBE_2 = {
 };
 
 
-var cleanupAccount = function(test, assert) {
-  // delete all contacts
-  amon.listContacts(ADMIN_UUID, function(err, contacts) {
-    contacts.forEach(function(contacts) {
-      sys.puts(contacts.name);
-      amon.deleteContact(ADMIN_UUID, contacts.name, function(err) {
-        assert.ifError(err);
-      });
-    });
-  });
 
-  amon.listMonitors(ADMIN_UUID, function(err, monitors) {
-    monitors.forEach(function(monitor) {
-      sys.puts(monitor.name);
-      // for each monitor, list and delete its probes
+//---- internal support stuff
+
+/**
+ * Run async `fn` on each entry in `list`. Call `cb(error)` when all done.
+ * `fn` is expected to have `fn(item, callback) -> callback(error)` signature.
+ *
+ * From Isaac's rimraf.js.
+ */
+function asyncForEach(list, fn, cb) {
+  if (!list.length) cb()
+  var c = list.length
+    , errState = null
+  list.forEach(function (item, i, list) {
+   fn(item, function (er) {
+      if (errState) return
+      if (er) return cb(errState = er)
+      if (-- c === 0) return cb()
+    })
+  })
+}
+
+
+
+//---- tests
+
+function cleanupAccount(test, assert) {
+  function deleteProbe(probe, callback) {
+    amon.deleteProbe(ADMIN_UUID, probe.monitor, probe.name, callback);
+  }
+  function deleteMonitor(monitor, callback) {
+    amon.getMonitor(ADMIN_UUID, MONITOR.name, function(err, monitor) {
+      //assert.ifError(err);   // don't error on 404
+      if (!monitor) {
+        return callback();
+      }
       amon.listProbes(ADMIN_UUID, monitor.name, function(err, probes) {
-        // delete the probes
-        probes.forEach(function(probe) {
-          sys.puts(probe.name);
-          amon.deleteProbe(ADMIN_UUID, monitor.name, probe.name, function(err) {
-            assert.ifError(err);
-          });
+        assert.ifError(err);
+        asyncForEach(probes, deleteProbe, function(err) {
+          assert.ifError(err);
+          setTimeout(function () {
+            amon.deleteMonitor(ADMIN_UUID, monitor.name, function (err) {
+              setTimeout(function () { callback(err) }, 2000);
+            });
+          }, 2000);
         });
       });
-
-       // delete the monitors
-      amon.deleteMonitor(ADMIN_UUID, monitor.name, function(err) {
-          test.finish();
-      });
     });
+  }
+  
+  // Delete all test monitors.
+  asyncForEach([MONITOR, MONITOR_2], deleteMonitor, function (err) {
+    test.finish();
   });
 };
 
@@ -101,65 +117,12 @@ exports.setUp = function(test, assert) {
   });
 
   cleanupAccount(test, assert);
-  test.finish();
 };
 
 exports.test_get_user = function(test, assert) {
   amon.getUser(ADMIN_UUID, function(err, user) {
     assert.ifError(err);
     test.finish();
-  });
-};
-
-exports.test_contact_crud = function(test, assert) {
-  amon.putContact(ADMIN_UUID, CONTACT, function(err, contact) {
-    assert.ifError(err);
-    assert.ok(contact);
-    assert.equal(contact.name, CONTACT.name);
-    assert.equal(contact.medium, CONTACT.medium);
-    assert.equal(contact.data, CONTACT.data);
-
-    amon.getContact(ADMIN_UUID, CONTACT.name, function(err, contact) {
-      assert.ifError(err);
-      assert.ok(contact);
-      assert.equal(contact.name, CONTACT.name);
-      assert.equal(contact.medium, CONTACT.medium);
-      assert.equal(contact.data, CONTACT.data);
-      // TODO: update is currently broken server side. add update when it's
-      // fixed
-      amon.deleteContact(ADMIN_UUID, CONTACT.name, function(err) {
-        assert.ifError(err);
-        amon.getContact(ADMIN_UUID, CONTACT.name, function(err) {
-          assert.equal(err.httpCode, 404);
-        });
-        test.finish();
-      });
-    });
-  });
-};
-
-exports.test_list_contacts = function(test, assert) {
-  amon.putContact(ADMIN_UUID, CONTACT_2, function(err, contact) {
-    assert.ifError(err);
-
-    amon.putContact(ADMIN_UUID, CONTACT, function(err, contact) {
-      assert.ifError(err);
-
-      amon.listContacts(ADMIN_UUID, function(err, contacts) {
-        assert.ifError(err);
-        assert.ok(contacts);
-        assert.equal(contacts.length, 2, 'Found more than 2 contacts');
-
-        amon.deleteContact(ADMIN_UUID, CONTACT.name, function(err) {
-          assert.ifError(err);
-
-          amon.deleteContact(ADMIN_UUID, CONTACT_2.name, function(err) {
-            assert.ifError(err);
-            test.finish();
-          });
-        });
-      });
-    });
   });
 };
 
@@ -228,9 +191,8 @@ exports.test_delete_probe = function(test, assert) {
     assert.ifError(err);
     amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function(err) {
       assert.equal(err.httpCode, 404);
+      test.finish();
     });
-
-    test.finish();
   });
 };
 
@@ -262,15 +224,15 @@ exports.test_get_monitor = function(test, assert) {
 exports.test_delete_monitor = function(test, assert) {
   amon.deleteMonitor(ADMIN_UUID, MONITOR.name, function(err) {
     assert.ifError(err);
-    amon.getMonitor(ADMIN_UUID, MONITOR.name, function(err) {
-      assert.equal(err.httpCode, 404);
-    });
-    test.finish();
+    setTimeout(function () {
+      amon.getMonitor(ADMIN_UUID, MONITOR.name, function(err) {
+        assert.equal(err.httpCode, 404);
+        test.finish();
+      });
+    }, 3000);
   });
 };
 
 exports.tearDown = function(test, assert) {
-  // delete all contacts, monitors and probes associated with admin-user
-  cleanupAccount();
-  test.finish();
+  cleanupAccount(test, assert);
 };
