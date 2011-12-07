@@ -434,6 +434,25 @@ exports.test_delete_vm = function(test, assert) {
 };
 
 
+exports.test_list_servers = function(test, assert) {
+  mapi.listServers(function(err, servers) {
+    assert.ifError(err);
+    assert.ok(servers);
+    assert.ok(servers.length);
+    log.debug('mapi.test: list_servers => %o', servers);
+    test.finish();
+  });
+};
+
+
+exports.test_update_servers = function(test, assert) {
+  mapi.updateServer(1, {reserved: false}, function(err) {
+    assert.ifError(err);
+    test.finish();
+  });
+};
+
+
 exports.tearDown = function(test, assert) {
   test.finish();
 };
