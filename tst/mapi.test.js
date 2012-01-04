@@ -173,9 +173,12 @@ exports.test_list_zones_limit_offset_empty = function(test, assert) {
 
 
 exports.test_count_zones = function(test, assert) {
-  mapi.countZones(customer, function(err, count) {
+  mapi.countZones(customer, function(err, count, headers) {
     assert.ifError(err);
     assert.isDefined(count);
+    assert.equal(typeof(count), "number");
+    assert.ok(count > 0);
+    assert.equal(count, Number(headers['x-joyent-resource-count']))
     log.debug('mapi.test: count_zones => %o', count);
     test.finish();
   });
@@ -183,10 +186,12 @@ exports.test_count_zones = function(test, assert) {
 
 
 exports.test_count_zones_no_tenant = function(test, assert) {
-  mapi.countZones(uuid(), function(err, count) {
+  mapi.countZones(uuid(), function(err, count, headers) {
     assert.ifError(err);
     assert.isDefined(count);
+    assert.equal(typeof(count), "number");
     assert.equal(count, 0);
+    assert.equal(count, Number(headers['x-joyent-resource-count']))
     log.debug('mapi.test: count_zones_no_tenant => %o', count);
     test.finish();
   });
@@ -340,9 +345,12 @@ exports.test_delete_zone = function(test, assert) {
 
 
 exports.test_count_vms_all = function(test, assert) {
-  mapi.countVMs(customer, function(err, count) {
+  mapi.countVMs(customer, function(err, count, headers) {
     assert.ifError(err);
     assert.isDefined(count);
+    assert.equal(typeof(count), "number");
+    assert.equal(count, 0);
+    assert.equal(count, Number(headers['x-joyent-resource-count']))
     log.debug('mapi.test: count_vms => %o', count);
     test.finish();
   });
