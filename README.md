@@ -25,6 +25,18 @@ What APIs? Currently, most of the SDC APIs.
 See the inline jsdoc. We should generate HTML docs from those. Have any
 suggestions for that?
 
+
+# Versioning & Changelog
+
+The version is the "version" field in package.json. Please follow these rules:
+
+- bug fix: increment the patch level
+- feature addition: increment the minor level
+- major architectural change or backward incompat: increment the major level
+
+A changelog is in CHANGES.md. Please add a note for each "interesting" change you make.
+
+
 # Tests
 
     make test
