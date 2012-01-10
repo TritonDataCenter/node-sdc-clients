@@ -28,6 +28,6 @@
     "test": "NO_PROVISION_TESTS=1 whiskey --quiet --timeout 120000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
   },
   "engines": {
-    "node": "~0.4.9"
+    "node": ">=0.4.9"
   }
 }
