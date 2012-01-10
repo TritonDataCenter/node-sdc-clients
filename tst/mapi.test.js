@@ -27,6 +27,7 @@ exports.setUp = function(test, assert) {
     url: 'http://10.99.99.8:8080',
     username: 'admin',
     password: 'tot@ls3crit',
+    errorFormatter: MAPI.restifyErrorFormatter,
     retryOptions: {
       retries: 1,
       minTimeout: 1000
@@ -111,6 +112,194 @@ exports.test_get_package_by_name_not_found = function(test, assert) {
   });
 };
 
+
+
+///--- Machines
+
+exports.test_list_machines = function(test, assert) {
+  mapi.listMachines(function(err, machines) {
+    assert.ifError(err);
+    assert.ok(Array.isArray(machines));
+    assert.ok(machines.length > 0);
+    test.finish();
+  });
+};
+
+exports.test_list_machines_owner = function(test, assert) {
+  var options = {
+    owner_uuid: customer
+  };
+  mapi.listMachines(options, function(err, machines) {
+    assert.ifError(err);
+    assert.ok(Array.isArray(machines));
+    assert.ok(machines.length > 0);
+    test.finish();
+  });
+};
+
+exports.test_list_machines_bogus_owner = function(test, assert) {
+  var options = {
+    owner_uuid: uuid()
+  };
+  mapi.listMachines(options, function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.equal(machines.length, 0);
+    test.finish();
+  });
+};
+
+
+exports.test_list_machines_limit_offset = function(test, assert) {
+  var options = {
+    owner_uuid: customer,
+    limit: 1,
+    offset: 0
+  };
+  mapi.listMachines(options, function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.equal(machines.length, 1);
+    log.debug('mapi.test: list_machines_limit_offset => %o', machines);
+    test.finish();
+  });
+};
+
+exports.test_list_machines_limit_offset_empty = function(test, assert) {
+  var options = {
+    owner_uuid: customer,
+    limit: 0,
+    offset: 10
+  };
+  mapi.listMachines(options, function(err, machines) {
+    assert.ifError(err);
+    assert.ok(machines);
+    assert.equal(machines.length, 0);
+    log.debug('mapi.test: list_machines_limit_offset_empty => %o', machines);
+    test.finish();
+  });
+};
+
+
+exports.test_count_machines = function(test, assert) {
+  var options = {
+    owner_uuid: customer
+  };
+  mapi.countMachines(options, function(err, count, headers) {
+    assert.ifError(err);
+    assert.isDefined(count);
+    assert.equal(typeof(count), "number");
+    assert.ok(count > 0);
+    assert.equal(count, Number(headers['x-joyent-resource-count']))
+    log.debug('mapi.test: count_machines => %o', count);
+    test.finish();
+  });
+};
+
+
+exports.test_count_machines_no_tenant = function(test, assert) {
+  var options = {
+    owner_uuid: uuid()
+  };
+  mapi.countMachines(options, function(err, count, headers) {
+    assert.ifError(err);
+    assert.isDefined(count);
+    assert.equal(typeof(count), "number");
+    assert.equal(count, 0);
+    assert.equal(count, Number(headers['x-joyent-resource-count']))
+    log.debug('mapi.test: count_machines_no_tenant => %o', count);
+    test.finish();
+  });
+};
+
+
+if (zoneAlias)
+exports.test_get_machine_by_alias = function(test, assert) {
+  mapi.getMachineByAlias(customer, zoneAlias, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    assert.equal(zoneAlias, machine.alias);
+    log.debug('mapi.test: get_machine_by_alias => %o', machine);
+    test.finish();
+  });
+};
+
+
+if (zoneAlias)
+exports.test_get_machine_by_alias_not_found = function(test, assert) {
+  mapi.getMachineByAlias(customer, uuid(), function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    log.debug('mapi.test: get_machine_by_alias_not_found => %o', err);
+    test.finish();
+  });
+};
+
+if (zoneAlias)
+exports.test_get_machine_by_alias_not_owner = function(test, assert) {
+  mapi.getMachineByAlias(uuid(), zoneAlias, function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    log.debug('mapi.test: get_machine_by_alias_not_owner => %o', err);
+    test.finish();
+  });
+};
+
+
+if (zoneName)
+exports.test_get_machine = function(test, assert) {
+  mapi.getMachine(zoneName, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    assert.equal(zoneName, machine.name);
+    test.finish();
+  });
+};
+
+if (zoneName)
+exports.test_get_machine_owner = function(test, assert) {
+  mapi.getMachine(zoneName, {owner_uuid: customer}, function(err, machine) {
+    assert.ifError(err);
+    assert.ok(machine);
+    assert.equal(zoneName, machine.name);
+    test.finish();
+  });
+};
+
+if (zoneName)
+exports.test_get_machine_not_owner = function(test, assert) {
+  mapi.getMachine(zoneName, {owner_uuid: uuid()}, function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    test.finish();
+  });
+};
+
+
+exports.test_get_machine_not_found = function(test, assert) {
+  mapi.getMachine(uuid(), function(err, machine) {
+    assert.ok(err);
+    assert.ok(!machine);
+    assert.equal(err.httpCode, 404);
+    assert.equal(err.restCode, 'ResourceNotFound');
+    assert.ok(err.message);
+    log.debug('mapi.test: get_machine_not_found => %o', err);
+    test.finish();
+  });
+};
+
+
+
+///--- Zones
 
 exports.test_list_zones = function(test, assert) {
   mapi.listZones(customer, function(err, zones) {
