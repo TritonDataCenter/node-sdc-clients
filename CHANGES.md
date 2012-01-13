@@ -1,5 +1,15 @@
 # sdc-clients Changelog
 
+## sdc-clients 7.0.1
+
+- CAPI-104: Fix `new UFDS(...)` handling for erroneous credential options.
+  Ensure no 'ready' event after an 'error' event for error to bind.
+
+  [Backward incompatible change.] Change the 'ready' event from `UFDS` to
+  not include the "bound" value: the 'ready' event means the bind was
+  successful.
+
+
 ## sdc-clients 7.0.0
 
 - PROV-1371: Add MAPI.{listMachines,countMachines,getMachine,getMachineByAlias}
