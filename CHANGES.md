@@ -1,5 +1,12 @@
 # sdc-clients Changelog
 
+## sdc-clients 7.0.2
+
+- [Backword incompatible change.] `Amon.putMonitor` and `Amon.putProbe`
+  methods have changed to take the monitor/probe *name* field as a
+  separate argument.
+
+
 ## sdc-clients 7.0.1
 
 - CAPI-104: Fix `new UFDS(...)` handling for erroneous credential options.

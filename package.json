@@ -2,7 +2,7 @@
   "author": "Mark Cavage <mark.cavage@joyent.com>",
   "name": "sdc-clients",
   "description": "Contains node.js client libraries for SDC REST APIs.",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "homepage": "http://www.joyent.com",
   "private": true,
   "repository": {
