@@ -12,7 +12,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "http-signature": "0.9.6",
-    "ldapjs": "0.4.4",
+    "ldapjs": "0.4.7",
     "lru-cache": "1.0.4",
     "node-uuid": "1.2.0",
     "nopt": "1.0.6",
