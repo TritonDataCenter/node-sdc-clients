@@ -8,6 +8,8 @@ var UFDS = require('../lib/index').UFDS;
 
 ///--- Globals
 
+var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.21');
+
 var ufds;
 var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';
 var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
@@ -21,11 +23,11 @@ var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
 
 exports.setUp = function(test, assert) {
   ufds = new UFDS({
-    url: 'ldaps://10.99.99.21',
+    url: UFDS_URL,
     bindDN: 'cn=root',
     bindPassword: 'secret'
   });
-  // ufds.setLogLevel('Trace');
+  ufds.setLogLevel('Trace');
   ufds.on('ready', function(bound) {
     assert.ok(bound);
     test.finish();
@@ -138,6 +140,7 @@ exports.test_list_and_get_keys = function(test, assert) {
 
 
 exports.test_del_key = function(test, assert) {
+  console.log('hi')
   ufds.getUser('admin', function(err, user) {
     assert.ifError(err);
     user.listKeys(function(err, keys) {
