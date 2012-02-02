@@ -1,33 +1,23 @@
 {
-  "author": "Mark Cavage <mark.cavage@joyent.com>",
   "name": "sdc-clients",
-  "description": "Contains node.js client libraries for SDC REST APIs.",
+  "description": "SmartDataCenter node.js client SDKs",
   "version": "7.0.0",
-  "homepage": "http://www.joyent.com",
+  "author": "Joyent (joyent.com)",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git@git.joyent.com:node-sdc-clients.git"
-  },
-  "main": "lib/index.js",
   "dependencies": {
-    "http-signature": "0.9.6",
-    "ldapjs": "0.3.4",
-    "lru-cache": "1.0.4",
-    "node-uuid": "1.2.0",
-    "nopt": "1.0.6",
-    "restify": "0.5.5",
+    "http-signature": "0.9.7",
+    "ldapjs": "0.4.7",
+    "lru-cache": "1.0.5",
+    "node-uuid": "1.3.3",
     "sprintf": "0.1.1",
-    "smartdc": "6.5.0-1"
+    "restify": "https://github.com/mcavage/node-restify/tarball/master",
+    "node-uuid": "1.3.3"
   },
   "devDependencies": {
-    "whiskey": "0.6.1"
+    "whiskey": "0.6.6"
   },
   "scripts": {
-    "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -e lib/node-smartdc/node_modules -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
-    "test": "NO_PROVISION_TESTS=1 whiskey --quiet --timeout 120000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
-  },
-  "engines": {
-    "node": "~0.4.9"
+    "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
+    "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --quiet --timeout 120000 --sequential -t \"`find test -name *.test.js | sort -r | xargs`\""
   }
 }

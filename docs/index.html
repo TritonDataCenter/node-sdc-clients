@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Joyent Engineering Guide</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="media/css/restdown.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+</head>
+<body>
+<div id="header">
+    <h1>Joyent Engineering Guide Documentation</h1>
+</div>
+
+    <div id="sidebar">
+<ul>
+  <li><div><a href="#repository-guidelines">Repository Guidelines</a></div>
+  <ul>
+    <li><div><a href="#Rule-#1:-FCS-Quality-All-the-Time"><span class="method name"><span class="name">Rule #1: FCS Quality All the Time</span></span></a></div></li>
+    <li><div><a href="#Repository-Naming"><span class="method name"><span class="name">Repository Naming</span></span></a></div></li>
+    <li><div><a href="#Language"><span class="method name"><span class="name">Language</span></span></a></div></li>
+    <li><div><a href="#Directory-Layout"><span class="method name"><span class="name">Directory Layout</span></span></a></div></li>
+    <li><div><a href="#Coding-Style"><span class="method name"><span class="name">Coding Style</span></span></a></div></li>
+    <li><div><a href="#Lint"><span class="method name"><span class="name">Lint</span></span></a></div></li>
+    <li><div><a href="#Copyright"><span class="method name"><span class="name">Copyright</span></span></a></div></li>
+    <li><div><a href="#Testing"><span class="method name"><span class="name">Testing</span></span></a></div></li>
+    <li><div><a href="#cscope"><span class="method name"><span class="name">cscope</span></span></a></div></li>
+    <li><div><a href="#Documentation"><span class="method name"><span class="name">Documentation</span></span></a></div></li>
+    <li><div><a href="#Managing-Node-Dependencies"><span class="method name"><span class="name">Managing Node Dependencies</span></span></a></div></li>
+    <li><div><a href="#Commit-Comments-and-JIRA-Tickets"><span class="method name"><span class="name">Commit Comments and JIRA Tickets</span></span></a></div></li>
+  </ul></li>
+  <li><div><a href="#logging-draft">Logging (DRAFT)</a></div></li>
+  <li><div><a href="#smf-integration">SMF Integration</a></div>
+  <ul>
+    <li><div><a href="#Managing-processes-under-SMF"><span class="method name"><span class="name">Managing processes under SMF</span></span></a></div></li>
+    <li><div><a href="#Service-logs"><span class="method name"><span class="name">Service logs</span></span></a></div></li>
+  </ul></li>
+  <li><div><a href="#rest-api-guidelines">REST API Guidelines</a></div>
+  <ul>
+    <li><div><a href="#Request-Identifiers"><span class="method name"><span class="name">Request Identifiers</span></span></a></div></li>
+    <li><div><a href="#XXX-Naming-Endpoints"><span class="method name"><span class="name">XXX Naming Endpoints</span></span></a></div></li>
+  </ul></li>
+  <li><div><a href="#miscellaneous-best-practices">Miscellaneous Best Practices</a></div></li>
+  <li><div><a href="#examples">Examples</a></div></li>
+</ul>
+
+    </div>
+    <div id="content">
+
+<h1>Joyent Engineering Guide</h1>
+<div class="intro">
+
+
+<p>This document describes standards and best practices for software development at
+Joyent. These standards are intended to maintain product quality and to provide
+consistency across codebases to make it easier for all engineers to learn new
+parts of the system. This latter goal is important to encourage everyone to feel
+comfortable diving into all parts of the system, as is often necessary when
+debugging.</p>
+
+<p>It's important to remember that all situations are unique, so rules should not
+be followed blindly. However, these guidelines represent the best practices
+agreed upon by the team. If you feel it necessary to diverge from them, that's
+okay, but be prepared to explain why.</p>
+
+<p>Note: In this document, services implementing an API are referred to as APIs.
+For example, "MAPI" denotes the service implementing the MAPI API.</p>
+
+
+</div>
+<h1 id="repository-guidelines">Repository Guidelines</h1>
+
+<p>These guidelines cover naming, structure, and processes around repositories.
+A template repository is included in this repo so you can quickly get something
+working that follows these guidelines.</p>
+
+<h2 id="Rule-#1:-FCS-Quality-All-the-Time"><span class="method name"><span class="name">Rule #1: FCS Quality All the Time</span></span></h2>
+
+<p>In general, use the "master" branch for development and releases. <strong>"master"
+must be FCS (First Customer Ship) quality at all times.</strong> Although releases are
+technically cut from release-specific branches, these branches are not expected
+to diverge significantly from "master" at the time the branch was cut except
+for fixes backported after the cut. That is, development should not be ongoing
+in the release branches.</p>
+
+<p>When working on large features, it's tempting to use development branches that
+eventually get integrated into master. Indeed, this is sometimes necessary.
+However, it should be avoided when possible, as it means people are running dev
+branches rather than "master", which can lead to a <a href="http://hub.opensolaris.org/bin/view/Community+Group+on/qual_death_spiral">quality death spiral
+(QDS)</a>
+as fewer people actually run the mainline tree. Where possible, consider
+whether larger projects can be split into reasonably-sized chunks that can
+individually be integrated into "master" without breaking existing
+functionality. This allows you to continue developing on "master" while still
+being able to commit frequently.</p>
+
+<h2 id="Repository-Naming"><span class="method name"><span class="name">Repository Naming</span></span></h2>
+
+<p>For repositories representing an API, the repo name that matches how the API is
+discussed (spoken, chatted and emailed) means you'll get the repo name right on
+first guess. If you can get away with it, a repo named after the abbreviate API
+name is best. For example:</p>
+
+<pre><code>Network API -&gt; NAPI -&gt; napi.git          # Good.
+                    -&gt; network-api.git   # Less good.
+                    -&gt; network_api.git   # Even less good.
+                    -&gt; NAPI.git          # Whoa! Capital letters are crazy here.
+</code></pre>
+
+<h2 id="Language"><span class="method name"><span class="name">Language</span></span></h2>
+
+<p>New server-side projects should almost certainly use Node.js with C/C++
+components as needed. Consolidating onto one language makes it easier for
+everyone to dig into other teams' projects as needed (for development as well
+as debugging) and allows us to share code and tools.</p>
+
+<h2 id="Directory-Layout"><span class="method name"><span class="name">Directory Layout</span></span></h2>
+
+<p>Here is a suggested directory/file structure for your repository. All
+repos <strong>must</strong> have a <code>README.md</code> and <code>Makefile</code>. The others are suggested
+namings for particular usages, should your repo require them.</p>
+
+<pre><code>build/          Built bits.
+deps/           Git submodules and/or commited 3rd-party deps should go
+                here. See "node_modules/" for node.js deps.
+docs/           Project docs. Uses restdown and man.
+lib/            JavaScript source files.
+node_modules/   Node.js deps, either populated at build time or commited.
+                See Managing Node Dependencies.
+pkg/            Package lifecycle scripts
+smf/manifests   SMF manifests
+smf/methods     SMF method scripts
+src/            C/C++ source files.
+test/           Test suite. node-tap prefered.
+tools/          Miscellaneous dev/upgrade/deployment tools and data.
+Makefile        See below.
+package.json    npm module info, if applicable (holds the project version)
+README.md       See below.
+</code></pre>
+
+<p>"docs" or "doc"? "test" or "tst"? We're not being religious about the
+directory names, however the Makefile target names should use the names
+specified below to allow automated build tools to rely on those names. The
+reason to suggest "docs" and "test" as the directory names is to have the
+same name as the Makefile targets.</p>
+
+<h3>README.md</h3>
+
+<p>Every repository <strong>must</strong> have in its root a README.md (Markdown) file that
+describes the repo and covers:</p>
+
+<ul>
+<li>the name of the API or other component(s) contained in the repo and a brief
+description of what they do</li>
+<li>the JIRA project for this repo (and any additional instructions, like how JIRA
+components are used for this project)</li>
+<li>owners of the project</li>
+<li>the style and lint configurations used, any additional pre-commit checks, and
+any non-standard useful Makefile targets</li>
+<li>some overview of the structure of the project, potentially including
+descriptions of the subcomponents, directory structure, and basic design
+principles</li>
+<li>basic development workflow: how to run the code and start playing with it</li>
+</ul>
+
+<p>It's strongly recommended to start with the template in this repo.</p>
+
+<h3>Makefile</h3>
+
+<p>All repos <strong>must</strong> have a Makefile that defines at least the following targets:</p>
+
+<ul>
+<li><code>all</code>: builds all intermediate objects (e.g., binaries, executables, docs,
+etc.). This should be the default target.</li>
+<li><code>check</code>: checks all files for adherence to lint, style, and other
+repo-specific rules not described here.</li>
+<li><code>clean</code>: removes all built files</li>
+<li><code>prepush</code>: runs all checks/tests required before pushing changes to the repo</li>
+<li><code>docs</code>: builds documentation (restdown, man pages)</li>
+<li><code>test</code>: runs the automated test suite</li>
+<li><code>release</code>: build releasable artifacts, e.g. a tarball (for projects that
+generate release packages)</li>
+</ul>
+
+<p>The <code>check</code> and <code>test</code> targets <strong>must</strong> fail if they find any 'check'
+violations or failed tests. The <code>prepush</code> target is intended to cover all
+pre-commit checks.  It <strong>must</strong> run successfully before any push to the repo.
+It <strong>must</strong> also be part of the automated build. Any commit which introduces a
+prepush failure <strong>must</strong> be fixed immediately or backed out. A typical prepush
+target will look like the following, but some non-code repositories might
+differ (e.g. not have a test suite):</p>
+
+<pre><code>prepush: check test
+        @echo "Okay to push."
+</code></pre>
+
+<h2 id="Coding-Style"><span class="method name"><span class="name">Coding Style</span></span></h2>
+
+<p>Every repository <strong>must</strong> have a consistent coding style that is enforced by
+some tool. It's not necessary that all projects use the same style, though it's
+strongly suggested to keep differences to a minimum (e.g., only hard vs. soft
+tabs and tabstops). All styles <strong>must</strong> limit line length to 80 columns.
+Existing style-checking tools include:</p>
+
+<ul>
+<li>C: <a href="https://github.com/joyent/illumos-joyent/blob/master/usr/src/tools/scripts/cstyle.pl">cstyle</a></li>
+<li>JavaScript: <a href="https://github.com/davepacheco/jsstyle">jsstyle</a>, <a href="https://code.google.com/closure/utilities/docs/linter_howto.html">gjslint</a></li>
+<li>Bash: bashstyle (contained in eng.git:tools/bashstyle)</li>
+<li>Makefiles: use bashstyle for now</li>
+</ul>
+
+<p>Both cstyle and jsstyle (which are 90% the same code) support overriding style
+checks on a per-line basis (e.g., for literal regular expressions). Feel free
+to add options to these tools to allow for flexibility, as in tabs vs. spaces.
+You can also write your own tool.</p>
+
+<p>Note that gjslint can be used as a style checker, but it is <strong>not</strong> a
+substitute for javascriptlint. And as with all style checkers, it <strong>must</strong> be
+integrated into <code>make check</code>.</p>
+
+<p>Bash scripts and Makefiles must also be checked for style. The only style
+guideline for now is the 80-column limit.</p>
+
+<p>Make target: "check"</p>
+
+<p><em>Note: It is understood that <code>jsstyle</code> currently isn't configurable for all
+the current common JavaScript styles in Joyent repositories. Adding support
+for those styles to jsstyle (or a separate tool) should be done, but
+prioritize accordingly with actual product work.</em></p>
+
+<h2 id="Lint"><span class="method name"><span class="name">Lint</span></span></h2>
+
+<p>Every C repository <strong>must</strong> run "lint" and every JavaScript repository <strong>must</strong>
+run <a href="http://github.com/davepacheco/javascriptlint">javascriptlint</a> and both
+<strong>must</strong> be lint-clean. Note that lint is not the same as style: lint covers
+objectively dangerous patterns like undeclared variables, while style covers
+subjective conventions like spacing.</p>
+
+<p>Both lint and javascriptlint are very configurable. Projects may choose to
+enable and disable particular sets of checks as they deem appropriate.  Most
+checks can be disabled on a per-line basis. As with style, it's recommended
+that we minimize divergence between repositories.</p>
+
+<p>Make target: "check" </p>
+
+<h2 id="Copyright"><span class="method name"><span class="name">Copyright</span></span></h2>
+
+<p>All source files (including Makefiles) should have a copyright statement that
+says:</p>
+
+<pre><code>Copyright (c) [year], Joyent, Inc. All rights reserved.
+</code></pre>
+
+<p>Year should be exactly the latest year when the file was changed, not a list or
+range of years. For example:</p>
+
+<pre><code>Copyright (c) 2012, Joyent, Inc. All rights reserved.
+</code></pre>
+
+<h2 id="Testing"><span class="method name"><span class="name">Testing</span></span></h2>
+
+<p>All repos <strong>must</strong> include a comprehensive automated test suite, preferably
+using node-tap. Bug fixes and new features should not be integrated without
+considering adding new tests.</p>
+
+<p>Make target: "test"</p>
+
+<h2 id="cscope"><span class="method name"><span class="name">cscope</span></span></h2>
+
+<p>cscope is a terminal-based tool for browsing source. For performance, it's best
+to use it with an index. For repos using this repo's Makefile, you can build a
+basic index in a source tree using:</p>
+
+<pre><code># make xref
+</code></pre>
+
+<p>which translates to:</p>
+
+<pre><code># cscope -bqR
+</code></pre>
+
+<p>To browse the source after the index is built, use:</p>
+
+<pre><code># cscope -dq
+</code></pre>
+
+<p>cscope is available for SmartOS in pkgsrc. It's also buildable on MacOS. For
+instructions, see <a href="https://hub.joyent.com/wiki/display/dev/Snow+Leopard+tips%2C+fixes+and+bugs">the
+wiki</a>.</p>
+
+<p>Make target: "xref"</p>
+
+<h2 id="Documentation"><span class="method name"><span class="name">Documentation</span></span></h2>
+
+<h3>API Documentation</h3>
+
+<p>You <strong>must</strong> use <a href="https://github.com/trentm/restdown">restdown</a>. Please discuss
+with Trent if this isn't workable for your project.</p>
+
+<p>Restdown is a tool for creating docs (and especially REST API docs) using a
+single Markdown file with a few added conventions. You can set it up as
+follows. Get the restdown tool:</p>
+
+<pre><code>git submodule add git://github.com/trentm/restdown.git deps/restdown
+cd deps/restdown/
+git checkout 1.2.15    # let's use a restdown release tag
+</code></pre>
+
+<p>Get a starter restdown file:</p>
+
+<pre><code>mkdir -p docs/media/img
+cp ../eng/docs/boilerplateapi.restdown docs/index.restdown
+cp ../eng/docs/media/img/favicon.ico docs/media/img/
+cp ../eng/docs/media/img/logo.png docs/media/img/
+</code></pre>
+
+<p>Tell the Makefile about it (<code>make docs</code>):</p>
+
+<pre><code>DOC_FILES = docs/index.restdown
+</code></pre>
+
+<p>TODO: Finish off static serving of the docs in server.js.</p>
+
+<h3>Code Documentation</h3>
+
+<p>Consider adding a block comment at the top of every file that describes at a
+high level the component that's implemented in the file. For example:</p>
+
+<pre><code>/*
+ * ca-profile.js: profile support
+ *
+ * Profiles are sets of metrics.  They can be used to limit visibility of
+ * metrics based on module, stat, or field names, or to suggest a group of
+ * metrics to a user for a particular use case.
+ */
+</code></pre>
+
+<p>For non-trivial subsystems, consider adding a Big Theory statement that
+describes what the component does, the external interface, and internal details.
+For a great example, check out
+<a href="https://github.com/joyent/illumos-joyent/blob/master/usr/src/uts/common/os/panic.c#L29">panic.c</a>
+in the kernel.</p>
+
+<p>Consider keeping design documents in restdown inside the repo. It's okay to have
+one-off documents for specific projects, even if they become out of date as the
+code evolves, but make clear in the document that the content may be out of
+date. Keep such docs separate from general design documents that are kept up to
+date.</p>
+
+<h3>Man Pages</h3>
+
+<p>XXX use ronn. Is ronnjs acceptable now? If so, document then and add examples.
+XXX use normal man page syntax for existing repos (illumos-joyent)</p>
+
+<h2 id="Managing-Node-Dependencies"><span class="method name"><span class="name">Managing Node Dependencies</span></span></h2>
+
+<p>There are several ways of managing Node dependencies, each with notable pros
+and cons. Choose whatever method works best for you, but try to be consistent
+within a given repo. Either way, "make all" and other "make" targets should
+automatically take care of setting up dependencies as needed.</p>
+
+<p>With any of these methods, beware that the build process <strong>must not</strong> use
+external resources because they cannot be trusted and may not even be
+available.</p>
+
+<p><em>Note: From the length of this section, it should be obvious that this
+isn't full baked yet. We need some more experience.</em></p>
+
+<h3>Method 1: Commit node_modules to Git</h3>
+
+<p>In short: <code>npm install</code> to install all your deps, <code>git add node_modules</code>,
+and commit. For binary modules: exclude binary bits and use <code>npm rebuild</code>
+at build time.</p>
+
+<p>This should be simple and easy to manage. However there are some remaining
+questions on implementing this in general:</p>
+
+<ul>
+<li>Are there difficulties with the <code>git add node_modules</code> due to .gitignore
+files in the deps? "node_modules" is a common entry in many node modules'
+.gitignore files. Perhaps just deleting them all is sufficient
+(.npmignore vs. .gitignore).</li>
+<li>Do "devDependencies" get in the way here? Presumably we wouldn't commit
+dev dependencies. Perhaps specific "node_modules/my-dev-dep" entries
+in ".gitignore" would suffice.</li>
+<li>TODO: spec the .gitignore entries to facilitate excluding binary bits
+in the <code>git add node_modules</code>.</li>
+</ul>
+
+<p>One downside with this approach is that there's nothing to enforce that the
+committed source actually matches what it's supposed to (i.e. and hasn't been
+inadvertently changed). This isn't likely to be an issue as engineers <em>should</em>
+know that source in node_modules is not original and must not be modified
+directly.</p>
+
+<p>One suggestion for the "floating patches" is to create a fork of the module
+(e.g.  <a href="http://search.npmjs.org/#/trentm-datetime">trentm-datetime</a> for
+<a href="http://search.npmjs.org/#/datetime">datetime</a>) until patches are released
+upstream.</p>
+
+<h3>Method 2: Git Submodules for Sources</h3>
+
+<p>Use git submodules to get the source for all dependent packages,
+<code>git submodule add git://github.com/bob/my-dep.git deps/my-dep</code>, and either
+reference the dependency's source directly or use <code>npm install deps/my-dep</code> at
+build time.  This avoids the potential inconsistency problem described above,
+but it's unclear how this can be generalized for dependencies with their own dependencies. Also, git submodules are somewhat clumsy.</p>
+
+<h3>Method 3: List Specific Versions</h3>
+
+<p>List specific versions (e.g., "1.2.3" not "1.2") for all deps <strong>and all deps
+of deps</strong> in your top-level "package.json". Then <code>npm install</code> to get
+specific versions of everything. You can check this by making sure there are
+no "node_modules/*/node_modules" directories.  This method requires vigilance
+when adding new dependencies, though that could be automatically checked as
+part of "make prepush". Another problem is that this method cannot support two different versions of a given module (used by different dependencies).</p>
+
+<p>The "./tools/npmfreeze.js" tool in this repo can help you put together the list
+of versions.</p>
+
+<h2 id="Commit-Comments-and-JIRA-Tickets"><span class="method name"><span class="name">Commit Comments and JIRA Tickets</span></span></h2>
+
+<p>In collaborating on a body of software as large as SDC, it's critical that the
+issues and thought processes behind non-trivial code changes be documented,
+whether that's through code comments, git commit comments, or JIRA tickets.
+There are many cases where people other than the original author need to
+examine the git log:</p>
+
+<ul>
+<li>An engineer in another area tries to understand a bug they've run into (in
+your repo or not), possibly as a result of a recent change. The easier it is
+for people to move between repos and understand recent changes, the more
+quickly bugs in master can be root-caused. This is particularly important to
+avoid an issue bouncing around between teams where the problem is <em>not</em>.</li>
+<li>An engineer in another area tries to understand when a feature or bugfix
+was integrated into your repo so that they can pull it down to use it.</li>
+<li>An engineer working on the same code base, possibly years later, needs to
+modify (or even rewrite) the same code to fix another bug. They need to
+understand why a particular change was made the way it was to avoid
+reintroducing the original bug (or introducing a new bug).</li>
+<li>A release engineer tries to better understand the risk and test impact of a
+change to decide whether it's appropriate to backport.</li>
+<li>A support engineer tries to better understand the risk and test impact of a
+change to decide whether it's appropriate for binary relief or hot patching.</li>
+<li>Product management wants to determine when a feature or bugfix was integrated.</li>
+<li>Automated tools want to connect commits to JIRA tickets.</li>
+</ul>
+
+<p>To this end, we require that with every commit there <strong>must</strong> be a comment that
+includes the list of JIRA tickets addressed with this commit and a synopsis of
+the changes (<em>either</em> for the whole commit <em>or</em> for each change, one by one).
+<strong>Between the JIRA ticket and the commit comment itself, there must be
+sufficient information for an engineer that's moderately familiar with the code
+base, possibly years later but with source in hand, to understand how and why
+the change was made.</strong></p>
+
+<p>The worst case is when the thought process and issue list are nowhere: not in
+the comments and not in the JIRA tickets.</p>
+
+<h3>Commit Comments</h3>
+
+<p>Across Joyent we require that <strong>each commit be associated with one or more JIRA
+tickets and that those tickets be listed in the commit comments</strong>. This way,
+given either the commit or the JIRA ticket, one can find the other.</p>
+
+<p>Historically, some repos (notably illumos-joyent and cloud-analytics) have
+additionally required that tickets must not be reused for multiple commits in
+the same repo except for very minor changes like fixing lint or style warnings.
+This makes it easier to correlate tickets and commits, since there's usually
+exactly one commit for each resolved ticket. It also makes it easier to
+back out the changes for a particular project. For these repos, the git
+comments for the commit consist of a single line per JIRA ticket being resolved
+in the commit. Each line consists of the ticket identifier and the synopsis
+exactly as it appears in JIRA (optionally truncated to 80 characters with
+"..."):</p>
+
+<pre><code>OS-147 vfsstat command to show VFS activity by zone
+OS-148 Update ziostat to coexist peacefully with vfsstat
+OS-149 New kstats to support vfsstat
+</code></pre>
+
+<p>This approach encourages short, descriptive ticket synopses. For repos that keep
+track of code reviews (e.g., illumos-joyent), that information is appended like
+this:</p>
+
+<pre><code>OS-850 Add support for Intel copper quad I350 to igb.
+Reviewed by: Jerry Jelinek &lt;jerry.jelinek@joyent.com&gt;
+</code></pre>
+
+<p>In the rare cases where the same ticket is used for multiple commits, a
+parenthetical is used to explain why:</p>
+
+<pre><code>INTRO-581 move mdb_v8 into illumos-joyent (missing file)
+</code></pre>
+
+<p>This structure works well for established repos like illumos, but it's not
+always appropriate. For new work on greenfield projects, it may not even make
+sense to use more than one ticket until the project reaches a first milestone.</p>
+
+<h3>JIRA Tickets</h3>
+
+<p>For bugs, especially those that a customer could hit, consider including
+additional information in the JIRA ticket:</p>
+
+<ul>
+<li>An explanation of what happened and the root cause, referencing the source
+where appropriate. This can be useful to engineers debugging similar issues
+or working on the same area of code who want to understand exactly why a
+change was made.</li>
+<li>An explanation of how to tell if you've hit this issue. This can be pretty
+technical (log entries, tools to run, etc.). This can be useful for engineers
+to tell if they've hit this bug in development as well as whether a customer
+has hit the bug.</li>
+<li>A workaround, if any.</li>
+</ul>
+
+<p>Of course, much of this information won't make sense for many bugs, so use your
+judgment, but don't assume that you're the only person who will ever look at the
+ticket.</p>
+
+<h1 id="logging-draft">Logging (DRAFT)</h1>
+
+<p><strong>Note: this section is still under heavy revision.</strong></p>
+
+<p>There are at least three different consumers for a service's logs:</p>
+
+<ul>
+<li>engineers debugging issues related to the service (which may not actually be
+problems with the service)</li>
+<li>monitoring tools that alert operators based on error events or levels of
+service activity</li>
+<li>non real-time analysis tools examining API activity to understand performance
+and workload characteristics and how people use the service</li>
+</ul>
+
+<p>For the debugging use case, <strong>the goal should be to have enough information
+available after a crash or an individual error to debug the problem from the
+very first occurrence in the field</strong>. It should also be possible for engineers
+to manually dump the same information as needed to debug non-fatal failures.</p>
+
+<p>Logs intended for humans may be plain text or structured (for processing by
+tools that will present the logs to people), but logs intended for machines
+<strong>must</strong> be formatted in
+<a href="http://journal.paul.querna.org/articles/2011/12/26/log-for-machines-in-json/">JSON</a>,
+which we'll call sdclog format.</p>
+
+<p>Multiple use cases do not require multiple log files.  Most services should log
+all activity (debugging, errors, and API activity) in JSON to either the SMF
+log or into a separate log file in
+/var/smartdc/&lt;service&gt;/logs/&lt;component&gt;.sdclog. For services with
+extraordinarily high volume for which it makes sense to separate out API
+activity into a separate file, that should be directed to
+/var/smartdc/&lt;service&gt;/logs/requests.sdclog However, don't use separate
+log files unless you're sure you need it.  All log files in
+/var/smartdc/&lt;service&gt;/logs should be configured for appropriate log
+rotation.</p>
+
+<p>For any log entries generated while handling a particular request, the log
+entry <strong>must</strong> include the request id. See "Request Identifiers" under "REST
+API Guidelines" below.</p>
+
+<p><strong>Note: we will be providing a common logging facility for logging in Node
+programs, but it's not yet available.</strong></p>
+
+<p>The following JSON keys should be used in log messages:</p>
+
+<table>
+<tbody>
+<tr><td><strong>JSON key</strong></td><td><strong>Description</strong></td><td><strong>Examples</strong></td><td><strong>Required</strong></td></tr>
+<tr><td><strong>time</strong></td><td>Date/time of event in <a href="http://www.hackcraft.net/web/datetime/#w3cdtf">W3C DTF</a> format using UTC: <code>YYYY-MM-DDThh:mm:ss.sssZ</code></td><td>"2012-01-26T19:20:30.450Z"</td><td>All entries</td></tr>
+<tr><td><strong>hostname</strong></td><td>Server hostname</td><td><code>uname -n</code></td><td>All entries</td></tr>
+<tr><td><strong>facility</strong></td><td>Service name</td><td>"ca" (for Cloud Analytics)</td><td>All entries</td></tr>
+<tr><td><strong>component</strong></td><td>Service component</td><td>"aggregator-12"</td><td>All entries for services with multiple components</td></tr>
+<tr><td><strong>type</strong></td><td>Used for different types of messages from the same service</td><td>"debug", "request"</td><td>All entries as desired</td></tr>
+<tr><td><strong>severity</strong></td><td>Log level.</td><td>"fatal", "error", "warn", "info", or "debug"</td><td>Entries with "type" == "debug"</td></tr>
+<tr><td><strong>request_id</strong></td><td>String request identifier</td><td>See "Request Identifiers" under "REST API Guidelines" below.</td><td>All entries relating to a particular request</td></tr>
+<tr><td><strong>short_message</strong></td><td>Short human- and machine-readable message</td><td>"illegal argument error"</td><td>Entries with "type" == "debug"</td></tr>
+<tr><td><strong>full_message</strong></td><td>Human-readable message</td><td>"illegal argument: parameter \'retention-time\' must be numeric"</td><td>Entries with "type" == "debug"</td></tr>
+<tr><td><strong>latency</strong></td><td>Time of request in milliseconds</td><td>155</td><td>Entries describing the completion of a request or other backend operation</td></tr>
+<tr><td><strong>http_method</strong></td><td>HTTP method</td><td>"GET"</td><td>Entries describing an HTTP request</td></tr>
+<tr><td><strong>http_uri</strong></td><td>HTTP URL path (not including querystring)</td><td>"/instrumentations/10"</td><td>Entries describing an HTTP request</td></tr>
+<tr><td><strong>http_qstring</strong></td><td>HTTP URL querystring</td><td>"?foo=bar"</td><td>Entries describing an HTTP request</td></tr>
+<tr><td><strong>http_headers</strong></td><td>HTTP headers</td><td><code>\{ "content-length": 5278 \}</code></td><td>Entries describing an HTTP request</td></tr>
+<tr><td><strong>http_user</strong></td><td>Authenticated user name</td><td>"dap"</td><td>Entries describing an HTTP request</td></tr>
+<tr><td><strong>http_body</strong></td><td>HTTP request body</td><td>arbitrary</td><td>Entries describing an HTTP request where the body may be significant (e.g., contain request parameters) and will not be very large (as for most REST services)</td></tr>
+<tr><td><strong>http_status</strong></td><td>HTTP status code</td><td>200</td><td>Entries describing the completion of an HTTP request</td></tr>
+</tbody>
+</table>
+
+<p>The hostname and facility should be included in all entries so that logs are
+self-contained. This makes them substantially easier to move (e.g., via support
+bundles) and then aggregate.</p>
+
+<p>We use these definitions for log severity levels:</p>
+
+<ul>
+<li>"fatal": the service is going to stop or become unusable now</li>
+<li>"error": fatal for a particular request, but the service continues servicing other requests</li>
+<li>"warn": a note on something that should probably be looked at by an operator</li>
+<li>"info": detail on regular operation</li>
+<li>"debug": anything else, i.e. too verbose to be included in "info" level.</li>
+</ul>
+
+<p>"debug" should be used sparingly. Information that will be useful to debug
+errors <em>post mortem</em> should usually be included in "info" messages if it's
+generally relevant or else with the corresponding "error" event. Don't rely on
+spewing mostly irrelevant debug messages all the time and sifting through them
+when an error occurs.</p>
+
+<p>Most of the time, different services should log to different files. But in some
+cases it's desirable for multiple consumers to log to the same file, as for
+vmadm and vmadmd. For such cases, syslog is an appropriate choice for logging
+since it handles synchronization automatically. Care must be taken to support
+entries longer than 1024 characters.</p>
+
+<h1 id="smf-integration">SMF Integration</h1>
+
+<p>All services <strong>must</strong> be delivered as SMF services. This means:</p>
+
+<ul>
+<li>They deliver an SMF service manifest.</li>
+<li>The install mechanism imports the manifest.</li>
+<li>The uninstall mechanism deletes the service.</li>
+<li>The service is started, stopped, restarted, etc. via SMF.</li>
+</ul>
+
+<p>While SMF itself is grimy and the documentation is far from perfect, the
+documentation <em>is</em> extensive and useful. Many common misunderstandings about
+how SMF works are addressed in the documentation. It's strongly recommended
+that you take a pass through the docs before starting the SMF integration for
+your service. In order of importance, check out:</p>
+
+<ul>
+<li>SMF concepts: smf(5), smf_restarter(5), smf_method(5), svc.startd(1M)</li>
+<li>Tools: svcs(1), svcadm(1M), svccfg(1M)</li>
+</ul>
+
+<p>Common mistakes include:</p>
+
+<ul>
+<li>Setting the start method to run the program you care about (e.g., "node
+foo.js") rather than backgrounding it (e.g., "node foo.js &amp;"). SMF expects
+the start method to start the service, not <em>be</em> the service. It times out
+start methods that don't complete, so if you do this you'll find that your
+service is killed after some default timeout interval. After this happens
+three times, SMF moves the service into maintenance.</li>
+<li>Using "child" or "wait model" services to avoid the above problem. Read the
+documentation carefully; this probably doesn't do what you want. In
+particular, if your "wait model" service fails repeatedly, SMF will never put
+it into maintenance. It will just loop forever, forking and exiting.</li>
+<li>Not using "-s" with svcadm enable/disable. Without "-s", these commands are
+asynchronous, which means the service may not be running when "svcadm enable"
+returns. If you really care about this, you should check the service itself
+for liveness, not rely on SMF, since the start method may have completed
+before the service has opened its TCP socket (for example).</li>
+</ul>
+
+<h2 id="Managing-processes-under-SMF"><span class="method name"><span class="name">Managing processes under SMF</span></span></h2>
+
+<p>SMF manages processes using an OS mechanism called contracts. See contract(4)
+for details. The upshot is that it can reliably tell when a process is no
+longer running, and it can also track child processes.</p>
+
+<p>Quoting svc.startd(1M):</p>
+
+<pre><code> A contract model service fails if any of the following conditions
+ occur:
+
+     o    all processes in the service exit
+
+     o    any processes in the service produce a core dump
+
+     o    a process outside the service sends a service process a
+          fatal signal (for example, an administrator terminates a
+          service process with the pkill command)
+</code></pre>
+
+<p>Notice that if your service forks a process and <em>that</em> process exits,
+successfully or otherwise, SMF will not consider that a service failure. One
+common mistake here is forking a process that will be part of your service, but
+not considering what happens when that process fails (exits). SMF will not
+restart your service, so you'll have to manage that somehow.</p>
+
+<h2 id="Service-logs"><span class="method name"><span class="name">Service logs</span></span></h2>
+
+<p>SMF maintains a log for each service in /var/svc/log. The system logs restarter
+events here and launches the start method with stderr redirected to the log,
+which often means the service itself will have stderr going to this log as
+well. It's recommended that services either use this log for free-form debug
+output or use the standard logging facility described under "Logging" above.</p>
+
+<h1 id="rest-api-guidelines">REST API Guidelines</h1>
+
+<p>It's strongly recommended to use
+<a href="https://github.com/mcavage/node-restify">restify</a> for all web services. Not
+only will you leverage common code and test coverage, but restify gives you
+features like DTrace observability, debuggability, throttling, and versioning
+out of the box. If it doesn't support something you need, consider adding it
+rather than rolling your own.</p>
+
+<h2 id="Request-Identifiers"><span class="method name"><span class="name">Request Identifiers</span></span></h2>
+
+<p>A request identifier uniquely identifies an operation across multiple services
+(e.g., portal, cloudapi, ca, ufds). It's essential for debugging issues after
+they've happened. The goal is for issues to be debuggable from the information
+available after their first occurrence, without having to reproduce it to
+gather more information. To facilitate this:</p>
+
+<ul>
+<li>When an external service receives a request from the outside, it <strong>must</strong>
+generate a unique request identifier and include it in the "x-request-id"
+header of any requests made as part of handling the initial request.</li>
+<li>When any service receives a request with an "x-request-id" header, it
+<strong>must</strong> include it in the "x-request-id" header of any request made as part
+of handling that request.</li>
+<li>When each service logs activity (API requests), alerts, or debug messages
+related to a particular request, it <strong>must</strong> include the request id.</li>
+</ul>
+
+<h2 id="XXX-Naming-Endpoints"><span class="method name"><span class="name">XXX Naming Endpoints</span></span></h2>
+
+<p>TODO: codify some of MarkC's and my (mostly mark) discussions on naming of
+API endpoints.</p>
+
+<h1 id="miscellaneous-best-practices">Miscellaneous Best Practices</h1>
+
+<ul>
+<li>Use JSON for config data. Not ini files: iniparser module has bugs, there
+are always questions about encoding non-string values.</li>
+<li>For services and distributed systems, consider building rich tools to
+understand the state of the service, like lists of the service's objects and
+information about each one. Think of the SmartOS proc(1) tools (see man pages
+for pgrep, pstack, pfiles, pargs).</li>
+<li>Consider doing development inside a SmartOS zone rather than on your Macbook
+or a COAL global zone. That forces us to use our product the way customers
+might, and it eliminates classes of problems where the dev environment doesn't
+match production.</li>
+<li>Whether you develop in COAL or on your Macbook, document what's necessary to
+get from scratch to a working development environment so that other people can
+try it out. Ideally, automate it. Having a script is especially useful if you
+do develop on COAL, which also forces you to keep it up to date.</li>
+<li>Similarly, build tools to automate deploying bits to a test system (usually a
+SmartOS headnode zone). The easier it is to test the actual deployment, the
+more likely people will actually test that, and you'll catch environment
+issues in development instead of after pushing.</li>
+</ul>
+
+<h1 id="examples">Examples</h1>
+
+<ul>
+<li>The <a href="boilerplateapi.html">boilerplate API</a> example in this repo gives you a
+starter file and some suggestions on how to document a web service.</li>
+</ul>
+
+    </div>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+    var headerHeight = $("#header").height();
+
+    var sections = $("#content h1[id], #content h2[id]");
+    var sectionOffsets = [];
+    var slack = 100;  // Give the section scroll some slack (in pixels).
+    sections.each(function(elem) {
+        sectionOffsets.push($(this).offset().top - headerHeight - slack);
+    });
+
+    var currSectionIdx = -1;
+    function getSectionIdx(scrollDistance) {
+        if (scrollDistance < sectionOffsets[0]) {
+            return -1;
+        } else {
+            for (var id = sectionOffsets.length; id > 0; id--) {
+                if (scrollDistance > sectionOffsets[id - 1]) {
+                    return id - 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    /** {{{ http://code.activestate.com/recipes/577787/ (r2) */
+    _slugify_strip_re = /[^\w\s-]/g;
+    _slugify_hyphenate_re = /[-\s]+/g;
+    function slugify(s) {
+      s = s.replace(_slugify_strip_re, '').trim().toLowerCase();
+      s = s.replace(_slugify_hyphenate_re, '-');
+      return s;
+    }
+    /** end of http://code.activestate.com/recipes/577787/ }}} */
+
+
+    $("#content").scroll(function() {
+        var scrollDistance = $("#content").attr('scrollTop');
+        var sectionIdx = getSectionIdx(scrollDistance);
+    
+        if (sectionIdx !== currSectionIdx) {
+            $("#sidebar li>div").removeClass("current");
+            currSectionIdx = sectionIdx;
+            if (currSectionIdx >= 0) {
+                var heading = $(sections[currSectionIdx]).text();
+                var possibleAnchors = [
+                    slugify(heading), // h1 or non-method h2
+                    heading.replace(/ /g, '-'), // h2 method, just name or just endpoint
+                    heading.slice(0, heading.lastIndexOf(' (')).trimRight().replace(/ /g, '-'), // h2 method, name and endpoint
+                ]
+                for (var i=0; i < possibleAnchors.length; i++) {
+                    $("#sidebar a[href|=#" + possibleAnchors[i] + "]").parent().addClass("current");
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
