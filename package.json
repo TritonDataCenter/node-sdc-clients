@@ -4,6 +4,7 @@
   "version": "7.0.3",
   "homepage": "http://www.joyent.com",
   "private": true,
+  "main": "./lib/index.js",
   "dependencies": {
     "http-signature": "0.9.8",
     "ldapjs": "0.4.7",
