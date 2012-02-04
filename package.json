@@ -4,6 +4,7 @@
   "version": "7.0.0",
   "author": "Joyent (joyent.com)",
   "private": true,
+  "main": "./lib/index.js",
   "dependencies": {
     "http-signature": "0.9.7",
     "ldapjs": "0.4.7",
