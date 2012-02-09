@@ -1,5 +1,7 @@
 # sdc-clients Changelog
 
+- HEAD-912: Add MAPI.{getBootParams,createNic} for the benefit of dhcpd.
+
 ## sdc-clients 7.0.0
 
 - Port most clients to restify 1.0
