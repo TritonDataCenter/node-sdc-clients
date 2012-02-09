@@ -2,6 +2,7 @@
 
 ## sdc-clients 7.0.0
 
+- Port most clients to restify 1.0
 - PROV-1370: MAPI.{count,list}{Zones,VMs}: drop 'all*' options. Just always set 'X-Joyent-Ignore-Provisioning-State' header.
 - PROV-1369: `count` in callback from `MAPI.countVMs` and `MAPI.countZones` 
 
