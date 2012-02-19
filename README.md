@@ -15,7 +15,8 @@ Node.js client libraries for the various SDC REST API services.
 # Repository
 
     lib/            Source files.
-    tst/            Test suite (using whiskey)
+    test/           Test suite (using whiskey)
+    tools/          Dev support tools
     Makefile
     package.json    npm module info (holds the project version)
     README.md
