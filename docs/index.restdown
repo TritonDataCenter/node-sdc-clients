@@ -46,7 +46,7 @@ Unbinds the underlying LDAP client.
 Checks a user's password in UFDS.
 
 Returns a RestError of '401' if password mismatches. Returns the same user
-object as getUser on success.
+object as getUser on success. 
 
 ### Arguments:
 
@@ -91,7 +91,7 @@ Looks up a user by login to UFDS.
 
 ### Throws
 
-|| TypeError || on bad input.
+|| TypeError || on bad input. ||
 
 
 
@@ -340,9 +340,9 @@ Low-level API to wrap up UFDS modify operations.
 See ldapjs docs.
 
 || *Name* || *Type* || *Description* ||
-|| dn || String || dn to update
-|| changes || Object || changes to make.
-|| callback || Function || callback of the form fn(error).
+|| dn || String || dn to update ||
+|| changes || Object || changes to make. ||
+|| callback || Function || callback of the form fn(error). ||
 
 ### Throws
 
