@@ -19,7 +19,7 @@
 #
 NPM		:= npm
 WHISKEY		:= ./node_modules/.bin/whiskey
-WHISKEY_ARGS	:= --failfast --sequential --real-time --timeout 120000 --tests
+WHISKEY_ARGS	:= --test-reporter tap --failfast --sequential --real-time --timeout 120000 --tests
 
 #
 # Files
