@@ -7,16 +7,13 @@ markdown2extras: wiki-tables, code-friendly
 
 node-sdc-clients provides node.js client libraries for SDC Services.
 
-**Repository:** git@git.joyent.com:node-sdc-clients.git
-
-**Browsing:** https://mo.joyent.com/node-sdc-clients
-
-**Who:** Mark Cavage and others
-
-**Tickets:** https://devhub.joyent.com/jira/browse/TOOLS or the specific service
+||**Repository**|| git@git.joyent.com:node-sdc-clients.git ||
+||**Browsing**|| <https://mo.joyent.com/node-sdc-clients> ||
+||**Who**|| Mark Cavage and others ||
+||**Tickets**|| <https://devhub.joyent.com/jira/browse/TOOLS> or the specific service ||
 
 
-# UFDS API
+# UFDS API Client
 
 ## UFDS(options)
 
@@ -46,7 +43,7 @@ Unbinds the underlying LDAP client.
 Checks a user's password in UFDS.
 
 Returns a RestError of '401' if password mismatches. Returns the same user
-object as getUser on success. 
+object as getUser on success.
 
 ### Arguments:
 
@@ -383,3 +380,19 @@ Convenience mechanism to set the LDAP log level.
 ### Throws
 
 || TypeError || on bad input. ||
+
+
+
+# Amon Master API Client
+
+TODO
+
+
+# CA API Client
+
+TODO
+
+
+# MAPI Client
+
+TODO
