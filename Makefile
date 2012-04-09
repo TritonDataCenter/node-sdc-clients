@@ -36,7 +36,7 @@ JSL_FILES_NODE   = $(JS_FILES)
 all:
 	$(NPM) rebuild
 
-.PHONY: test ca_test mapi_test ufds_test
+.PHONY: test ca_test mapi_test ufds_test config_test
 
 ca_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/ca.test.js
@@ -47,7 +47,10 @@ mapi_test: $(WHISKEY)
 ufds_test:
 	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
 
-test: ca_test mapi_test ufds_test
+config_test:
+	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
+
+test: ca_test mapi_test ufds_test config_test
 
 include ./Makefile.deps
 include ./Makefile.targ
