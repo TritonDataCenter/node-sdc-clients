@@ -396,3 +396,35 @@ TODO
 # MAPI Client
 
 TODO
+
+# Config Client
+
+The config client can be used by importing sdc-clients.Config, creating
+a new Config object and utilizing it's properties as though it were a simple
+JS object.
+
+    var cfg = new Config({svc: 'capi', ufdsargs: ufds});
+    var url = cfg.url;
+
+## Config(options)
+
+Creates a UFDS Config client instance.
+
+Options must be an object that contains
+
+|| *Name* || *Type* || *Description* ||
+|| svc || String || name of the service to fetch configuration for ||
+|| ufdsargs || object || ufds options as documented in the UFDS section above ||
+|| dc || String || optional* the datacentre name, if used for scoping ||
+|| host || String || optional* the host name, if used for scoping ||
+|| nofollowref || Object or *false* || optional* do not follow ldap referrals (to other services) ||
+
+
+## insert(cfg)
+
+Insert the properties in *cfg* in to the configuration database
+
+|| *Name* || *Type* || *Description* ||
+|| cfg || Object || object containing the key:value pairs of properties to insert ( must be of the form key:*String* ) ||
+
+
