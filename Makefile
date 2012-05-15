@@ -19,7 +19,9 @@
 #
 NPM		:= npm
 WHISKEY		:= ./node_modules/.bin/whiskey
+NODEUNIT	:= ./node_modules/.bin/nodeunit
 WHISKEY_ARGS	:= --test-reporter tap --failfast --sequential --real-time --timeout 120000 --tests
+NODEUNIT_ARGS   :=
 
 #
 # Files
@@ -46,6 +48,9 @@ mapi_test: $(WHISKEY)
 
 zapi_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/zapi.test.js
+
+cnapi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
 
 ufds_test:
 	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js

@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "bunyan": "0.6.8",
-    "whiskey": "0.6.6"
+    "whiskey": "0.6.6",
+    "nodeunit": "0.7.4"
   },
   "scripts": {
     "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",

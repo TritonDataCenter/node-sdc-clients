@@ -10,8 +10,7 @@ var ZAPI = require('../lib/index').ZAPI;
 
 ///--- Globals
 
-var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || '0.0.0.0:8080');
-// var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || '10.99.99.19');
+var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || '10.99.99.19');
 
 var zapi = null;
 var ZONE = null;
@@ -45,7 +44,7 @@ exports.setUp = function(test, assert) {
   zapi = new ZAPI({
     url: ZAPI_URL,
     username: 'admin',
-    password: 'z3cr3t',
+    password: 'lbpass123',
     retry: {
       retries: 1,
       minTimeout: 1000
