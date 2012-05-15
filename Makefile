@@ -44,6 +44,9 @@ ca_test: $(WHISKEY)
 mapi_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/mapi.test.js
 
+zapi_test: $(WHISKEY)
+	$(WHISKEY) $(WHISKEY_ARGS) test/zapi.test.js
+
 ufds_test:
 	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
 
