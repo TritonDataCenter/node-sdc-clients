@@ -106,7 +106,10 @@ exports.test_create_zone = function(test) {
     test.ifError(err);
     test.ok(machine);
     test.equal(opts.ram, machine.ram);
-    ZONE = machine.uuid;
+    QUERY = {
+      uuid: machine.uuid,
+      owner_uuid: CUSTOMER
+    };
     test.done();
   });
 };
