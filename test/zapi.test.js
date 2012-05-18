@@ -15,6 +15,7 @@ var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || '10.99.99.19');
 var zapi = null;
 var ZONE = null;
 var DATASET_UUID = null;
+var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
 
 
@@ -23,7 +24,7 @@ var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
 
 function waitForState(state, callback) {
   function check() {
-    return zapi.getMachine(ZONE, function(err, machine) {
+    return zapi.getMachine(QUERY, function(err, machine) {
       if (err)
         return callback(err);
 
@@ -40,7 +41,7 @@ function waitForState(state, callback) {
 
 ///--- Tests
 
-exports.setUp = function(test, assert) {
+exports.setUp = function(callback) {
   zapi = new ZAPI({
     url: ZAPI_URL,
     username: 'admin',
@@ -56,40 +57,44 @@ exports.setUp = function(test, assert) {
       serializers: Logger.stdSerializers
     })
   });
-  test.finish();
+  callback();
 };
 
 
-exports.test_list_machines = function(test, assert) {
+exports.test_list_machines = function(test) {
   zapi.listMachines(function(err, machines) {
-    assert.ifError(err);
-    assert.ok(machines);
+    test.ifError(err);
+    test.ok(machines);
     ZONE = machines[0].uuid;
     DATASET_UUID = machines[0].dataset_uuid;
-    test.finish();
+    QUERY = {
+      uuid: ZONE,
+      owner_uuid: CUSTOMER
+    };
+    test.done();
   });
 };
 
 
-exports.test_list_machines_by_owner = function(test, assert) {
+exports.test_list_machines_by_owner = function(test) {
   zapi.listMachines({ owner_uuid: CUSTOMER }, function(err, machines) {
-    assert.ifError(err);
-    assert.ok(machines);
-    test.finish();
+    test.ifError(err);
+    test.ok(machines);
+    test.done();
   });
 };
 
 
-exports.test_get_machine = function(test, assert) {
-  zapi.getMachine(ZONE, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    test.finish();
+exports.test_get_machine = function(test) {
+  zapi.getMachine(QUERY, function(err, machine) {
+    test.ifError(err);
+    test.ok(machine);
+    test.done();
   });
 };
 
 
-exports.test_create_zone = function(test, assert) {
+exports.test_create_zone = function(test) {
   var opts = {
     owner_uuid: CUSTOMER,
     dataset_uuid: DATASET_UUID,
@@ -98,93 +103,93 @@ exports.test_create_zone = function(test, assert) {
   };
 
   zapi.createMachine(opts, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    assert.equal(opts.ram, machine.ram);
+    test.ifError(err);
+    test.ok(machine);
+    test.equal(opts.ram, machine.ram);
     ZONE = machine.uuid;
-    test.finish();
+    test.done();
   });
 };
 
 
-exports.test_wait_for_running = function(test, assert) {
+exports.test_wait_for_running = function(test) {
   waitForState('running', function(err) {
-    assert.ifError(err);
+    test.ifError(err);
     setTimeout(function () {
       // Try to avoid the reboot after zoneinit so we don't stop the zone
       // too early
-      test.finish();
+      test.done();
     }, 20000);
 
   });
 };
 
 
-exports.test_stop_zone = function(test, assert) {
-  zapi.stopMachine(ZONE, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    test.finish();
+exports.test_stop_zone = function(test) {
+  zapi.stopMachine(QUERY, function(err, machine) {
+    test.ifError(err);
+    test.ok(machine);
+    test.done();
   });
 };
 
 
-exports.test_wait_for_stopped = function(test, assert) {
+exports.test_wait_for_stopped = function(test) {
   waitForState('stopped', function(err) {
-    assert.ifError(err);
-    test.finish();
+    test.ifError(err);
+    test.done();
   });
 };
 
 
-exports.test_start_zone = function(test, assert) {
-  zapi.startMachine(ZONE, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    test.finish();
+exports.test_start_zone = function(test) {
+  zapi.startMachine(QUERY, function(err, machine) {
+    test.ifError(err);
+    test.ok(machine);
+    test.done();
   });
 };
 
 
-exports.test_wait_for_started = function(test, assert) {
+exports.test_wait_for_started = function(test) {
   waitForState('running', function(err) {
-    assert.ifError(err);
-    test.finish();
+    test.ifError(err);
+    test.done();
   });
 };
 
 
-exports.test_reboot_zone = function(test, assert) {
-  zapi.rebootMachine(ZONE, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    test.finish();
+exports.test_reboot_zone = function(test) {
+  zapi.rebootMachine(QUERY, function(err, machine) {
+    test.ifError(err);
+    test.ok(machine);
+    test.done();
   });
 };
 
 
-exports.test_wait_for_reboot = function(test, assert) {
+exports.test_wait_for_reboot = function(test) {
   setTimeout(function () {
       waitForState('running', function(err) {
-        assert.ifError(err);
-        test.finish();
+        test.ifError(err);
+        test.done();
       });
   }, 3000);
 };
 
 
-exports.test_destroy_zone = function(test, assert) {
-  zapi.destroyMachine(ZONE, function(err, machine) {
-    assert.ifError(err);
-    assert.ok(machine);
-    test.finish();
+exports.test_destroy_zone = function(test) {
+  zapi.deleteMachine(QUERY, function(err, machine) {
+    test.ifError(err);
+    test.ok(machine);
+    test.done();
   });
 };
 
 
-exports.test_wait_for_destroyed = function(test, assert) {
+exports.test_wait_for_destroyed = function(test) {
   waitForState('destroyed', function(err) {
-    assert.ifError(err);
-    test.finish();
+    test.ifError(err);
+    test.done();
   });
 };
