@@ -17,6 +17,7 @@ var ZONE = null;
 var DATASET_UUID = null;
 var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
+var NETWORKS = '1e7b1f40-0204-439f-a0ae-3c05a38729f6';
 
 
 
@@ -96,6 +97,7 @@ exports.test_create_zone = function(test) {
   var opts = {
     owner_uuid: CUSTOMER,
     dataset_uuid: DATASET_UUID,
+    networks: NETWORKS,
     brand: 'joyent',
     ram: 64
   };
