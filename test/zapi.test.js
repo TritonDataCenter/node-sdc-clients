@@ -44,8 +44,6 @@ function waitForState(state, callback) {
 exports.setUp = function(callback) {
   zapi = new ZAPI({
     url: ZAPI_URL,
-    username: 'admin',
-    password: 'lbpass123',
     retry: {
       retries: 1,
       minTimeout: 1000
