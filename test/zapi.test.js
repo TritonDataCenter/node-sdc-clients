@@ -10,14 +10,14 @@ var ZAPI = require('../lib/index').ZAPI;
 
 ///--- Globals
 
-var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || '10.99.99.19');
+var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || 'localhost:8080');
 
 var zapi = null;
 var ZONE = null;
 var DATASET_UUID = null;
 var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
-var NETWORKS = '1e7b1f40-0204-439f-a0ae-3c05a38729f6';
+var NETWORKS = 'adbf3257-e566-40a9-8df0-c0db469b78bd';
 
 
 
@@ -25,11 +25,11 @@ var NETWORKS = '1e7b1f40-0204-439f-a0ae-3c05a38729f6';
 
 function waitForState(state, callback) {
   function check() {
-    return zapi.getMachine(QUERY, function(err, machine) {
+    return zapi.getVm(QUERY, function(err, vm) {
       if (err)
         return callback(err);
 
-      if (machine.state === state)
+      if (vm.state === state)
         return callback(null);
 
       setTimeout(check, 3000);
@@ -60,12 +60,12 @@ exports.setUp = function(callback) {
 };
 
 
-exports.test_list_machines = function(test) {
-  zapi.listMachines(function(err, machines) {
+exports.test_list_vms = function(test) {
+  zapi.listVms(function(err, vms) {
     test.ifError(err);
-    test.ok(machines);
-    ZONE = machines[0].uuid;
-    DATASET_UUID = machines[0].dataset_uuid;
+    test.ok(vms);
+    ZONE = vms[0].uuid;
+    DATASET_UUID = vms[0].dataset_uuid;
     QUERY = {
       uuid: ZONE,
       owner_uuid: CUSTOMER
@@ -75,19 +75,19 @@ exports.test_list_machines = function(test) {
 };
 
 
-exports.test_list_machines_by_owner = function(test) {
-  zapi.listMachines({ owner_uuid: CUSTOMER }, function(err, machines) {
+exports.test_list_vms_by_owner = function(test) {
+  zapi.listVms({ owner_uuid: CUSTOMER }, function(err, vms) {
     test.ifError(err);
-    test.ok(machines);
+    test.ok(vms);
     test.done();
   });
 };
 
 
-exports.test_get_machine = function(test) {
-  zapi.getMachine(QUERY, function(err, machine) {
+exports.test_get_vm = function(test) {
+  zapi.getVm(QUERY, function(err, vm) {
     test.ifError(err);
-    test.ok(machine);
+    test.ok(vm);
     test.done();
   });
 };
@@ -98,16 +98,15 @@ exports.test_create_zone = function(test) {
     owner_uuid: CUSTOMER,
     dataset_uuid: DATASET_UUID,
     networks: NETWORKS,
-    brand: 'joyent',
+    brand: 'joyent-minimal',
     ram: 64
   };
 
-  zapi.createMachine(opts, function(err, machine) {
+  zapi.createVm(opts, function(err, job) {
     test.ifError(err);
-    test.ok(machine);
-    test.equal(opts.ram, machine.ram);
+    test.ok(job);
     QUERY = {
-      uuid: machine.uuid,
+      uuid: job.vm_uuid,
       owner_uuid: CUSTOMER
     };
     test.done();
@@ -129,9 +128,9 @@ exports.test_wait_for_running = function(test) {
 
 
 exports.test_stop_zone = function(test) {
-  zapi.stopMachine(QUERY, function(err, machine) {
+  zapi.stopVm(QUERY, function(err, job) {
     test.ifError(err);
-    test.ok(machine);
+    test.ok(job);
     test.done();
   });
 };
@@ -146,9 +145,9 @@ exports.test_wait_for_stopped = function(test) {
 
 
 exports.test_start_zone = function(test) {
-  zapi.startMachine(QUERY, function(err, machine) {
+  zapi.startVm(QUERY, function(err, job) {
     test.ifError(err);
-    test.ok(machine);
+    test.ok(job);
     test.done();
   });
 };
@@ -163,9 +162,9 @@ exports.test_wait_for_started = function(test) {
 
 
 exports.test_reboot_zone = function(test) {
-  zapi.rebootMachine(QUERY, function(err, machine) {
+  zapi.rebootVm(QUERY, function(err, job) {
     test.ifError(err);
-    test.ok(machine);
+    test.ok(job);
     test.done();
   });
 };
@@ -182,9 +181,9 @@ exports.test_wait_for_reboot = function(test) {
 
 
 exports.test_destroy_zone = function(test) {
-  zapi.deleteMachine(QUERY, function(err, machine) {
+  zapi.deleteVm(QUERY, function(err, job) {
     test.ifError(err);
-    test.ok(machine);
+    test.ok(job);
     test.done();
   });
 };
