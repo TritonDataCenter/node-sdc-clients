@@ -46,8 +46,8 @@ ca_test: $(WHISKEY)
 mapi_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/mapi.test.js
 
-zapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/zapi.test.js
+vmapi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/vmapi.test.js
 
 cnapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js

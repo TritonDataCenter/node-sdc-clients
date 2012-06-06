@@ -4,15 +4,15 @@ var Logger = require('bunyan');
 var restify = require('restify');
 var uuid = require('node-uuid');
 
-var ZAPI = require('../lib/index').ZAPI;
+var VMAPI = require('../lib/index').VMAPI;
 
 
 
 ///--- Globals
 
-var ZAPI_URL = 'http://' + (process.env.ZAPI_IP || 'localhost:8080');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || 'localhost:8080');
 
-var zapi = null;
+var vmapi = null;
 var ZONE = null;
 var DATASET_UUID = null;
 var QUERY = null;
@@ -25,7 +25,7 @@ var NETWORKS = 'adbf3257-e566-40a9-8df0-c0db469b78bd';
 
 function waitForState(state, callback) {
   function check() {
-    return zapi.getVm(QUERY, function(err, vm) {
+    return vmapi.getVm(QUERY, function(err, vm) {
       if (err)
         return callback(err);
 
@@ -43,14 +43,14 @@ function waitForState(state, callback) {
 ///--- Tests
 
 exports.setUp = function(callback) {
-  zapi = new ZAPI({
-    url: ZAPI_URL,
+  vmapi = new VMAPI({
+    url: VMAPI_URL,
     retry: {
       retries: 1,
       minTimeout: 1000
     },
     log: new Logger({
-      name: 'zapi_unit_test',
+      name: 'vmapi_unit_test',
       stream: process.stderr,
       level: (process.env.LOG_LEVEL || 'info'),
       serializers: Logger.stdSerializers
@@ -61,7 +61,7 @@ exports.setUp = function(callback) {
 
 
 exports.test_list_vms = function(test) {
-  zapi.listVms(function(err, vms) {
+  vmapi.listVms(function(err, vms) {
     test.ifError(err);
     test.ok(vms);
     ZONE = vms[0].uuid;
@@ -76,7 +76,7 @@ exports.test_list_vms = function(test) {
 
 
 exports.test_list_vms_by_owner = function(test) {
-  zapi.listVms({ owner_uuid: CUSTOMER }, function(err, vms) {
+  vmapi.listVms({ owner_uuid: CUSTOMER }, function(err, vms) {
     test.ifError(err);
     test.ok(vms);
     test.done();
@@ -85,7 +85,7 @@ exports.test_list_vms_by_owner = function(test) {
 
 
 exports.test_get_vm = function(test) {
-  zapi.getVm(QUERY, function(err, vm) {
+  vmapi.getVm(QUERY, function(err, vm) {
     test.ifError(err);
     test.ok(vm);
     test.done();
@@ -102,7 +102,7 @@ exports.test_create_zone = function(test) {
     ram: 64
   };
 
-  zapi.createVm(opts, function(err, job) {
+  vmapi.createVm(opts, function(err, job) {
     test.ifError(err);
     test.ok(job);
     QUERY = {
@@ -128,7 +128,7 @@ exports.test_wait_for_running = function(test) {
 
 
 exports.test_stop_zone = function(test) {
-  zapi.stopVm(QUERY, function(err, job) {
+  vmapi.stopVm(QUERY, function(err, job) {
     test.ifError(err);
     test.ok(job);
     test.done();
@@ -145,7 +145,7 @@ exports.test_wait_for_stopped = function(test) {
 
 
 exports.test_start_zone = function(test) {
-  zapi.startVm(QUERY, function(err, job) {
+  vmapi.startVm(QUERY, function(err, job) {
     test.ifError(err);
     test.ok(job);
     test.done();
@@ -162,7 +162,7 @@ exports.test_wait_for_started = function(test) {
 
 
 exports.test_reboot_zone = function(test) {
-  zapi.rebootVm(QUERY, function(err, job) {
+  vmapi.rebootVm(QUERY, function(err, job) {
     test.ifError(err);
     test.ok(job);
     test.done();
@@ -181,7 +181,7 @@ exports.test_wait_for_reboot = function(test) {
 
 
 exports.test_destroy_zone = function(test) {
-  zapi.deleteVm(QUERY, function(err, job) {
+  vmapi.deleteVm(QUERY, function(err, job) {
     test.ifError(err);
     test.ok(job);
     test.done();
