@@ -6,7 +6,7 @@ var CA = require('../lib/index').CA;
 var restify = require('restify');
 
 
-///--- Globals
+// --- Globals
 
 var CA_URL = 'http://' + (process.env.CA_IP || '10.99.99.19') + ':23181';
 
@@ -15,9 +15,9 @@ var customer = '930896af-bf8c-48d4-885c-6573a94b1853';
 var instrumentation = null;
 
 
-///--- Tests
+// --- Tests
 
-exports.setUp = function(test, assert) {
+exports.setUp = function (test, assert) {
   ca = new CA({
     url: CA_URL,
     retryOptions: {
@@ -29,8 +29,8 @@ exports.setUp = function(test, assert) {
 };
 
 
-exports.test_list_schema = function(test, assert) {
-  ca.listSchema(customer, function(err, schema) {
+exports.test_list_schema = function (test, assert) {
+  ca.listSchema(customer, function (err, schema) {
     assert.ifError(err);
     assert.ok(schema);
     test.finish();
@@ -38,8 +38,8 @@ exports.test_list_schema = function(test, assert) {
 };
 
 
-exports.test_create_instrumentation_bad_params = function(test, assert) {
-  ca.createInstrumentation(customer, {}, function(err, instrumentation) {
+exports.test_create_instrumentation_bad_params = function (test, assert) {
+  ca.createInstrumentation(customer, {}, function (err, instrumentation) {
     assert.ok(err);
     assert.ok(!instrumentation);
     assert.equal(err.httpCode, 409);
@@ -50,13 +50,13 @@ exports.test_create_instrumentation_bad_params = function(test, assert) {
 };
 
 
-exports.test_create_instrumentation = function(test, assert) {
+exports.test_create_instrumentation = function (test, assert) {
   var params = {
     module: 'fs',
     stat: 'logical_ops',
     decomposition: 'latency'
   };
-  ca.createInstrumentation(customer, params, function(err, inst) {
+  ca.createInstrumentation(customer, params, function (err, inst) {
     assert.ifError(err);
     assert.ok(inst);
     var uri = inst.uri;
@@ -66,8 +66,8 @@ exports.test_create_instrumentation = function(test, assert) {
 };
 
 
-exports.test_list_instrumentations = function(test, assert) {
-  ca.listInstrumentations(customer, function(err, instrumentations) {
+exports.test_list_instrumentations = function (test, assert) {
+  ca.listInstrumentations(customer, function (err, instrumentations) {
     assert.ifError(err);
     assert.ok(instrumentations);
     assert.ok(instrumentations.length);
@@ -79,8 +79,8 @@ exports.test_list_instrumentations = function(test, assert) {
 };
 
 
-exports.test_list_instrumentations_bogus_customer = function(test, assert) {
-  ca.listInstrumentations(uuid(), function(err, instrumentations) {
+exports.test_list_instrumentations_bogus_customer = function (test, assert) {
+  ca.listInstrumentations(uuid(), function (err, instrumentations) {
     assert.ifError(err);
     assert.ok(instrumentations);
     assert.equal(instrumentations.length, 0);
@@ -89,8 +89,8 @@ exports.test_list_instrumentations_bogus_customer = function(test, assert) {
 };
 
 
-exports.test_get_instrumentation_bad = function(test, assert) {
-  ca.getInstrumentation(customer, uuid(), function(err, instrumentation) {
+exports.test_get_instrumentation_bad = function (test, assert) {
+  ca.getInstrumentation(customer, uuid(), function (err, instrumentation) {
     assert.ok(err);
     assert.ok(!instrumentation);
     assert.equal(err.httpCode, 404);
@@ -101,8 +101,8 @@ exports.test_get_instrumentation_bad = function(test, assert) {
 };
 
 
-exports.test_get_instrumentation = function(test, assert) {
-  ca.getInstrumentation(customer, instrumentation, function(err, inst) {
+exports.test_get_instrumentation = function (test, assert) {
+  ca.getInstrumentation(customer, instrumentation, function (err, inst) {
     assert.ifError(err);
     assert.ok(inst);
     test.finish();
@@ -110,8 +110,8 @@ exports.test_get_instrumentation = function(test, assert) {
 };
 
 
-exports.test_get_heatmap = function(test, assert) {
-  ca.getHeatmap(customer, instrumentation, function(err, heatmap) {
+exports.test_get_heatmap = function (test, assert) {
+  ca.getHeatmap(customer, instrumentation, function (err, heatmap) {
     assert.ifError(err);
     assert.ok(heatmap);
     test.finish();
@@ -119,8 +119,8 @@ exports.test_get_heatmap = function(test, assert) {
 };
 
 
-exports.test_get_heatmap_bad = function(test, assert) {
-  ca.getHeatmap(customer, uuid(), function(err, heatmap) {
+exports.test_get_heatmap_bad = function (test, assert) {
+  ca.getHeatmap(customer, uuid(), function (err, heatmap) {
     assert.ok(err);
     assert.ok(!heatmap);
     assert.equal(err.httpCode, 404);
@@ -132,8 +132,8 @@ exports.test_get_heatmap_bad = function(test, assert) {
 };
 
 
-exports.test_get_heatmap_details_bad = function(test, assert) {
-  ca.getHeatmapDetails(customer, uuid(), {x:10,y:20}, function(err, heatmap) {
+exports.test_get_heatmap_details_bad = function (test, assert) {
+  ca.getHeatmapDetails(customer, uuid(), {x:10, y:20}, function (err, heatmap) {
     assert.ok(err);
     assert.ok(!heatmap);
     assert.equal(err.httpCode, 404);
@@ -144,8 +144,8 @@ exports.test_get_heatmap_details_bad = function(test, assert) {
 };
 
 
-exports.test_delete_instrumentation_bad = function(test, assert) {
-  ca.deleteInstrumentation(customer, uuid(), function(err) {
+exports.test_delete_instrumentation_bad = function (test, assert) {
+  ca.deleteInstrumentation(customer, uuid(), function (err) {
     assert.ok(err);
     assert.equal(err.httpCode, 404);
     assert.equal(err.restCode, 'ResourceNotFound');
@@ -155,10 +155,10 @@ exports.test_delete_instrumentation_bad = function(test, assert) {
 };
 
 
-exports.test_clone_instrumentation = function(test, assert) {
-  ca.cloneInstrumentation(customer, instrumentation, function(err, inst) {
+exports.test_clone_instrumentation = function (test, assert) {
+  ca.cloneInstrumentation(customer, instrumentation, function (err, inst) {
     assert.ifError(err);
-    ca.deleteInstrumentation(customer, inst.id, function(err) {
+    ca.deleteInstrumentation(customer, inst.id, function (err) {
       assert.ifError(err);
       test.finish();
     });
@@ -166,14 +166,14 @@ exports.test_clone_instrumentation = function(test, assert) {
 };
 
 
-exports.test_delete_instrumentation = function(test, assert) {
-  ca.deleteInstrumentation(customer, instrumentation, function(err) {
+exports.test_delete_instrumentation = function (test, assert) {
+  ca.deleteInstrumentation(customer, instrumentation, function (err) {
     assert.ifError(err);
     test.finish();
   });
 };
 
 
-exports.tearDown = function(test, assert) {
+exports.tearDown = function (test, assert) {
   test.finish();
 };

@@ -7,7 +7,7 @@ var UFDS = require('../lib/index').UFDS;
 
 
 
-///--- Globals
+// --- Globals
 
 var UFDS_URL = process.env.UFDS_URL || 'ldaps://10.99.99.18';
 
@@ -20,9 +20,9 @@ var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
 
 
 
-///--- Tests
+// --- Tests
 
-exports.setUp = function(test, assert) {
+exports.setUp = function (test, assert) {
   ufds = new UFDS({
     url: UFDS_URL,
     bindDN: 'cn=root',
@@ -34,17 +34,17 @@ exports.setUp = function(test, assert) {
       serializers: Logger.stdSerializers
     })
   });
-  ufds.on('ready', function() {
+  ufds.on('ready', function () {
     test.finish();
   });
-  ufds.on('error', function(err) {
+  ufds.on('error', function (err) {
     assert.fail(err);
   });
 };
 
 
-exports.test_get_user = function(test, assert) {
-  ufds.getUser('admin', function(err, user) {
+exports.test_get_user = function (test, assert) {
+  ufds.getUser('admin', function (err, user) {
     assert.ifError(err);
     assert.equal(user.login, 'admin');
     assert.ok(user.isAdmin);
@@ -53,7 +53,7 @@ exports.test_get_user = function(test, assert) {
     assert.ok(user.groups());
     assert.equal(user.groups().length, 1);
     assert.equal(user.groups()[0], 'operators');
-    ufds.getUser(user, function(err, user2) {
+    ufds.getUser(user, function (err, user2) {
       assert.ifError(err);
       assert.eql(user, user2);
       test.finish();
@@ -62,8 +62,8 @@ exports.test_get_user = function(test, assert) {
 };
 
 
-exports.test_get_user_by_uuid = function(test, assert) {
-  ufds.getUser(ADMIN_UUID, function(err, user) {
+exports.test_get_user_by_uuid = function (test, assert) {
+  ufds.getUser(ADMIN_UUID, function (err, user) {
     assert.ifError(err);
     assert.equal(user.login, 'admin');
     assert.ok(user.isAdmin);
@@ -73,8 +73,8 @@ exports.test_get_user_by_uuid = function(test, assert) {
 };
 
 
-exports.test_get_user_not_found = function(test, assert) {
-  ufds.getUser(uuid(), function(err, user) {
+exports.test_get_user_not_found = function (test, assert) {
+  ufds.getUser(uuid(), function (err, user) {
     assert.ok(err);
     assert.equal(err.httpCode, 404);
     assert.equal(err.restCode, 'ResourceNotFound');
@@ -85,11 +85,11 @@ exports.test_get_user_not_found = function(test, assert) {
 };
 
 
-exports.test_authenticate = function(test, assert) {
-  ufds.authenticate('admin', 'joypass123', function(err, user) {
+exports.test_authenticate = function (test, assert) {
+  ufds.authenticate('admin', 'joypass123', function (err, user) {
     assert.ifError(err);
     assert.ok(user);
-    ufds.getUser('admin', function(err, user2) {
+    ufds.getUser('admin', function (err, user2) {
       assert.ifError(err);
       assert.equal(user.login, user2.login);
       test.finish();
@@ -98,13 +98,13 @@ exports.test_authenticate = function(test, assert) {
 };
 
 
-exports.test_authenticate_by_uuid = function(test, assert) {
-  ufds.authenticate(ADMIN_UUID, 'joypass123', function(err, user) {
+exports.test_authenticate_by_uuid = function (test, assert) {
+  ufds.authenticate(ADMIN_UUID, 'joypass123', function (err, user) {
     assert.ifError(err);
     assert.ok(user);
     assert.equal(user.login, 'admin');
     assert.ok(user.isAdmin());
-    user.authenticate('joypass123', function(err) {
+    user.authenticate('joypass123', function (err) {
       assert.ifError(err);
       test.finish();
     });
@@ -112,10 +112,10 @@ exports.test_authenticate_by_uuid = function(test, assert) {
 };
 
 
-exports.test_add_key = function(test, assert) {
-  ufds.getUser('admin', function(err, user) {
+exports.test_add_key = function (test, assert) {
+  ufds.getUser('admin', function (err, user) {
     assert.ifError(err);
-    user.addKey(SSH_KEY, function(err, key) {
+    user.addKey(SSH_KEY, function (err, key) {
       assert.ifError(err);
       assert.ok(key);
       assert.equal(key.openssh, SSH_KEY);
@@ -125,15 +125,15 @@ exports.test_add_key = function(test, assert) {
 };
 
 
-exports.test_list_and_get_keys = function(test, assert) {
-  ufds.getUser('admin', function(err, user) {
+exports.test_list_and_get_keys = function (test, assert) {
+  ufds.getUser('admin', function (err, user) {
     assert.ifError(err);
-    user.listKeys(function(err, keys) {
+    user.listKeys(function (err, keys) {
       assert.ifError(err);
       assert.ok(keys);
       assert.ok(keys.length);
       assert.equal(keys[0].openssh, SSH_KEY);
-      user.getKey(keys[0].fingerprint, function(err, key) {
+      user.getKey(keys[0].fingerprint, function (err, key) {
         assert.ifError(err);
         assert.ok(key);
         assert.eql(keys[0], key);
@@ -144,12 +144,12 @@ exports.test_list_and_get_keys = function(test, assert) {
 };
 
 
-exports.test_del_key = function(test, assert) {
-  ufds.getUser('admin', function(err, user) {
+exports.test_del_key = function (test, assert) {
+  ufds.getUser('admin', function (err, user) {
     assert.ifError(err);
-    user.listKeys(function(err, keys) {
+    user.listKeys(function (err, keys) {
       assert.ifError(err);
-      user.deleteKey(keys[0], function(err) {
+      user.deleteKey(keys[0], function (err) {
         assert.ifError(err);
         test.finish();
       });
@@ -158,20 +158,20 @@ exports.test_del_key = function(test, assert) {
 };
 
 
-exports.test_crud_user = function(test, assert) {
+exports.test_crud_user = function (test, assert) {
   var entry = {
     login: 'a' + uuid().replace('-', '').substr(0, 7),
     email: uuid() + '@devnull.com',
     userpassword: 'secret'
   };
-  ufds.addUser(entry, function(err, user) {
+  ufds.addUser(entry, function (err, user) {
     assert.ifError(err);
     assert.ok(user);
     assert.ok(user.uuid);
     user.phone = '+1 (206) 555-1212';
-    user.save(function(err) {
+    user.save(function (err) {
       assert.ifError(err);
-      user.destroy(function(err) {
+      user.destroy(function (err) {
         assert.ifError(err);
         test.finish();
       });
@@ -180,28 +180,28 @@ exports.test_crud_user = function(test, assert) {
 };
 
 
-exports.test_crud_limit = function(test, assert) {
-  ufds.getUser('admin', function(err, user) {
+exports.test_crud_limit = function (test, assert) {
+  ufds.getUser('admin', function (err, user) {
     assert.ifError(err);
     assert.ok(user);
-    user.addLimit({ datacenter: 'coal', smartos: '123'}, function(err, limit) {
+    user.addLimit({ datacenter: 'coal', smartos: '123'}, function (err, limit) {
       assert.ifError(err);
       assert.ok(limit);
       assert.ok(limit.smartos);
-      user.listLimits(function(err, limits) {
+      user.listLimits(function (err, limits) {
         assert.ifError(err);
         assert.ok(limits);
         assert.ok(limits.length);
         assert.ok(limits[0].smartos);
         limits[0].nodejs = 234;
-        user.updateLimit(limits[0], function(err) {
+        user.updateLimit(limits[0], function (err) {
           assert.ifError(err);
-          user.getLimit(limits[0].datacenter, function(err, limit) {
+          user.getLimit(limits[0].datacenter, function (err, limit) {
             assert.ifError(err);
             assert.ok(limit);
             assert.ok(limit.smartos);
             assert.ok(limit.nodejs);
-            user.deleteLimit(limit, function(err) {
+            user.deleteLimit(limit, function (err) {
               assert.ifError(err);
               test.finish();
             });
@@ -213,8 +213,8 @@ exports.test_crud_limit = function(test, assert) {
 };
 
 
-exports.tearDown = function(test, assert) {
-  ufds.close(function() {
+exports.tearDown = function (test, assert) {
+  ufds.close(function () {
     test.finish();
   });
 };

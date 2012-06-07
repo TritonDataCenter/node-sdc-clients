@@ -8,7 +8,7 @@ var MAPI = require('../lib/index').MAPI;
 
 
 
-///--- Globals
+// --- Globals
 
 var MAPI_URL = 'http://' + (process.env.MAPI_IP || '10.99.99.11') + ':8080';
 
@@ -21,26 +21,29 @@ var ZONE = null;
 
 
 
-///--- Helpers
+// --- Helpers
 
 function waitForState(state, callback) {
   function check() {
-    return mapi.getMachine(CUSTOMER, ZONE, function(err, machine) {
-      return callback(err);
+    return mapi.getMachine(CUSTOMER, ZONE, function (err, machine) {
+      if (err) {
+        return callback(err);
+      }
 
-      if (machine.running_status === state)
-        return callback(null)
+      if (machine.running_status === state) {
+        return callback(null);
+      }
 
-      setTimeout(check, 1000);
+      return setTimeout(check, 1000);
     });
   }
 
   return check();
 }
 
-///--- Tests
+// --- Tests
 
-exports.setUp = function(test, assert) {
+exports.setUp = function (test, assert) {
   mapi = new MAPI({
     url: MAPI_URL,
     username: 'admin',
@@ -60,8 +63,8 @@ exports.setUp = function(test, assert) {
 };
 
 
-exports.test_list_datasets = function(test, assert) {
-  mapi.listDatasets(CUSTOMER, function(err, datasets) {
+exports.test_list_datasets = function (test, assert) {
+  mapi.listDatasets(CUSTOMER, function (err, datasets) {
     assert.ifError(err);
     assert.ok(datasets);
     assert.ok(datasets.length);
@@ -74,8 +77,8 @@ exports.test_list_datasets = function(test, assert) {
 };
 
 
-/// Start stuff to do early because of MAPI timing woes
-exports.test_create_zone = function(test, assert) {
+// Start stuff to do early because of MAPI timing woes
+exports.test_create_zone = function (test, assert) {
   var opts = {
     dataset_uuid: DATASET_UUID,
     networks: 'external',
@@ -84,7 +87,7 @@ exports.test_create_zone = function(test, assert) {
     'package': 'regular_128'
   };
 
-  mapi.createMachine(CUSTOMER, opts, function(err, machine) {
+  mapi.createMachine(CUSTOMER, opts, function (err, machine) {
     assert.ifError(err);
     assert.ok(machine);
     assert.equal(opts.alias, machine.alias);
@@ -94,19 +97,19 @@ exports.test_create_zone = function(test, assert) {
 };
 
 
-exports.test_wait_for_running = function(test, assert) {
-  waitForState('running', function(err) {
+exports.test_wait_for_running = function (test, assert) {
+  waitForState('running', function (err) {
     assert.ifError(err);
     test.finish();
   });
 };
-/// End stuff to do early
+// End stuff to do early
 
-exports.test_get_dataset = function(test, assert) {
-  mapi.listDatasets(CUSTOMER, function(err, datasets) {
+exports.test_get_dataset = function (test, assert) {
+  mapi.listDatasets(CUSTOMER, function (err, datasets) {
     assert.ifError(err);
     assert.ok(datasets.length);
-    mapi.getDataset(CUSTOMER, datasets[0].uuid, function(err, dataset) {
+    mapi.getDataset(CUSTOMER, datasets[0].uuid, function (err, dataset) {
       assert.ifError(err);
       assert.ok(dataset);
       test.finish();
@@ -115,8 +118,8 @@ exports.test_get_dataset = function(test, assert) {
 };
 
 
-exports.test_get_dataset_not_found = function(test, assert) {
-  mapi.getDataset(CUSTOMER, uuid(), function(err, dataset) {
+exports.test_get_dataset_not_found = function (test, assert) {
+  mapi.getDataset(CUSTOMER, uuid(), function (err, dataset) {
     assert.ok(err);
     assert.ok(!dataset);
     assert.equal(err.httpCode, 404);
@@ -127,8 +130,8 @@ exports.test_get_dataset_not_found = function(test, assert) {
 };
 
 
-exports.test_list_packages = function(test, assert) {
-  mapi.listPackages(CUSTOMER, function(err, packages) {
+exports.test_list_packages = function (test, assert) {
+  mapi.listPackages(CUSTOMER, function (err, packages) {
     assert.ifError(err);
     assert.ok(packages);
     assert.ok(packages.length);
@@ -137,8 +140,8 @@ exports.test_list_packages = function(test, assert) {
 };
 
 
-exports.test_get_package_by_name = function(test, assert) {
-  mapi.getPackageByName(CUSTOMER, 'regular_128', function(err, pkg) {
+exports.test_get_package_by_name = function (test, assert) {
+  mapi.getPackageByName(CUSTOMER, 'regular_128', function (err, pkg) {
     assert.ifError(err);
     assert.ok(pkg);
     test.finish();
@@ -146,8 +149,8 @@ exports.test_get_package_by_name = function(test, assert) {
 };
 
 
-exports.test_get_package_by_name_not_found = function(test, assert) {
-  mapi.getPackageByName(CUSTOMER, uuid(), function(err, pkg) {
+exports.test_get_package_by_name_not_found = function (test, assert) {
+  mapi.getPackageByName(CUSTOMER, uuid(), function (err, pkg) {
     assert.ok(err);
     assert.ok(!pkg);
     assert.equal(err.httpCode, 404);
@@ -158,8 +161,8 @@ exports.test_get_package_by_name_not_found = function(test, assert) {
 };
 
 
-exports.test_list_machines = function(test, assert) {
-  mapi.listMachines(CUSTOMER, function(err, machines) {
+exports.test_list_machines = function (test, assert) {
+  mapi.listMachines(CUSTOMER, function (err, machines) {
     assert.ifError(err);
     assert.ok(machines);
     test.finish();
@@ -167,8 +170,8 @@ exports.test_list_machines = function(test, assert) {
 };
 
 
-exports.test_list_machines_bad_tenant = function(test, assert) {
-  mapi.listMachines(uuid(), function(err, zones) {
+exports.test_list_machines_bad_tenant = function (test, assert) {
+  mapi.listMachines(uuid(), function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     test.finish();
@@ -176,12 +179,12 @@ exports.test_list_machines_bad_tenant = function(test, assert) {
 };
 
 
-exports.test_list_machines_limit_offset = function(test, assert) {
+exports.test_list_machines_limit_offset = function (test, assert) {
   var opts = {
     limit: 1,
     offset: 0
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     assert.ok(zones.length);
@@ -190,12 +193,12 @@ exports.test_list_machines_limit_offset = function(test, assert) {
 };
 
 
-exports.test_list_machines_limit_offset_empty = function(test, assert) {
+exports.test_list_machines_limit_offset_empty = function (test, assert) {
   var opts = {
     limit: 1,
     offset: 1000
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     assert.equal(zones.length, 0);
@@ -204,11 +207,11 @@ exports.test_list_machines_limit_offset_empty = function(test, assert) {
 };
 
 
-exports.test_list_machines_no_vms = function(test, assert) {
+exports.test_list_machines_no_vms = function (test, assert) {
   var opts = {
     type: 'vm'
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     assert.equal(zones.length, 0);
@@ -217,11 +220,11 @@ exports.test_list_machines_no_vms = function(test, assert) {
 };
 
 
-exports.test_get_zone_by_alias = function(test, assert) {
+exports.test_get_zone_by_alias = function (test, assert) {
   var opts = {
     alias: 'ufds0'
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     assert.equal(zones.length, 1);
@@ -231,11 +234,11 @@ exports.test_get_zone_by_alias = function(test, assert) {
 };
 
 
-exports.test_get_zone_by_alias_not_found = function(test, assert) {
+exports.test_get_zone_by_alias_not_found = function (test, assert) {
   var opts = {
     alias: uuid()
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
     assert.equal(zones.length, 0);
@@ -244,14 +247,14 @@ exports.test_get_zone_by_alias_not_found = function(test, assert) {
 };
 
 
-exports.test_get_machine = function(test, assert) {
+exports.test_get_machine = function (test, assert) {
   var opts = {
     alias: 'ufds0'
   };
-  mapi.listMachines(CUSTOMER, opts, function(err, zones) {
+  mapi.listMachines(CUSTOMER, opts, function (err, zones) {
     assert.ifError(err);
     assert.ok(zones);
-    mapi.getMachine(CUSTOMER, zones[0].name, function(err, machine) {
+    mapi.getMachine(CUSTOMER, zones[0].name, function (err, machine) {
       assert.ifError(err);
       assert.ok(machine);
       assert.equal(machine.name, zones[0].name);
@@ -261,8 +264,8 @@ exports.test_get_machine = function(test, assert) {
 };
 
 
-exports.test_get_machine_404 = function(test, assert) {
-  mapi.getMachine(CUSTOMER, uuid(), function(err, machine) {
+exports.test_get_machine_404 = function (test, assert) {
+  mapi.getMachine(CUSTOMER, uuid(), function (err, machine) {
     assert.ok(err);
     assert.ok(!machine);
     assert.equal(err.httpCode, 404);
@@ -273,10 +276,10 @@ exports.test_get_machine_404 = function(test, assert) {
 };
 
 
-exports.test_update_metadata = function(test, assert) {
-  mapi.putMachineMetadata(CUSTOMER, ZONE, { foo: 'bar' }, function(err) {
+exports.test_update_metadata = function (test, assert) {
+  mapi.putMachineMetadata(CUSTOMER, ZONE, { foo: 'bar' }, function (err) {
     assert.ifError(err);
-    mapi.getMachine(CUSTOMER, ZONE, function(err, machine) {
+    mapi.getMachine(CUSTOMER, ZONE, function (err, machine) {
       assert.ifError(err);
       assert.equal(machine.customer_metadata.foo, 'bar');
       test.finish();
@@ -285,8 +288,8 @@ exports.test_update_metadata = function(test, assert) {
 };
 
 
-exports.test_list_tags = function(test, assert) {
-  mapi.listMachineTags(CUSTOMER, ZONE, function(err, tags) {
+exports.test_list_tags = function (test, assert) {
+  mapi.listMachineTags(CUSTOMER, ZONE, function (err, tags) {
     assert.ifError(err);
     assert.ok(tags);
     assert.equal(Object.keys(tags).length, 0);
@@ -295,14 +298,14 @@ exports.test_list_tags = function(test, assert) {
 };
 
 
-exports.test_create_tags = function(test, assert) {
+exports.test_create_tags = function (test, assert) {
   var tags = {
     blaze: 'glory',
     fuck: 'off'
-  }
-  mapi.addMachineTags(CUSTOMER, ZONE, tags, function(err) {
+  };
+  mapi.addMachineTags(CUSTOMER, ZONE, tags, function (err) {
     assert.ifError(err);
-    mapi.listMachineTags(CUSTOMER, ZONE, function(err, tags) {
+    mapi.listMachineTags(CUSTOMER, ZONE, function (err, tags) {
       assert.ifError(err);
       assert.ok(tags);
       assert.equal(tags.blaze, 'glory');
@@ -312,8 +315,8 @@ exports.test_create_tags = function(test, assert) {
 };
 
 
-exports.test_get_tag = function(test, assert) {
-  mapi.getMachineTag(CUSTOMER, ZONE, 'blaze', function(err, tag) {
+exports.test_get_tag = function (test, assert) {
+  mapi.getMachineTag(CUSTOMER, ZONE, 'blaze', function (err, tag) {
     assert.ifError(err);
     assert.equal(tag, 'glory');
     test.finish();
@@ -321,9 +324,9 @@ exports.test_get_tag = function(test, assert) {
 };
 
 
-exports.test_del_tag = function(test, assert) {
-  mapi.deleteMachineTag(CUSTOMER, ZONE, 'blaze', function(err) {
-    mapi.getMachineTag(CUSTOMER, ZONE, 'blaze', function(err, tag) {
+exports.test_del_tag = function (test, assert) {
+  mapi.deleteMachineTag(CUSTOMER, ZONE, 'blaze', function (err) {
+    mapi.getMachineTag(CUSTOMER, ZONE, 'blaze', function (err, tag) {
       assert.ok(err);
       assert.equal(err.httpCode, 404);
       assert.equal(err.restCode, 'ResourceNotFound');
@@ -334,9 +337,9 @@ exports.test_del_tag = function(test, assert) {
 };
 
 
-exports.test_del_tags = function(test, assert) {
-  mapi.deleteMachineTags(CUSTOMER, ZONE, function(err) {
-    mapi.listMachineTags(CUSTOMER, ZONE, function(err, tags) {
+exports.test_del_tags = function (test, assert) {
+  mapi.deleteMachineTags(CUSTOMER, ZONE, function (err) {
+    mapi.listMachineTags(CUSTOMER, ZONE, function (err, tags) {
       assert.ifError(err);
       assert.ok(tags);
       assert.equal(Object.keys(tags).length, 0);
@@ -346,21 +349,21 @@ exports.test_del_tags = function(test, assert) {
 };
 
 
-exports.test_create_snapshot = function(test, assert) {
-  mapi.createZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function(err) {
+exports.test_create_snapshot = function (test, assert) {
+  mapi.createZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function (err) {
     assert.ifError(err);
     test.finish();
   });
 };
 
 
-exports.test_read_snapshots = function(test, assert) {
-  mapi.listZoneSnapshots(CUSTOMER, ZONE, function(err, snapshots) {
+exports.test_read_snapshots = function (test, assert) {
+  mapi.listZoneSnapshots(CUSTOMER, ZONE, function (err, snapshots) {
     assert.ifError(err);
     assert.ok(snapshots);
     assert.equal(snapshots.length, 1);
     assert.equal(snapshots[0].name, 'unitTest');
-    mapi.getZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function(err, snapshot) {
+    mapi.getZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function (err, snapshot) {
       assert.ifError(err);
       assert.equal(snapshot.name, 'unitTest');
       test.finish();
@@ -386,43 +389,22 @@ exports.test_read_snapshots = function(test, assert) {
 // };
 //
 
-exports.test_delete_snapshot = function(test, assert) {
-  mapi.deleteZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function(err) {
+exports.test_delete_snapshot = function (test, assert) {
+  mapi.deleteZoneSnapshot(CUSTOMER, ZONE, 'unitTest', function (err) {
     assert.ifError(err);
     test.finish();
   });
 };
 
 
-exports.test_delete_machine = function(test, assert) {
-  mapi.deleteMachine(CUSTOMER, ZONE, function(err) {
+exports.test_delete_machine = function (test, assert) {
+  mapi.deleteMachine(CUSTOMER, ZONE, function (err) {
     assert.ifError(err);
     test.finish();
   });
 };
 
 
-/*
-exports.test_list_servers = function(test, assert) {
-  mapi.listServers(function(err, servers) {
-    assert.ifError(err);
-    assert.ok(servers);
-    assert.ok(servers.length);
-    log.debug('mapi.test: list_servers => %o', servers);
-    test.finish();
-  });
-};
-
-
-exports.test_update_servers = function(test, assert) {
-  mapi.updateServer(1, {reserved: false}, function(err) {
-    assert.ifError(err);
-    test.finish();
-  });
-};
-
-
-exports.tearDown = function(test, assert) {
+exports.tearDown = function (test, assert) {
   test.finish();
 };
-*/
