@@ -17,7 +17,7 @@
 #
 # Tools
 #
-NPM		:= npm
+NPM       := npm
 WHISKEY		:= ./node_modules/.bin/whiskey
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 WHISKEY_ARGS	:= --test-reporter tap --failfast --sequential --real-time --timeout 120000 --tests
@@ -27,9 +27,13 @@ NODEUNIT_ARGS   :=
 # Files
 #
 DOC_FILES	 = index.restdown
-JS_FILES	:= $(shell find lib -name '*.js')
+JS_FILES	:= $(shell find lib test -name '*.js')
 JSL_CONF_NODE	 = tools/jsl.node.conf
 JSL_FILES_NODE   = $(JS_FILES)
+JSSTYLE_FILES	 = $(JS_FILES)
+JSSTYLE_FLAGS    = -o indent=2,doxygen,unparenthesized-return=0
+
+include ./tools/mk/Makefile.defs
 
 #
 # Repo-specific targets
@@ -60,5 +64,9 @@ config_test:
 
 test: ca_test mapi_test ufds_test config_test
 
-include ./Makefile.deps
-include ./Makefile.targ
+.PHONY: setup
+setup:
+	$(NPM) install
+
+include ./tools/mk/Makefile.deps
+include ./tools/mk/Makefile.targ
