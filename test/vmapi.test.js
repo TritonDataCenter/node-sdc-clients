@@ -17,7 +17,7 @@ var ZONE = null;
 var DATASET_UUID = null;
 var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
-var NETWORKS = 'adbf3257-e566-40a9-8df0-c0db469b78bd';
+var NETWORKS = '48a36b2e-b1da-4014-9a7a-6b6b6d80d661';
 
 
 
@@ -30,6 +30,24 @@ function waitForState(state, callback) {
         return callback(err);
 
       if (vm.state === state)
+        return callback(null);
+
+      return setTimeout(check, 3000);
+    });
+  }
+
+  return check();
+}
+
+
+// TODO duplicated function above. Fix soon
+function waitForAlias(alias, callback) {
+  function check() {
+    return vmapi.getVm(QUERY, function (err, vm) {
+      if (err)
+        return callback(err);
+
+      if (vm.alias === alias)
         return callback(null);
 
       return setTimeout(check, 3000);
@@ -123,6 +141,29 @@ exports.test_wait_for_running = function (test) {
       test.done();
     }, 20000);
 
+  });
+};
+
+
+exports.test_update_zone = function (test) {
+  var UPDATE_QUERY = {
+    uuid: ZONE,
+    owner_uuid: CUSTOMER,
+    alias: 'foobar'
+  };
+
+  vmapi.updateVm(UPDATE_QUERY, function (err, job) {
+    test.ifError(err);
+    test.ok(job);
+    test.done();
+  });
+};
+
+
+exports.test_wait_for_updated = function (test) {
+  waitForAlias('foobar', function (err) {
+    test.ifError(err);
+    test.done();
   });
 };
 
