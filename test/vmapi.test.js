@@ -123,8 +123,9 @@ exports.test_create_zone = function (test) {
   vmapi.createVm(opts, function (err, job) {
     test.ifError(err);
     test.ok(job);
+    ZONE = job.vm_uuid;
     QUERY = {
-      uuid: job.vm_uuid,
+      uuid: ZONE,
       owner_uuid: CUSTOMER
     };
     test.done();
