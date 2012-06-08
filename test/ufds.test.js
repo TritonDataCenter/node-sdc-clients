@@ -18,6 +18,7 @@ var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
   '5YwRC51EVhyDuqthVJWjKrYxgDMbHru8fc1oV51l0bKdmvmJWbA/VyeJvstoX+eiSGT3Jge' +
   'egSMVtc= mark@foo.local';
 
+var ADMIN_PWD = process.env.ADMIN_PWD || 'joypass123';
 
 
 // --- Tests
@@ -86,7 +87,7 @@ exports.test_get_user_not_found = function (test, assert) {
 
 
 exports.test_authenticate = function (test, assert) {
-  ufds.authenticate('admin', 'joypass123', function (err, user) {
+  ufds.authenticate('admin', ADMIN_PWD, function (err, user) {
     assert.ifError(err);
     assert.ok(user);
     ufds.getUser('admin', function (err, user2) {
@@ -99,12 +100,12 @@ exports.test_authenticate = function (test, assert) {
 
 
 exports.test_authenticate_by_uuid = function (test, assert) {
-  ufds.authenticate(ADMIN_UUID, 'joypass123', function (err, user) {
+  ufds.authenticate(ADMIN_UUID, ADMIN_PWD, function (err, user) {
     assert.ifError(err);
     assert.ok(user);
     assert.equal(user.login, 'admin');
     assert.ok(user.isAdmin());
-    user.authenticate('joypass123', function (err) {
+    user.authenticate(ADMIN_PWD, function (err) {
       assert.ifError(err);
       test.finish();
     });

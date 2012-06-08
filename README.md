@@ -91,6 +91,10 @@ So, in brief, requirements to run these test suites:
 
 with the different IP env vars pointing to the right IP for each zone.
 
+Note that it's also possible to pass the ENV variable `ADMIN_PWD` to be used
+with UFDS authentication tests. When not given, it will default to the
+_traditional_ `joypass123`.
+
 # TODO:
 
 - ATM, not all these test suites run properly versus SDC-7.0. [DCAPI-24]
