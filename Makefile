@@ -42,7 +42,7 @@ include ./tools/mk/Makefile.defs
 all:
 	$(NPM) rebuild
 
-.PHONY: test ca_test mapi_test ufds_test config_test
+.PHONY: test ca_test mapi_test ufds_test
 
 ca_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/ca.test.js
@@ -56,13 +56,13 @@ vmapi_test: $(NODEUNIT)
 cnapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
 
-ufds_test:
+ufds_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
 
-config_test:
-	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
+amon_test: $(WHISKEY)
+	$(WHISKEY) $(WHISKEY_ARGS) test/amon.test.js
 
-test: ca_test mapi_test ufds_test config_test
+test: ca_test mapi_test ufds_test
 
 .PHONY: setup
 setup:
