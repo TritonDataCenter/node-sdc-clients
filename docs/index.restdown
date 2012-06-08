@@ -393,9 +393,115 @@ TODO
 TODO
 
 
-# MAPI Client
+# VMAPI Client
 
-TODO
+## listVms(params, callback)
+
+List all VMs given the specified filter params. Currently the following 
+parameters are allowed:
+
+|| **Name** || **Type** || **Description** ||
+|| owner_uuid || UUID || VM Owner ||
+|| type || String || 'vm' or 'zone' ||
+|| alias || String || VM Alias ||
+|| state || String || running, stopped, active or destroyed ||
+|| ram || Number || Amount of memory of the VM ||
+|| tag.key || String || If VM is tagged with 'key' ||
+
+The function callback takes the following form
+
+|| **Name** || **Type** || **Description** ||
+|| callback || Function || fn(error, vms) ||
+
+
+## getVm(params, callback)
+
+Gets a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, vm) ||
+
+
+## createVm(params, callback)
+
+Creates a VM. See VMAPI docs for more information regarding available parameters
+for creating a new VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Attributes of the VM ||
+|| callback || Function || fn(error, job) ||
+
+
+## stopVm(params, callback)
+
+Stops a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, job) ||
+
+
+## startVm(params, callback)
+
+Starts a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, job) ||
+
+
+## rebootVm(params, callback)
+
+Reboots a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, job) ||
+
+
+## updateVm(params, callback)
+
+Updates a VM. Params takes the following options:
+
+|| **Name** || **Type** || **Description** ||
+|| uuid || UUID || VM UUID. Required ||
+|| owner_uuid || UUID || VM Owner. Optional ||
+
+Additionally the following  parameters are allowed for update:
+
+|| **Name** || **Type** || **Description** ||
+|| alias || String || VM Alias ||
+|| ram || Number || Amount of memory of the VM ||
+|| max_swap || Number || Amount of swap of the VM ||
+|| tags || Object || New tags to assign to the VM ||
+|| customer_metadata || Object || New customer_metadata to assign to the VM ||
+|| internal_metadata || Object || New internal_metadata to assign to the VM ||
+
+The function callback takes the following form
+
+|| **Name** || **Type** || **Description** ||
+|| callback || Function || fn(error, job) ||
+
+
+## deleteVm(params, callback)
+
+Deletes a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, job) ||
+
 
 # Config Client
 
