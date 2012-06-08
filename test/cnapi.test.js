@@ -1,4 +1,4 @@
-// Copyright 2011 Joyent, Inc.  All rights reserved.
+// Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
 var restify = require('restify');
@@ -10,7 +10,7 @@ var CNAPI = require('../lib/index').CNAPI;
 
 // --- Globals
 
-var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.17');
+var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.16');
 
 var SERVER = null;
 var ZONE = uuid();

@@ -1,4 +1,4 @@
-// Copyright 2011 Joyent, Inc.  All rights reserved.
+// Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
 var restify = require('restify');
@@ -10,7 +10,7 @@ var VMAPI = require('../lib/index').VMAPI;
 
 // --- Globals
 
-var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || 'localhost:8080');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.18');
 
 var vmapi = null;
 var ZONE = null;

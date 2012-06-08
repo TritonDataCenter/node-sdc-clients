@@ -1,4 +1,4 @@
-// Copyright 2011 Joyent, Inc.  All rights reserved.
+// Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
 var uuid = require('node-uuid');
@@ -9,7 +9,7 @@ var UFDS = require('../lib/index').UFDS;
 
 // --- Globals
 
-var UFDS_URL = process.env.UFDS_URL || 'ldaps://10.99.99.18';
+var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.13');
 
 var ufds;
 var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';

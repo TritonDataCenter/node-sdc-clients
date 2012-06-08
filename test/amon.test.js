@@ -8,8 +8,7 @@ var amon = null;
 
 // --- fixtures
 
-// TODO: change this to the actualy COAL URL once we move to COAL
-var AMON_URL = 'http://localhost:8080';
+var AMON_URL = 'http://' + (process.env.AMON_IP || 'localhost:8080');
 
 // We hijack the admin user since it's always going to exist.
 // TODO: Should use a test user. Might be *using* 'admin' user.
