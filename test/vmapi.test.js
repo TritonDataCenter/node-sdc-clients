@@ -24,216 +24,215 @@ var NETWORKS = '48a36b2e-b1da-4014-9a7a-6b6b6d80d661';
 // --- Helpers
 
 function waitForState(state, callback) {
-  function check() {
-    return vmapi.getVm(QUERY, function (err, vm) {
-      if (err)
-        return callback(err);
+    function check() {
+        return vmapi.getVm(QUERY, function (err, vm) {
+            if (err)
+                return callback(err);
 
-      if (vm.state === state)
-        return callback(null);
+            if (vm.state === state)
+                return callback(null);
 
-      return setTimeout(check, 3000);
-    });
-  }
+            return setTimeout(check, 3000);
+        });
+    }
 
-  return check();
+    return check();
 }
 
 
 // TODO duplicated function above. Fix soon
 function waitForAlias(alias, callback) {
-  function check() {
-    return vmapi.getVm(QUERY, function (err, vm) {
-      if (err)
-        return callback(err);
+    function check() {
+        return vmapi.getVm(QUERY, function (err, vm) {
+            if (err)
+                return callback(err);
 
-      if (vm.alias === alias)
-        return callback(null);
+            if (vm.alias === alias)
+                return callback(null);
 
-      return setTimeout(check, 3000);
-    });
-  }
+            return setTimeout(check, 3000);
+        });
+    }
 
-  return check();
+    return check();
 }
 
 
 // --- Tests
 
 exports.setUp = function (callback) {
-  vmapi = new VMAPI({
-    url: VMAPI_URL,
-    retry: {
-      retries: 1,
-      minTimeout: 1000
-    },
-    log: new Logger({
-      name: 'vmapi_unit_test',
-      stream: process.stderr,
-      level: (process.env.LOG_LEVEL || 'info'),
-      serializers: Logger.stdSerializers
-    })
-  });
-  callback();
+    vmapi = new VMAPI({
+        url: VMAPI_URL,
+        retry: {
+            retries: 1,
+            minTimeout: 1000
+        },
+        log: new Logger({
+            name: 'vmapi_unit_test',
+            stream: process.stderr,
+            level: (process.env.LOG_LEVEL || 'info'),
+            serializers: Logger.stdSerializers
+        })
+    });
+    callback();
 };
 
 
 exports.test_list_vms = function (test) {
-  vmapi.listVms(function (err, vms) {
-    test.ifError(err);
-    test.ok(vms);
-    ZONE = vms[0].uuid;
-    DATASET_UUID = vms[0].dataset_uuid;
-    QUERY = {
-      uuid: ZONE,
-      owner_uuid: CUSTOMER
-    };
-    test.done();
-  });
+    vmapi.listVms(function (err, vms) {
+        test.ifError(err);
+        test.ok(vms);
+        ZONE = vms[0].uuid;
+        DATASET_UUID = vms[0].dataset_uuid;
+        QUERY = {
+            uuid: ZONE,
+            owner_uuid: CUSTOMER
+        };
+        test.done();
+    });
 };
 
 
 exports.test_list_vms_by_owner = function (test) {
-  vmapi.listVms({ owner_uuid: CUSTOMER }, function (err, vms) {
-    test.ifError(err);
-    test.ok(vms);
-    test.done();
-  });
+    vmapi.listVms({ owner_uuid: CUSTOMER }, function (err, vms) {
+        test.ifError(err);
+        test.ok(vms);
+        test.done();
+    });
 };
 
 
 exports.test_get_vm = function (test) {
-  vmapi.getVm(QUERY, function (err, vm) {
-    test.ifError(err);
-    test.ok(vm);
-    test.done();
-  });
+    vmapi.getVm(QUERY, function (err, vm) {
+        test.ifError(err);
+        test.ok(vm);
+        test.done();
+    });
 };
 
 
 exports.test_create_zone = function (test) {
-  var opts = {
-    owner_uuid: CUSTOMER,
-    dataset_uuid: DATASET_UUID,
-    networks: NETWORKS,
-    brand: 'joyent-minimal',
-    ram: 64
-  };
-
-  vmapi.createVm(opts, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    ZONE = job.vm_uuid;
-    QUERY = {
-      uuid: ZONE,
-      owner_uuid: CUSTOMER
+    var opts = {
+        owner_uuid: CUSTOMER,
+        dataset_uuid: DATASET_UUID,
+        networks: NETWORKS,
+        brand: 'joyent-minimal',
+        ram: 64
     };
-    test.done();
-  });
+
+    vmapi.createVm(opts, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        ZONE = job.vm_uuid;
+        QUERY = {
+            uuid: ZONE,
+            owner_uuid: CUSTOMER
+        };
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_running = function (test) {
-  waitForState('running', function (err) {
-    test.ifError(err);
-    setTimeout(function () {
-      // Try to avoid the reboot after zoneinit so we don't stop the zone
-      // too early
-      test.done();
-    }, 20000);
-
-  });
+    waitForState('running', function (err) {
+        test.ifError(err);
+        setTimeout(function () {
+            // Try to avoid the reboot after zoneinit so we don't stop the zone
+            // too early
+            test.done();
+        }, 20000);
+    });
 };
 
 
 exports.test_update_zone = function (test) {
-  var UPDATE_QUERY = {
-    uuid: ZONE,
-    owner_uuid: CUSTOMER,
-    alias: 'foobar'
-  };
+    var UPDATE_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        alias: 'foobar'
+    };
 
-  vmapi.updateVm(UPDATE_QUERY, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    test.done();
-  });
+    vmapi.updateVm(UPDATE_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_updated = function (test) {
-  waitForAlias('foobar', function (err) {
-    test.ifError(err);
-    test.done();
-  });
+    waitForAlias('foobar', function (err) {
+        test.ifError(err);
+        test.done();
+    });
 };
 
 
 exports.test_stop_zone = function (test) {
-  vmapi.stopVm(QUERY, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    test.done();
-  });
+    vmapi.stopVm(QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_stopped = function (test) {
-  waitForState('stopped', function (err) {
-    test.ifError(err);
-    test.done();
-  });
+    waitForState('stopped', function (err) {
+        test.ifError(err);
+        test.done();
+    });
 };
 
 
 exports.test_start_zone = function (test) {
-  vmapi.startVm(QUERY, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    test.done();
-  });
+    vmapi.startVm(QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_started = function (test) {
-  waitForState('running', function (err) {
-    test.ifError(err);
-    test.done();
-  });
+    waitForState('running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
 };
 
 
 exports.test_reboot_zone = function (test) {
-  vmapi.rebootVm(QUERY, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    test.done();
-  });
+    vmapi.rebootVm(QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_reboot = function (test) {
-  setTimeout(function () {
-      waitForState('running', function (err) {
-        test.ifError(err);
-        test.done();
-      });
-  }, 3000);
+    setTimeout(function () {
+        waitForState('running', function (err) {
+            test.ifError(err);
+            test.done();
+        });
+    }, 3000);
 };
 
 
 exports.test_destroy_zone = function (test) {
-  vmapi.deleteVm(QUERY, function (err, job) {
-    test.ifError(err);
-    test.ok(job);
-    test.done();
-  });
+    vmapi.deleteVm(QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
 };
 
 
 exports.test_wait_for_destroyed = function (test) {
-  waitForState('destroyed', function (err) {
-    test.ifError(err);
-    test.done();
-  });
+    waitForState('destroyed', function (err) {
+        test.ifError(err);
+        test.done();
+    });
 };
