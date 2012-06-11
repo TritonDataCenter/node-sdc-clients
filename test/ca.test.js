@@ -17,7 +17,7 @@ var instrumentation = null;
 
 // --- Tests
 
-exports.setUp = function (test) {
+exports.setUp = function (callback) {
     ca = new CA({
         url: CA_URL,
         retryOptions: {
@@ -25,7 +25,7 @@ exports.setUp = function (test) {
             minTimeout: 1000
         }
     });
-    test.done();
+    callback();
 };
 
 
@@ -177,6 +177,6 @@ exports.test_delete_instrumentation = function (test) {
 };
 
 
-exports.tearDown = function (test) {
-    test.done();
+exports.tearDown = function (callback) {
+    callback();
 };
