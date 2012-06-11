@@ -44,20 +44,20 @@ all:
 
 .PHONY: test ca_test ufds_test
 
-ca_test: $(WHISKEY)
-	$(WHISKEY) $(WHISKEY_ARGS) test/ca.test.js
+ca_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/ca.test.js
 
 vmapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/vmapi.test.js
 
 cnapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT) test/cnapi.test.js
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
 
 ufds_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT) test/ufds.test.js
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/ufds.test.js
 
-amon_test: $(WHISKEY)
-	$(WHISKEY) $(WHISKEY_ARGS) test/amon.test.js
+amon_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/amon.test.js
 
 test: ca_test ufds_test
 
