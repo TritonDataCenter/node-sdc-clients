@@ -59,6 +59,9 @@ exports.test_create_instrumentation = function (test) {
     ca.createInstrumentation(customer, params, function (err, inst) {
         test.ifError(err);
         test.ok(inst);
+        if (err) {
+          console.log(util.inspect(err, false, 8));
+        }
         var uri = inst.uri;
         instrumentation = uri.substr(uri.lastIndexOf('/') + 1);
         test.done();
