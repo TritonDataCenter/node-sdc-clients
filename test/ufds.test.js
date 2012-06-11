@@ -216,8 +216,8 @@ exports.testCrudLimit = function (test) {
 };
 
 
-exports.tearDown = function (test) {
+exports.tearDown = function (callback) {
     ufds.close(function () {
-        test.done();
+        callback();
     });
 };
