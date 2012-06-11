@@ -31,7 +31,7 @@ JS_FILES	:= $(shell find lib test -name '*.js')
 JSL_CONF_NODE	 = tools/jsl.node.conf
 JSL_FILES_NODE   = $(JS_FILES)
 JSSTYLE_FILES	 = $(JS_FILES)
-JSSTYLE_FLAGS    = -o indent=2,doxygen,unparenthesized-return=0
+JSSTYLE_FLAGS    = -o indent=4,doxygen,unparenthesized-return=0
 
 include ./tools/mk/Makefile.defs
 
@@ -42,27 +42,24 @@ include ./tools/mk/Makefile.defs
 all:
 	$(NPM) rebuild
 
-.PHONY: test ca_test mapi_test ufds_test
+.PHONY: test ca_test ufds_test
 
 ca_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/ca.test.js
-
-mapi_test: $(WHISKEY)
-	$(WHISKEY) $(WHISKEY_ARGS) test/mapi.test.js
 
 vmapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/vmapi.test.js
 
 cnapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
+	$(NODEUNIT) $(NODEUNIT) test/cnapi.test.js
 
-ufds_test: $(WHISKEY)
-	$(WHISKEY) $(WHISKEY_ARGS) test/ufds.test.js
+ufds_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT) test/ufds.test.js
 
 amon_test: $(WHISKEY)
 	$(WHISKEY) $(WHISKEY_ARGS) test/amon.test.js
 
-test: ca_test mapi_test ufds_test
+test: ca_test ufds_test
 
 .PHONY: setup
 setup:
