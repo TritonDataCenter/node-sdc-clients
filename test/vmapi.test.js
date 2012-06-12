@@ -11,7 +11,8 @@ var NAPI = require('../lib/index').NAPI;
 
 // --- Globals
 
-var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.18');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || 'localhost:8080');
+// var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.18');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 
 var vmapi = null;
@@ -22,35 +23,35 @@ var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
 var NETWORKS = null;
 
+var ADD_METADATA = { foo: 'bar' };
+var SET_METADATA = { bar: 'baz' };
 
 
 // --- Helpers
 
-function waitForState(state, callback) {
-    function check() {
-        return vmapi.getVm(QUERY, function (err, vm) {
-            if (err)
-                return callback(err);
+function checkEqual(value, expected) {
+    if ((typeof(value) === 'object') && (typeof(expected) === 'object')) {
+        var exkeys = Object.keys(expected);
+        for (var i = 0; i < exkeys.length; i++) {
+            var key = exkeys[i];
+            if (value[key] !== expected[key])
+                return false;
+        }
 
-            if (vm.state === state)
-                return callback(null);
-
-            return setTimeout(check, 3000);
-        });
+        return true;
+    } else {
+        return (value === expected);
     }
-
-    return check();
 }
 
 
-// TODO duplicated function above. Fix soon
-function waitForAlias(alias, callback) {
+function waitForValue(prop, value, callback) {
     function check() {
         return vmapi.getVm(QUERY, function (err, vm) {
             if (err)
                 return callback(err);
 
-            if (vm.alias === alias)
+            if (checkEqual(vm[prop], value))
                 return callback(null);
 
             return setTimeout(check, 3000);
@@ -160,7 +161,7 @@ exports.test_create_zone = function (test) {
 
 
 exports.test_wait_for_running = function (test) {
-    waitForState('running', function (err) {
+    waitForValue('state', 'running', function (err) {
         test.ifError(err);
         setTimeout(function () {
             // Try to avoid the reboot after zoneinit so we don't stop the zone
@@ -187,7 +188,84 @@ exports.test_update_zone = function (test) {
 
 
 exports.test_wait_for_updated = function (test) {
-    waitForAlias('foobar', function (err) {
+    waitForValue('alias', 'foobar', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_add_metadata = function (test) {
+    var MDATA_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        foo: 'bar'
+    };
+
+    vmapi.addMetadata('tags', MDATA_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_add_metadata = function (test) {
+    waitForValue('tags', ADD_METADATA, function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_list_metadata = function (test) {
+    vmapi.listMetadata('tags', QUERY, function (err, md) {
+        test.ifError(err);
+        test.ok(md.foo);
+        test.done();
+    });
+};
+
+
+exports.test_set_metadata = function (test) {
+    var MDATA_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        bar: 'baz'
+    };
+
+    vmapi.setMetadata('tags', MDATA_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_set_metadata = function (test) {
+    waitForValue('tags', SET_METADATA, function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_delete_metadata = function (test) {
+    var MDATA_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER
+    };
+
+    vmapi.deleteAllMetadata('tags', MDATA_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_no_metadata = function (test) {
+    waitForValue('tags', {}, function (err) {
         test.ifError(err);
         test.done();
     });
@@ -204,7 +282,7 @@ exports.test_stop_zone = function (test) {
 
 
 exports.test_wait_for_stopped = function (test) {
-    waitForState('stopped', function (err) {
+    waitForValue('state', 'stopped', function (err) {
         test.ifError(err);
         test.done();
     });
@@ -221,7 +299,7 @@ exports.test_start_zone = function (test) {
 
 
 exports.test_wait_for_started = function (test) {
-    waitForState('running', function (err) {
+    waitForValue('state', 'running', function (err) {
         test.ifError(err);
         test.done();
     });
@@ -239,7 +317,7 @@ exports.test_reboot_zone = function (test) {
 
 exports.test_wait_for_reboot = function (test) {
     setTimeout(function () {
-        waitForState('running', function (err) {
+        waitForValue('state', 'running', function (err) {
             test.ifError(err);
             test.done();
         });
@@ -257,7 +335,7 @@ exports.test_destroy_zone = function (test) {
 
 
 exports.test_wait_for_destroyed = function (test) {
-    waitForState('destroyed', function (err) {
+    waitForValue('state', 'destroyed', function (err) {
         test.ifError(err);
         test.done();
     });

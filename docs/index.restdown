@@ -397,7 +397,7 @@ TODO
 
 ## listVms(params, callback)
 
-List all VMs given the specified filter params. Currently the following 
+List all VMs given the specified filter params. Currently the following
 parameters are allowed:
 
 || **Name** || **Type** || **Description** ||
@@ -501,6 +501,89 @@ Deletes a VM.
 || params.uuid || UUID || VM UUID. Required ||
 || params.owner_uuid || UUID || VM Owner. Optional ||
 || callback || Function || fn(error, job) ||
+
+
+## listMetadata(type, params, callback)
+
+Gets existing metadata for a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| type || String || 'customer_metadata', 'internal_metadata' or 'tags' ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, metadata) ||
+
+
+## addMetadata(type, params, callback)
+
+Adds (appends) metadata to a VM. Existing metadata will not be replaced. For
+specifying metadata to be added to the VM, add values to the params object other
+than uuid or owner_uuid. If we wanted to add foo=bar as metadata tags for a VM
+then the params argument would look like:
+
+        {
+            uuid: <uuid>,
+            owner_uuid: <owner_uuid>,
+            foo: 'bar'
+        }
+
+
+|| **Name** || **Type** || **Description** ||
+|| type || String || 'customer_metadata', 'internal_metadata' or 'tags' ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| params.<key> || String/Number/Boolean || Additional metadata keys ||
+|| callback || Function || fn(error, jobs) ||
+
+
+## setMetadata(type, params, callback)
+
+Sets (replaces) metadata to a VM. Existing metadata will be replaced. For
+specifying metadata to be added to the VM, add values to the params object other
+than uuid or owner_uuid. If we wanted to add foo=bar as metadata tags for a VM
+then the params argument would look like:
+
+        {
+            uuid: <uuid>,
+            owner_uuid: <owner_uuid>,
+            foo: 'bar'
+        }
+
+
+|| **Name** || **Type** || **Description** ||
+|| type || String || 'customer_metadata', 'internal_metadata' or 'tags' ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| params.<key> || String/Number/Boolean || Additional metadata keys ||
+|| callback || Function || fn(error, jobs) ||
+
+
+## deleteMetadata(type, params, key, callback)
+
+Deletes a metadata key from a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| type || String || 'customer_metadata', 'internal_metadata' or 'tags' ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| key || String || Metadata key to be removed ||
+|| callback || Function || fn(error, jobs) ||
+
+
+## deleteAllMetadata(type, params, callback)
+
+Deletes ALL metadata keys from a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| type || String || 'customer_metadata', 'internal_metadata' or 'tags' ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, jobs) ||
 
 
 # Config Client
