@@ -5,19 +5,22 @@ var restify = require('restify');
 var uuid = require('node-uuid');
 
 var VMAPI = require('../lib/index').VMAPI;
+var NAPI = require('../lib/index').NAPI;
 
 
 
 // --- Globals
 
 var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.18');
+var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 
 var vmapi = null;
+var napi = null;
 var ZONE = null;
-var DATASET_UUID = null;
+var IMAGE_UUID = null;
 var QUERY = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
-var NETWORKS = '48a36b2e-b1da-4014-9a7a-6b6b6d80d661';
+var NETWORKS = null;
 
 
 
@@ -61,20 +64,43 @@ function waitForAlias(alias, callback) {
 // --- Tests
 
 exports.setUp = function (callback) {
+    var logger = new Logger({
+            name: 'vmapi_unit_test',
+            stream: process.stderr,
+            level: (process.env.LOG_LEVEL || 'info'),
+            serializers: Logger.stdSerializers
+    });
+
     vmapi = new VMAPI({
         url: VMAPI_URL,
         retry: {
             retries: 1,
             minTimeout: 1000
         },
-        log: new Logger({
-            name: 'vmapi_unit_test',
-            stream: process.stderr,
-            level: (process.env.LOG_LEVEL || 'info'),
-            serializers: Logger.stdSerializers
-        })
+        log: logger
     });
+
+    napi = new NAPI({
+        url: NAPI_URL,
+        retry: {
+            retries: 1,
+            minTimeout: 1000
+        },
+        log: logger
+    });
+
     callback();
+};
+
+
+
+exports.test_list_networks = function (test) {
+    napi.listNetworks({}, function (err, networks) {
+        test.ifError(err);
+        test.ok(networks);
+        NETWORKS = networks[0].uuid;
+        test.done();
+    });
 };
 
 
@@ -83,7 +109,7 @@ exports.test_list_vms = function (test) {
         test.ifError(err);
         test.ok(vms);
         ZONE = vms[0].uuid;
-        DATASET_UUID = vms[0].dataset_uuid;
+        IMAGE_UUID = vms[0].image_uuid;
         QUERY = {
             uuid: ZONE,
             owner_uuid: CUSTOMER
@@ -114,7 +140,7 @@ exports.test_get_vm = function (test) {
 exports.test_create_zone = function (test) {
     var opts = {
         owner_uuid: CUSTOMER,
-        dataset_uuid: DATASET_UUID,
+        image_uuid: IMAGE_UUID,
         networks: NETWORKS,
         brand: 'joyent-minimal',
         ram: 64
