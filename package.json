@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
   "description": "Contains node.js client libraries for SDC REST APIs.",
-  "version": "7.0.3",
+  "version": "8.0.0",
   "homepage": "http://www.joyent.com",
   "private": true,
   "main": "./lib/index.js",
@@ -14,11 +14,6 @@
   },
   "devDependencies": {
     "bunyan": "0.6.8",
-    "whiskey": "0.6.6",
     "nodeunit": "0.7.4"
-  },
-  "scripts": {
-    "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
-    "test": "NO_PROVISION_TESTS=1 ./node_modules/.bin/whiskey --quiet --timeout 120000 --sequential -t \"`find test -name *.test.js | sort -r | xargs`\""
   }
 }
