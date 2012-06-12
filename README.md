@@ -41,10 +41,16 @@ the previous `make test` will run successfully.
 Currently, every `test/*.test.js` file can be run separately as a different
 test suite by issuing the proper commands:
 
+    AMON_IP=10.99.99.206 \
+    MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make amon_test
-    make ca_test
+
+    CA_IP=10.99.99.113 make ca_test
+
     make cnapi_test
+
     make ufds_test
+
     make vmapi_test
 
 Each one of this commands assumes you've got a running version of the proper
@@ -62,6 +68,10 @@ indicate the IP addresses where these services are running:
 Of course, you provide each one of these environment variables to the proper
 test suite make command and, in case you plan to run `make test`, i.e, all the
 test suites, you may want to provide all these environment variables.
+
+Also, note that `amon` test suite requires the UUID of a real machine to be
+given as environment variable in order to be able to create real machine
+probes (`MACHINE_UUID` env var).
 
 Given UFDS, CNAPI and VMAPI are services provided by the default headnode core
 zones, if the associated IP env variables are not provided, the test suites
@@ -86,7 +96,8 @@ So, in brief, requirements to run these test suites:
     VMAPI_IP=10.99.99.18 \
     UFDS_IP=10.99.99.13 \
     CA_IP=10.99.99.113 \
-    AMON_IP=10.99.99.165 \
+    AMON_IP=10.99.99.206 \
+    MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make test
 
 with the different IP env vars pointing to the right IP for each zone.
