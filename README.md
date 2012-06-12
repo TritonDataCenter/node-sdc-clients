@@ -53,6 +53,8 @@ test suite by issuing the proper commands:
 
     make vmapi_test
 
+    make napi_test
+
 Each one of this commands assumes you've got a running version of the proper
 API service.
 
@@ -64,6 +66,7 @@ indicate the IP addresses where these services are running:
     CNAPI_IP
     UFDS_IP
     VMAPI_IP
+    NAPI_IP
 
 Of course, you provide each one of these environment variables to the proper
 test suite make command and, in case you plan to run `make test`, i.e, all the
@@ -73,14 +76,15 @@ Also, note that `amon` test suite requires the UUID of a real machine to be
 given as environment variable in order to be able to create real machine
 probes (`MACHINE_UUID` env var).
 
-Given UFDS, CNAPI and VMAPI are services provided by the default headnode core
-zones, if the associated IP env variables are not provided, the test suites
-will set them to the default values into a COAL image running the headnode;
-that is:
+Given UFDS, CNAPI, NAPI and VMAPI are services provided by the default headnode
+core zones, if the associated IP env variables are not provided, the test
+suites will set them to the default values into a COAL image running the
+headnode; that is:
 
     CNAPI_IP=10.99.99.16
     UFDS_IP=10.99.99.13
     VMAPI_IP=10.99.99.18
+    NAPI_IP=10.99.99.10
 
 There are no default values pointing to the headnode zones for AMON and CA.
 The default test values for these APIs point to `localhost` so, you may want
@@ -95,6 +99,7 @@ So, in brief, requirements to run these test suites:
     CNAPI_IP=10.99.99.16 \
     VMAPI_IP=10.99.99.18 \
     UFDS_IP=10.99.99.13 \
+    NAPI_IP=10.99.99.10 \
     CA_IP=10.99.99.113 \
     AMON_IP=10.99.99.206 \
     MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \

@@ -18,9 +18,7 @@
 # Tools
 #
 NPM       := npm
-WHISKEY		:= ./node_modules/.bin/whiskey
 NODEUNIT	:= ./node_modules/.bin/nodeunit
-WHISKEY_ARGS	:= --test-reporter tap --failfast --sequential --real-time --timeout 120000 --tests
 NODEUNIT_ARGS   :=
 
 #
@@ -58,6 +56,9 @@ ufds_test: $(NODEUNIT)
 
 amon_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/amon.test.js
+
+napi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/napi.test.js
 
 test: ca_test ufds_test
 
