@@ -33,16 +33,16 @@ var PROBE = {
     'name': 'test-probe',
     'user': ADMIN_UUID,
     'monitor': MONITOR.name,
-    "type": "machine-up",
-    "machine": MACHINE_UUID
+    'type': 'machine-up',
+    'machine': MACHINE_UUID
 };
 
 var PROBE_2 = {
     'name': 'test-probe-2',
     'user': ADMIN_UUID,
     'monitor': MONITOR.name,
-    "type": "machine-up",
-    "machine": MACHINE_UUID
+    'type': 'machine-up',
+    'machine': MACHINE_UUID
 };
 
 
@@ -69,7 +69,8 @@ exports.test_put_monitor = function (test) {
 };
 
 exports.test_put_probe = function (test) {
-    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE.name, PROBE, function (err, probe) {
+    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE.name, PROBE,
+        function (err, probe) {
         test.ifError(err);
         test.ok(probe);
         test.equal(probe.name, PROBE.name);
@@ -82,7 +83,8 @@ exports.test_put_probe = function (test) {
 };
 
 exports.test_list_probes = function (test) {
-    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name, PROBE_2, function (err, probe) {
+    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name, PROBE_2,
+        function (err, probe) {
         test.ifError(err);
         test.ok(probe);
 
@@ -124,7 +126,8 @@ exports.test_delete_probe = function (test) {
 };
 
 exports.test_list_monitors = function (test) {
-    amon.putMonitor(ADMIN_UUID, MONITOR_2.name, MONITOR_2, function (err, monitor) {
+    amon.putMonitor(ADMIN_UUID, MONITOR_2.name, MONITOR_2,
+        function (err, monitor) {
         test.ifError(err);
         amon.listMonitors(ADMIN_UUID, function (err, monitors) {
             test.ifError(err);

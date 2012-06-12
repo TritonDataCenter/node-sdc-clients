@@ -29,7 +29,7 @@ var SET_METADATA = { bar: 'baz' };
 // --- Helpers
 
 function checkEqual(value, expected) {
-    if ((typeof(value) === 'object') && (typeof(expected) === 'object')) {
+    if ((typeof (value) === 'object') && (typeof (expected) === 'object')) {
         var exkeys = Object.keys(expected);
         for (var i = 0; i < exkeys.length; i++) {
             var key = exkeys[i];
