@@ -55,6 +55,8 @@ test suite by issuing the proper commands:
 
     make napi_test
 
+    make imgapi_test
+
 Each one of this commands assumes you've got a running version of the proper
 API service.
 
@@ -113,8 +115,4 @@ _traditional_ `joypass123`.
 
 # TODO:
 
-- ATM, not all these test suites run properly versus SDC-7.0. [DCAPI-24]
-- All the test suites will be modified to use Nodeunit, in order to keep
-  just one test tool dependency. [DCAPI-17]
-- Adding tests for NAPI is pending.
 - Adding tests for CONFIG service is pending.
