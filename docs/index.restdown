@@ -586,6 +586,42 @@ Deletes ALL metadata keys from a VM.
 || callback || Function || fn(error, jobs) ||
 
 
+## listJobs(params, callback)
+
+Returns all jobs matching the specified search filters.
+
+|| **Name** || **Type** || **Description** ||
+|| vm_uuid || UUID || Return all jobs for this VM UUID ||
+|| execution || String || Job state. See below ||
+|| task || String || Type of job. See below ||
+
+### Job 'execution' State Inputs
+
+|| **Execution** ||
+|| running ||
+|| succeeded ||
+|| failed ||
+
+### Job 'task' Type Inputs
+
+**NOTE** Any metadata endpoint that returns a Job response object is an 'update'
+job for the backend system.
+
+|| **Task** ||
+|| provision ||
+|| start ||
+|| stop ||
+|| reboot ||
+|| update ||
+
+## getJob(uuid, callback)
+
+Returns a job with the specified UUID.
+
+||**Name**||**Type**||**Description**||
+||uuid||UUID||Job UUID||
+
+
 # Config Client
 
 The config client can be used by importing sdc-clients.Config, creating a new

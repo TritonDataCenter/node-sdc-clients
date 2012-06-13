@@ -19,6 +19,7 @@ var napi = null;
 var ZONE = null;
 var IMAGE_UUID = null;
 var QUERY = null;
+var JOB_UUID = null;
 var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
 var NETWORKS = null;
 
@@ -339,3 +340,27 @@ exports.test_wait_for_destroyed = function (test) {
         test.done();
     });
 };
+
+
+exports.test_list_jobs = function (test) {
+    var query = {
+        vm_uuid: ZONE,
+        task: 'provision'
+    };
+
+    vmapi.listJobs(query, function (err, jobs) {
+        test.ifError(err);
+        test.ok(jobs);
+        JOB_UUID = jobs[0].uuid;
+        test.done();
+    });
+};
+
+exports.test_get_job = function (test) {
+    vmapi.getJob(JOB_UUID, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        test.done();
+    });
+};
+
