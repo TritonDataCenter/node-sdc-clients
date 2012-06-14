@@ -1,10 +1,11 @@
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
-var uuid = require('node-uuid');
+var uuid = require('node-uuid'),
+    util = require('util'),
+    clone = require('clone');
 
 var UFDS = require('../lib/index').UFDS;
-
 
 
 // --- Globals
@@ -212,6 +213,83 @@ exports.testCrudLimit = function (test) {
                 });
             });
         });
+    });
+};
+
+
+exports.test_crud_package = function (t) {
+    var entry = {
+        name: 'regular_128',
+        version: '1.0.0',
+        max_physical_memory: 128,
+        quota: 5120,
+        max_swap: 256,
+        cpu_cap: 350,
+        max_lwps: 2000,
+        zfs_io_priority: 1,
+        'default': true,
+        vcpus: 1,
+        urn: 'sdc::regular_128:1.0.0'
+    },
+    another_entry = {
+        name: 'regular_256',
+        version: '1.0.0',
+        max_physical_memory: 256,
+        quota: 5120,
+        max_swap: 512,
+        cpu_cap: 350,
+        max_lwps: 2000,
+        zfs_io_priority: 1,
+        'default': true,
+        vcpus: 1,
+        urn: 'sdc::regular_256:1.0.0'
+    };
+
+    ufds.addPackage(entry, function (err, pkg) {
+        t.ifError(err);
+        t.ok(pkg);
+        t.ok(pkg.uuid);
+        t.equal(pkg.vcpus, 1);
+        t.equal(pkg.max_swap, 256);
+        var changes = clone(pkg);
+        // Test removing attributes:
+        delete changes.vcpus;
+        changes.max_swap = 512;
+        ufds.updatePackage(pkg, changes, function (err) {
+            t.ifError(err);
+            ufds.getPackage(pkg.uuid, function (err, pckg) {
+                t.equal(pckg.max_swap, 512);
+                t.ok(!pckg.vcpus);
+                // Test adding attributes now:
+                var chgs = clone(pckg);
+                chgs.vcpus = 2;
+                ufds.updatePackage(pckg, chgs, function (err) {
+                    t.ifError(err);
+                    ufds.getPackage(pkg.uuid, function (err, p) {
+                        t.ifError(err);
+                        t.ok(p.vcpus);
+                        t.equal(p.vcpus, 2);
+                        ufds.addPackage(another_entry, function (err, pkg2) {
+                            t.ifError(err);
+                            ufds.listPackages(function (err, packages) {
+                                t.ifError(err);
+                                t.ok(util.isArray(packages));
+                                ufds.deletePackage(pkg, function (err) {
+                                    t.ifError(err);
+                                    ufds.getPackage(pkg.uuid, function (e, p) {
+                                        t.ok(e);
+                                        t.done();
+                                    });
+                                });
+                            });
+                        });
+                        // Test list packages
+                        // Test delete package
+                    });
+                });
+            });
+        });
+
     });
 };
 

@@ -77,6 +77,9 @@
         }
       }
     },
+    "clone": {
+      "version": "0.1.0"
+    },
     "bunyan": {
       "version": "0.6.8"
     },
