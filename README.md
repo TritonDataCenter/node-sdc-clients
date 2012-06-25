@@ -9,7 +9,7 @@ Tickets: <https://devhub.joyent.com/jira/browse/TOOLS> or the specific service
 # Overview
 
 Node.js client libraries for the various SDC REST API services: Amon, CA,
-CNAPI, NAPI, UFDS and VMAPI so far.
+CNAPI, NAPI, UFDS, Packages on top of UFDS and VMAPI so far.
 
 # Repository
 
@@ -50,6 +50,8 @@ test suite by issuing the proper commands:
     make cnapi_test
 
     make ufds_test
+
+    make package_test
 
     make vmapi_test
 
