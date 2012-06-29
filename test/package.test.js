@@ -165,6 +165,12 @@ exports.test_urn_must_be_unique = function (t) {
 };
 
 
+exports.test_instantiate_with_ufds_instance = function (t) {
+    var instance = new Package(pack.ufds);
+    t.ok(instance);
+    t.done();
+};
+
 exports.tearDown = function (callback) {
     pack.ufds.close(function () {
         callback();
