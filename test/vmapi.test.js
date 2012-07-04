@@ -27,6 +27,10 @@ var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
 
 
+// In seconds
+var TIMEOUT = 90;
+
+
 // --- Helpers
 
 function checkEqual(value, expected) {
@@ -44,17 +48,26 @@ function checkEqual(value, expected) {
     }
 }
 
+var times = 0;
 
-function waitForValue(prop, value, callback) {
+function waitForValue(fn, params, prop, value, callback) {
     function check() {
-        return vmapi.getVm(QUERY, function (err, vm) {
+        return fn.call(vmapi, params, function(err, vm) {
             if (err)
                 return callback(err);
 
-            if (checkEqual(vm[prop], value))
+            if (checkEqual(vm[prop], value)) {
+                times = 0;
                 return callback(null);
+            }
 
-            return setTimeout(check, 3000);
+            times++;
+
+            if (times == TIMEOUT) {
+                throw new Error('Timeout after ' + TIMEOUT + ' seconds');
+            }
+
+            return setTimeout(check, 1000);
         });
     }
 
@@ -151,6 +164,7 @@ exports.test_create_zone = function (test) {
         test.ifError(err);
         test.ok(job);
         ZONE = job.vm_uuid;
+        JOB_UUID = job.job_uuid;
         QUERY = {
             uuid: ZONE,
             owner_uuid: CUSTOMER
@@ -160,14 +174,23 @@ exports.test_create_zone = function (test) {
 };
 
 
+exports.test_wait_for_running_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
 exports.test_wait_for_running = function (test) {
-    waitForValue('state', 'running', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
         test.ifError(err);
         setTimeout(function () {
             // Try to avoid the reboot after zoneinit so we don't stop the zone
             // too early
             test.done();
-        }, 20000);
+        }, 10000);
     });
 };
 
@@ -182,13 +205,23 @@ exports.test_update_zone = function (test) {
     vmapi.updateVm(UPDATE_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_updated_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_updated = function (test) {
-    waitForValue('alias', 'foobar', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'alias', 'foobar', function (err) {
         test.ifError(err);
         test.done();
     });
@@ -205,13 +238,23 @@ exports.test_add_metadata = function (test) {
     vmapi.addMetadata('tags', MDATA_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_add_metadata_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_add_metadata = function (test) {
-    waitForValue('tags', ADD_METADATA, function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'tags', ADD_METADATA, function (err) {
         test.ifError(err);
         test.done();
     });
@@ -237,13 +280,23 @@ exports.test_set_metadata = function (test) {
     vmapi.setMetadata('tags', MDATA_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_set_metadata_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_set_metadata = function (test) {
-    waitForValue('tags', SET_METADATA, function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'tags', SET_METADATA, function (err) {
         test.ifError(err);
         test.done();
     });
@@ -259,13 +312,23 @@ exports.test_delete_metadata = function (test) {
     vmapi.deleteAllMetadata('tags', MDATA_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_no_metadata_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_no_metadata = function (test) {
-    waitForValue('tags', {}, function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'tags', {}, function (err) {
         test.ifError(err);
         test.done();
     });
@@ -276,13 +339,23 @@ exports.test_stop_zone = function (test) {
     vmapi.stopVm(QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_stopped_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_stopped = function (test) {
-    waitForValue('state', 'stopped', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'stopped', function (err) {
         test.ifError(err);
         test.done();
     });
@@ -293,13 +366,23 @@ exports.test_start_zone = function (test) {
     vmapi.startVm(QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_started_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_started = function (test) {
-    waitForValue('state', 'running', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
         test.ifError(err);
         test.done();
     });
@@ -310,18 +393,26 @@ exports.test_reboot_zone = function (test) {
     vmapi.rebootVm(QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_reboot_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_reboot = function (test) {
-    setTimeout(function () {
-        waitForValue('state', 'running', function (err) {
-            test.ifError(err);
-            test.done();
-        });
-    }, 3000);
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
 };
 
 
@@ -329,13 +420,23 @@ exports.test_destroy_zone = function (test) {
     vmapi.deleteVm(QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_destroyed_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
         test.done();
     });
 };
 
 
 exports.test_wait_for_destroyed = function (test) {
-    waitForValue('state', 'destroyed', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'destroyed', function (err) {
         test.ifError(err);
         test.done();
     });
