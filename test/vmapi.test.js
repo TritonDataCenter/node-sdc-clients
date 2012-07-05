@@ -270,6 +270,15 @@ exports.test_list_metadata = function (test) {
 };
 
 
+exports.test_get_metadata = function (test) {
+    vmapi.getMetadata('tags', 'foo', QUERY, function (err, md) {
+        test.ifError(err);
+        test.ok(md);
+        test.done();
+    });
+};
+
+
 exports.test_set_metadata = function (test) {
     var MDATA_QUERY = {
         uuid: ZONE,
