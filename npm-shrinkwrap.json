@@ -15,19 +15,19 @@
     },
     "ldapjs": {
       "version": "0.5.0",
-      "from": "git://github.com/mcavage/node-ldapjs.git#e378ae84748af3d46645440c23ed746da4165482",
+      "from": "git://github.com/mcavage/node-ldapjs.git#3ce399a710c8bb001b997a7bef62291b9806a87f",
       "dependencies": {
         "asn1": {
           "version": "0.1.11"
         },
         "buffertools": {
-          "version": "1.0.9"
+          "version": "1.1.0"
         },
         "bunyan": {
-          "version": "0.6.8"
+          "version": "0.10.0"
         },
         "dtrace-provider": {
-          "version": "0.0.7"
+          "version": "0.0.9"
         },
         "nopt": {
           "version": "1.0.10",
@@ -38,7 +38,25 @@
           }
         },
         "pooling": {
-          "version": "0.1.0"
+          "version": "0.2.1",
+          "dependencies": {
+            "bunyan": {
+              "version": "0.7.0"
+            },
+            "vasync": {
+              "version": "1.1.1",
+              "dependencies": {
+                "verror": {
+                  "version": "1.1.0",
+                  "dependencies": {
+                    "extsprintf": {
+                      "version": "1.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
