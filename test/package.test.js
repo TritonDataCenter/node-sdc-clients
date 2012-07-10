@@ -11,7 +11,6 @@ var Package = require('../lib/index').Package;
 // --- Globals
 
 var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.13');
-
 var pack;
 
 var entry = {
@@ -158,8 +157,6 @@ exports.test_urn_must_be_unique = function (t) {
     pack.add(changes, function (err, pkg) {
         t.ok(err);
         t.ok(/already exists/.test(err.message));
-        t.ok(/urn/.test(err.message));
-        t.ok(/unique/.test(err.message));
         t.done();
     });
 };
