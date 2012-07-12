@@ -97,9 +97,9 @@ Looks up a user by login to UFDS.
 Updates a user record.
 
 || *Name* || *Type* || *Description* ||
-|| user || Object || user the user record you got from getUser. ||
-|| changes || Object || changes the plain object you want merged in. ||
-|| callback || Function || callback of the form fn(err, user). ||
+|| user || String|Object || The user UUID or login string or a user object with a `user.dn`, `user.uuid` or `user.login` (i.e. a user object as from `getUser`).user the user record you got from getUser. ||
+|| changes || Object || Changes to the object you want merged in. For example: `{myfield: "blah"}` will add/replace the existing `myfield`. You can delete an existing field by passing in a null value, e.g.: `{addthisfield: "blah", rmthisfield: null}`. ||
+|| callback || Function || callback of the form `function (err, user)`. ||
 
 ### Throws
 
@@ -692,5 +692,3 @@ Insert the properties in *cfg* in to the configuration database
 
 || *Name* || *Type* || *Description* ||
 || cfg || Object || object containing the key:value pairs of properties to insert ( must be of the form key:*String* ) ||
-
-
