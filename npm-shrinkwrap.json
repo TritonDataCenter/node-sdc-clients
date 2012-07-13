@@ -14,7 +14,7 @@
       }
     },
     "ldapjs": {
-      "version": "0.5.3",
+      "version": "0.5.4",
       "dependencies": {
         "asn1": {
           "version": "0.1.11"
@@ -40,7 +40,7 @@
           }
         },
         "pooling": {
-          "version": "0.2.1",
+          "version": "0.2.2",
           "dependencies": {
             "bunyan": {
               "version": "0.7.0"
