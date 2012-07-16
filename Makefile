@@ -19,7 +19,7 @@
 #
 NPM       := npm
 NODEUNIT	:= ./node_modules/.bin/nodeunit
-NODEUNIT_ARGS   :=
+NODEUNIT_ARGS   ?=
 
 #
 # Files
