@@ -20,7 +20,7 @@ var instrumentation = null;
 exports.setUp = function (callback) {
     ca = new CA({
         url: CA_URL,
-        retryOptions: {
+        retry: {
             retries: 1,
             minTimeout: 1000
         }
