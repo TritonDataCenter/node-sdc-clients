@@ -38,7 +38,7 @@ include ./tools/mk/Makefile.defs
 #
 .PHONY: all
 all:
-	$(NPM) rebuild
+	$(NPM) install && $(NPM) rebuild
 
 .PHONY: test config_test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test package_test
 
