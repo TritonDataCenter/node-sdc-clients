@@ -52,7 +52,7 @@ var times = 0;
 
 function waitForValue(fn, params, prop, value, callback) {
     function check() {
-        return fn.call(vmapi, params, function(err, vm) {
+        return fn.call(vmapi, params, function (err, vm) {
             if (err)
                 return callback(err);
 
