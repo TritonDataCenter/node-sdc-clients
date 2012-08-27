@@ -52,6 +52,8 @@ var CONFIG = {
     }
 };
 
+// -- Setup
+
 test('setup client', function (t) {
     client = new Config(options);
     t.ok(client);
@@ -62,7 +64,7 @@ test('setup client', function (t) {
 // -- Basic tests
 
 test('lookup nonexistent role', function (t) {
-    client.lookup('notarole', function (err, results) {
+    client.lookupFile('notarole', function (err, results) {
         t.ifError(err);
         t.deepEqual(results, {});
         t.done();
@@ -70,7 +72,7 @@ test('lookup nonexistent role', function (t) {
 });
 
 test('lookup nonexistent role w/ empty options', function (t) {
-    client.lookup('notarole', {}, function (err, results) {
+    client.lookupFile('notarole', {}, function (err, results) {
         t.ifError(err);
         t.deepEqual(results, {});
         t.done();
@@ -78,7 +80,7 @@ test('lookup nonexistent role w/ empty options', function (t) {
 });
 
 test('lookup nonexistent zone', function (t) {
-    client.lookup('notarole', { zoneid: uuid.v4() }, function (err, results) {
+    client.lookupFile('notarole', { zoneid: uuid.v4() }, function (err, results) {
         t.ifError(err);
         t.deepEqual(results, {});
         t.done();
@@ -86,7 +88,7 @@ test('lookup nonexistent zone', function (t) {
 });
 
 test('lookup nonexistent tag', function (t) {
-    client.lookup('notarole', { tag: uuid.v4() }, function (err, results) {
+    client.lookupFile('notarole', { tag: uuid.v4() }, function (err, results) {
         t.ifError(err);
         t.deepEqual(results, {});
         t.done();
@@ -109,14 +111,14 @@ test('put text config file', function (t) {
     file.contents = nsswitch_contents;
     file.path = nsswitch;
 
-    client.put(file, role, function (err) {
+    client.putFile(file, role, function (err) {
         t.ifError(err);
         t.done();
     });
 });
 
 test('lookup config file', function (t) {
-    client.lookup(role, function (err, res) {
+    client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
         t.equal(res['nsswitch'].path, nsswitch);
@@ -128,7 +130,7 @@ test('lookup config file', function (t) {
 });
 
 test('lookup config file w/empty options', function (t) {
-    client.lookup(role, {}, function (err, res) {
+    client.lookupFile(role, {}, function (err, res) {
         t.ifError(err);
 
         t.equal(res['nsswitch'].path, nsswitch);
@@ -148,14 +150,14 @@ test('put another text config file', function (t) {
     file.contents = resolv_contents;
     file.path = resolv;
 
-    client.put(file, role, function (err) {
+    client.putFile(file, role, function (err) {
         t.ifError(err);
         t.done();
     });
 });
 
 test('lookup config files', function (t) {
-    client.lookup(role, function (err, res) {
+    client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
         t.equal(res['nsswitch'].path, nsswitch);
@@ -177,14 +179,14 @@ test('put JSON config file', function (t) {
     file.contents = CONFIG;
     file.path = '/opt/smartdc/mako/etc/config.json';
 
-    client.put(file, role, function (err) {
+    client.putFile(file, role, function (err) {
         t.ifError(err);
         t.done();
     });
 });
 
 test('lookup config files yet again', function (t) {
-    client.lookup(role, function (err, res) {
+    client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
         t.equal(res['nsswitch'].path, nsswitch);
@@ -211,7 +213,7 @@ test('delete one config file', function (t) {
 });
 
 test('lookup config files one last time', function (t) {
-    client.lookup(role, function (err, res) {
+    client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
         t.equal(res['nsswitch'].path, nsswitch);
@@ -239,7 +241,7 @@ test('delete the rest of config files', function (t) {
 });
 
 test('lookup returns an empty object', function (t) {
-    client.lookup(role, function (err, res) {
+    client.lookupFile(role, function (err, res) {
         console.log(res);
         t.equal(Object.keys(res).length, 0);
         t.done();
@@ -260,14 +262,14 @@ test('put file to be written locally', function (t) {
     var config;
 
     var put = function (_, cb) {
-        client.put(file, role, function (err) {
+        client.putFile(file, role, function (err) {
             t.ifError(err);
             return (cb(null));
         });
     };
 
     var lookup = function (_, cb) {
-        client.lookup(role, function (err, result) {
+        client.lookupFile(role, function (err, result) {
             t.ifError(err);
             config = result;
             return (cb(null));
@@ -309,6 +311,37 @@ test('put file to be written locally', function (t) {
         t.done();
     });
 });
+
+
+// -- Test "simple" interface
+
+var roleid = 'testrole' + uuid.v4().substr(0, 7);
+
+test('lookupConfig() should return empty config', function (t) {
+    client.lookupConfig(roleid, function (err, config) {
+        t.ifError(err);
+        t.deepEqual(config, {});
+        t.done();
+    });
+});
+
+test('putConfig()', function (t) {
+    client.putConfig(CONFIG, roleid, function (err) {
+        t.ifError(err);
+        t.done();
+    });
+});
+
+test('lookupConfig() should return proper config', function (t) {
+    client.lookupConfig(roleid, function (err, config) {
+        t.ifError(err);
+        t.deepEqual(config, CONFIG);
+        t.done();
+    });
+});
+
+
+// -- Teardown
 
 test('unbind', function (t) {
     client.unbind(function (err) {
