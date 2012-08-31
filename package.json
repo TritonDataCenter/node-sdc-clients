@@ -24,8 +24,5 @@
   "scripts": {
     "pretest": "which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -e lib/node-smartdc/node_modules -r lib; else echo \"Missing gjslint. Skipping lint\"; fi",
     "test": "NO_PROVISION_TESTS=1 whiskey --quiet --timeout 120000 --sequential -t \"`find tst -name *.test.js | sort -r | xargs`\""
-  },
-  "engines": {
-    "node": "~0.4.9"
   }
 }
