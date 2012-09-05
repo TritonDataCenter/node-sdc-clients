@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Run the node-sdc-clients tests in a running SDC.
+#
+
+if [[ -n "$TRACE" ]]; then
+    export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+    set -o xtrace
+fi
+set -o errexit
+set -o pipefail
+
+
+
+#---- globals/config
+
+TOP=$(cd $(dirname $0)/../; pwd)
+NODEUNIT=$(TOP)/node_modules/nodeunit/bin/nodeunit
+
+
+#---- support stuff
+
+function fatal
+{
+    echo "$0: fatal error: $*"
+    exit 1
+}
+
+function errexit
+{
+    [[ $1 -ne 0 ]] || exit 0
+    fatal "error exit status $1"
+}
+
+
+
+#---- mainline
+
+trap 'errexit $?' EXIT
+
+#TODO(RELENG-386): production guard
+
+#TODO(RELENG-386): set test user: sdcclientstestuser
+
+test_files=$(ls -1 $(TOP)/test/*.test.js)
+if [[ -n "$test_files" ]]; then
+    $NODEUNIT --reporter=tap $test_files \
+        | tee $OUTPUT_DIR/node-sdc-clients.tap
+fi
