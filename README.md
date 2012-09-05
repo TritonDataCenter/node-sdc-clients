@@ -115,6 +115,8 @@ Note that it's also possible to pass the ENV variable `ADMIN_PWD` to be used
 with UFDS authentication tests. When not given, it will default to the
 _traditional_ `joypass123`.
 
-# TODO:
+
+# TODO
 
 - Adding tests for CONFIG service is pending.
+
