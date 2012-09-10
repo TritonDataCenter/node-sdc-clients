@@ -48,4 +48,6 @@ test_files=$(ls -1 test/*.test.js)
 test_files="test/amon.test.js"
 if [[ -n "$test_files" ]]; then
     $NODEUNIT --reporter=tap $test_files
+    # Note: Need https://github.com/caolan/nodeunit/pull/168 before we get
+    # a non-zero exit status on any test failures.
 fi
