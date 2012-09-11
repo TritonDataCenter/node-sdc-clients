@@ -78,7 +78,7 @@ exports.testGetUserByUuid = function (test) {
 exports.testGetUserNotFound = function (test) {
     ufds.getUser(uuid(), function (err, user) {
         test.ok(err);
-        test.equal(err.httpCode, 404);
+        test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
         test.ok(!user);
