@@ -10,7 +10,7 @@ var Package = require('../lib/index').Package;
 
 // --- Globals
 
-var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.13');
+var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.14');
 var pack;
 
 var entry = {
