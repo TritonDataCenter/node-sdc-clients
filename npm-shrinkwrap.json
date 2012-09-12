@@ -15,7 +15,7 @@
     },
     "ldapjs": {
       "version": "0.5.4",
-      "from": "git://github.com/mcavage/node-ldapjs.git#97ed53717491b51bd268cd551eef4205ece4200d",
+      "from": "git://github.com/kusor/node-ldapjs.git#87061486d1cd0367bc82056fc6c62991538673b1",
       "dependencies": {
         "asn1": {
           "version": "0.1.11"
@@ -23,11 +23,8 @@
         "buffertools": {
           "version": "1.1.0"
         },
-        "bunyan": {
-          "version": "0.10.0"
-        },
         "dtrace-provider": {
-          "version": "0.0.9"
+          "version": "0.2.0"
         },
         "nopt": {
           "version": "1.0.10",
