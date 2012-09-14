@@ -80,7 +80,10 @@ test('lookup nonexistent role w/ empty options', function (t) {
 });
 
 test('lookup nonexistent zone', function (t) {
-    client.lookupFile('notarole', { zoneid: uuid.v4() }, function (err, results) {
+    var opts = {};
+    opts.zoneid = uuid.v4();
+
+    client.lookupFile('notarole', opts, function (err, results) {
         t.ifError(err);
         t.deepEqual(results, {});
         t.done();
@@ -206,8 +209,32 @@ test('lookup config files yet again', function (t) {
 });
 
 test('delete one config file', function (t) {
-    client.del('resolv', role, function (err) {
+    client.deleteConfig('resolv', role, function (err) {
         t.ifError(err);
+        t.done();
+    });
+});
+
+test('delete nonexistent config file', function (t) {
+    client.deleteConfig('resolv', role, function (err) {
+        t.ok(err);
+        t.ok(err.message);
+        t.done();
+    });
+});
+
+test('delete bogus config file', function (t) {
+    client.deleteConfig('bogus', role, function (err) {
+        t.ok(err);
+        t.ok(err.message);
+        t.done();
+    });
+});
+
+test('delete bogus config file from bogus role', function (t) {
+    client.deleteConfig('bogus', 'bogusrole', function (err) {
+        t.ok(err);
+        t.ok(err.message);
         t.done();
     });
 });
@@ -231,9 +258,9 @@ test('lookup config files one last time', function (t) {
 });
 
 test('delete the rest of config files', function (t) {
-    client.del('mako', role, function (err) {
+    client.deleteConfig('mako', role, function (err) {
         t.ifError(err);
-        client.del('nsswitch', role, function (suberr) {
+        client.deleteConfig('nsswitch', role, function (suberr) {
             t.ifError(suberr);
             t.done();
         });
