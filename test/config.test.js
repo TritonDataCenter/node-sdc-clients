@@ -303,8 +303,8 @@ test('put file to be written locally', function (t) {
         });
     };
 
-    var write = function (_, cb) {
-        client.write(config, function (err) {
+    var writeFile = function (_, cb) {
+        client.writeFile(config.dummy, { norefresh: true }, function (err) {
             t.ifError(err);
             return (cb(null));
         });
@@ -329,7 +329,7 @@ test('put file to be written locally', function (t) {
         funcs: [
             put,
             lookup,
-            write,
+            writeFile,
             verify,
             unlink
         ]
