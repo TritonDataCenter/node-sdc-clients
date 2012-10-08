@@ -339,6 +339,40 @@ test('put file to be written locally', function (t) {
     });
 });
 
+var newrole = 'testsvc-' + uuid.v4().substr(0, 7);
+var newzoneid = uuid.v4();
+
+test('put file for zone w/o putting file for role first', function (t) {
+    var file = {};
+    file.service = 'nsswitch';
+    file.type = 'text';
+    file.contents = nsswitch_contents;
+    file.path = nsswitch;
+
+    var opts = {};
+    opts.zoneid = newzoneid;
+
+    client.putFile(file, newrole, opts, function (err) {
+        t.ifError(err);
+        t.done();
+    });
+});
+
+test('lookup zone config file', function (t) {
+    var opts = {};
+    opts.zoneid = newzoneid;
+
+    client.lookupFile(newrole, opts, function (err, res) {
+        t.ifError(err);
+
+        t.equal(res['nsswitch'].path, nsswitch);
+        t.equal(res['nsswitch'].contents, nsswitch_contents);
+        t.equal(res['nsswitch'].type, 'text');
+
+        t.done();
+    });
+});
+
 
 // -- Test "simple" interface
 
