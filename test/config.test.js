@@ -20,7 +20,7 @@ var helper = require('./helper.js');
 var test = helper.test;
 
 var client, role, zoneid;
-role = 'testsvc-' + uuid.v4().substr(0, 7);
+role = 'testsvc-' + uuid.v4().substr(0, 8);
 zoneid = uuid.v4();
 
 var UFDS_IP = process.env.UFDS_IP || '10.2.206.10'; // bh1-kvm6
@@ -339,7 +339,7 @@ test('put file to be written locally', function (t) {
     });
 });
 
-var newrole = 'testsvc-' + uuid.v4().substr(0, 7);
+var newrole = 'testsvc-' + uuid.v4().substr(0, 8);
 var newzoneid = uuid.v4();
 
 test('put file for zone w/o putting file for role first', function (t) {
@@ -374,9 +374,48 @@ test('lookup zone config file', function (t) {
 });
 
 
+// -- Test overwriting configuration
+
+newrole = 'testsvc-' + uuid.v4().substr(0, 8);
+newzoneid = uuid.v4();
+
+test('overwrite configuration', function (t) {
+    var file = {};
+    file.service = 'foobar';
+    file.type = 'json';
+    file.contents = { foo: 'bar' };
+    file.path = '/etc/foobar.conf';
+
+    var opts = {};
+    opts.zoneid = newzoneid;
+
+    client.putFile(file, newrole, opts, function (err) {
+        t.ifError(err);
+
+        file.contents = { baz: 'biz' };
+
+        client.putFile(file, newrole, opts, function (suberr) {
+            t.ifError(suberr);
+
+            client.lookupFile(newrole, opts, function (subsuberr, res) {
+                t.ifError(subsuberr);
+
+                t.equal(res['foobar'].path, '/etc/foobar.conf');
+                t.deepEqual(res['foobar'].contents, { baz: 'biz' });
+                t.equal(res['foobar'].type, 'json');
+
+                t.ok(!res['foobar'].contents.foo);
+
+                t.done();
+            });
+        });
+    });
+});
+
+
 // -- Test "simple" interface
 
-var roleid = 'testrole' + uuid.v4().substr(0, 7);
+var roleid = 'testrole' + uuid.v4().substr(0, 8);
 
 test('lookupConfig() should return empty config', function (t) {
     client.lookupConfig(roleid, function (err, config) {
