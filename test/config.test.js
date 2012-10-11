@@ -209,14 +209,14 @@ test('lookup config files yet again', function (t) {
 });
 
 test('delete one config file', function (t) {
-    client.deleteConfig('resolv', role, function (err) {
+    client.deleteFile('resolv', role, function (err) {
         t.ifError(err);
         t.done();
     });
 });
 
 test('delete nonexistent config file', function (t) {
-    client.deleteConfig('resolv', role, function (err) {
+    client.deleteFile('resolv', role, function (err) {
         t.ok(err);
         t.ok(err.message);
         t.done();
@@ -224,7 +224,7 @@ test('delete nonexistent config file', function (t) {
 });
 
 test('delete bogus config file', function (t) {
-    client.deleteConfig('bogus', role, function (err) {
+    client.deleteFile('bogus', role, function (err) {
         t.ok(err);
         t.ok(err.message);
         t.done();
@@ -232,7 +232,7 @@ test('delete bogus config file', function (t) {
 });
 
 test('delete bogus config file from bogus role', function (t) {
-    client.deleteConfig('bogus', 'bogusrole', function (err) {
+    client.deleteFile('bogus', 'bogusrole', function (err) {
         t.ok(err);
         t.ok(err.message);
         t.done();
@@ -258,9 +258,9 @@ test('lookup config files one last time', function (t) {
 });
 
 test('delete the rest of config files', function (t) {
-    client.deleteConfig('mako', role, function (err) {
+    client.deleteFile('mako', role, function (err) {
         t.ifError(err);
-        client.deleteConfig('nsswitch', role, function (suberr) {
+        client.deleteFile('nsswitch', role, function (suberr) {
             t.ifError(suberr);
             t.done();
         });
@@ -410,6 +410,17 @@ test('overwrite configuration', function (t) {
             });
         });
     });
+});
+
+
+// -- Test changelog
+
+test('recent changes', function (t) {
+	client.recentChanges(newrole, 0, function (err, changes) {
+        t.ifError(err);
+		t.ok(changes.length > 0);
+		t.done();
+	});
 });
 
 

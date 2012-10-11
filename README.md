@@ -47,6 +47,8 @@ test suite by issuing the proper commands:
 
     CA_IP=10.99.99.113 make ca_test
 
+    UFDS_IP=10.99.99.13 make config_test
+
     make cnapi_test
 
     make ufds_test
@@ -114,9 +116,3 @@ with the different IP env vars pointing to the right IP for each zone.
 Note that it's also possible to pass the ENV variable `ADMIN_PWD` to be used
 with UFDS authentication tests. When not given, it will default to the
 _traditional_ `joypass123`.
-
-
-# TODO
-
-- Adding tests for CONFIG service is pending.
-
