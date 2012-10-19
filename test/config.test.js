@@ -416,11 +416,11 @@ test('overwrite configuration', function (t) {
 // -- Test changelog
 
 test('recent changes', function (t) {
-	client.recentChanges(newrole, 0, function (err, changes) {
+    client.recentChanges(newrole, 0, function (err, changes) {
         t.ifError(err);
-		t.ok(changes.length > 0);
-		t.done();
-	});
+        t.ok(changes.length > 0);
+        t.done();
+    });
 });
 
 
@@ -447,6 +447,21 @@ test('lookupConfig() should return proper config', function (t) {
     client.lookupConfig(roleid, function (err, config) {
         t.ifError(err);
         t.deepEqual(config, CONFIG);
+        t.done();
+    });
+});
+
+test('deleteConfig() ', function (t) {
+    client.deleteConfig(roleid, function (err) {
+        t.ifError(err);
+        t.done();
+    });
+});
+
+test('lookupConfig() after delete should return empty config', function (t) {
+    client.lookupConfig(roleid, function (err, config) {
+        t.ifError(err);
+        t.deepEqual(config, {});
         t.done();
     });
 });

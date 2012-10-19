@@ -717,6 +717,16 @@ Delete a configuration file from a role's or specific zone's configuration.
 || zoneid || String || UUID of zone to which configuration applies ||
 
 
+## deleteConfig(role, callback)
+
+A simple wrapper over deleteFile() -- this is deleteFile's putConfig()
+equivalent.  It is intended for configuration which is stored in UFDS and not
+written out to a file.
+
+|| **Name** || **Type** || **Description** ||
+|| role || String || Role to which configuration applies. Required. ||
+
+
 ## recentChanges(role, changenumber, callback)
 
 Query UFDS changelog for recent changes to this role's configuration.
