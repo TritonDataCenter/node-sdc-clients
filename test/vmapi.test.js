@@ -20,7 +20,7 @@ var ZONE = null;
 var IMAGE_UUID = null;
 var QUERY = null;
 var JOB_UUID = null;
-var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
+var CUSTOMER = '00000000-0000-0000-0000-000000000000';
 var NETWORKS = null;
 
 var ADD_METADATA = { foo: 'bar' };
@@ -137,6 +137,15 @@ exports.test_list_vms_by_owner = function (test) {
     vmapi.listVms({ owner_uuid: CUSTOMER }, function (err, vms) {
         test.ifError(err);
         test.ok(vms);
+        test.done();
+    });
+};
+
+
+exports.test_count_vms = function (test) {
+    vmapi.countVms({ owner_uuid: CUSTOMER }, function (err, counter) {
+        test.ifError(err);
+        test.ok(counter);
         test.done();
     });
 };

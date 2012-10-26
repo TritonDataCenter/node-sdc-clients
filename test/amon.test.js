@@ -13,7 +13,7 @@ var AMON_URL = 'http://' + (process.env.AMON_IP || 'localhost:8080');
 
 // We hijack the admin user since it's always going to exist.
 // TODO: Should use a test user. Might be *using* 'admin' user.
-var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';
+var ADMIN_UUID = '00000000-0000-0000-0000-000000000000';
 
 var MACHINE_UUID = process.env.MACHINE_UUID;
 

@@ -13,7 +13,7 @@ var UFDS = require('../lib/index').UFDS;
 var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.14');
 
 var ufds;
-var ADMIN_UUID = '930896af-bf8c-48d4-885c-6573a94b1853';
+var ADMIN_UUID = '00000000-0000-0000-0000-000000000000';
 var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
     'n2G7o1794VN3FazVhV09yooXIuUhA+7OmT7ChiHueayxSubgL2MrO/HvvF/GGVUs/t3e0u4' +
     '5YwRC51EVhyDuqthVJWjKrYxgDMbHru8fc1oV51l0bKdmvmJWbA/VyeJvstoX+eiSGT3Jge' +

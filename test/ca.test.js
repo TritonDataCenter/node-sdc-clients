@@ -12,7 +12,7 @@ var restify = require('restify');
 var CA_URL = 'http://' + (process.env.CA_IP || '10.99.99.19') + ':23181';
 
 var ca = null;
-var customer = '930896af-bf8c-48d4-885c-6573a94b1853';
+var customer = '00000000-0000-0000-0000-000000000000';
 var instrumentation = null;
 
 // --- Tests

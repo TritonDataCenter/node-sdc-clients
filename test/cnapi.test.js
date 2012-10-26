@@ -16,7 +16,7 @@ var SERVER = null;
 var ZONE = uuid();
 var TASK = null;
 var DATASET_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
-var CUSTOMER = '930896af-bf8c-48d4-885c-6573a94b1853';
+var CUSTOMER = '00000000-0000-0000-0000-000000000000';
 var cnapi;
 
 // --- Helpers
