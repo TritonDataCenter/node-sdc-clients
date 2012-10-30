@@ -23,7 +23,7 @@ var client, role, zoneid;
 role = 'testsvc-' + uuid.v4().substr(0, 8);
 zoneid = uuid.v4();
 
-var UFDS_IP = process.env.UFDS_IP || '10.2.206.10'; // bh1-kvm6
+var UFDS_IP = process.env.UFDS_IP || '10.99.99.14';
 
 var options = {
     ufds: {
