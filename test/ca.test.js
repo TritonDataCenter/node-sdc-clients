@@ -9,7 +9,7 @@ var restify = require('restify');
 
 // --- Globals
 
-var CA_URL = 'http://' + (process.env.CA_IP || '10.99.99.19') + ':23181';
+var CA_URL = 'http://' + (process.env.CA_IP || '10.99.99.24') + ':23181';
 
 var ca = null;
 var customer = '00000000-0000-0000-0000-000000000000';
