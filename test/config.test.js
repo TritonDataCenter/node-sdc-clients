@@ -44,7 +44,7 @@ var CONFIG = {
             'acting_talent': 'incredible'
         },
         'Donbot': {
-           'says': 'Their desire to keep living shows me no respect.'
+            'says': 'Their desire to keep living shows me no respect.'
         },
         'Clamps': {
             'num': 2
@@ -101,8 +101,8 @@ test('lookup nonexistent tag', function (t) {
 
 // -- Test config files
 
-var nsswitch = '/etc/nsswitch.conf';
-var resolv = '/etc/resolv.conf';
+var nsswitch = __dirname + '/nsswitch.conf';
+var resolv = __dirname + '/resolv.conf';
 var nsswitch_contents, resolv_contents;
 
 test('put text config file', function (t) {
@@ -124,9 +124,9 @@ test('lookup config file', function (t) {
     client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
         t.done();
     });
@@ -136,9 +136,9 @@ test('lookup config file w/empty options', function (t) {
     client.lookupFile(role, {}, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
         t.done();
     });
@@ -163,13 +163,13 @@ test('lookup config files', function (t) {
     client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
-        t.equal(res['resolv'].path, resolv);
-        t.equal(res['resolv'].contents, resolv_contents);
-        t.equal(res['resolv'].type, 'text');
+        t.equal(res.resolv.path, resolv);
+        t.equal(res.resolv.contents, resolv_contents);
+        t.equal(res.resolv.type, 'text');
 
         t.done();
     });
@@ -180,7 +180,7 @@ test('put JSON config file', function (t) {
     file.service = 'mako';
     file.type = 'json';
     file.contents = CONFIG;
-    file.path = '/opt/smartdc/mako/etc/config.json';
+    file.path = __dirname + 'mako.config.json';
 
     client.putFile(file, role, function (err) {
         t.ifError(err);
@@ -192,17 +192,17 @@ test('lookup config files yet again', function (t) {
     client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
-        t.equal(res['resolv'].path, resolv);
-        t.equal(res['resolv'].contents, resolv_contents);
-        t.equal(res['resolv'].type, 'text');
+        t.equal(res.resolv.path, resolv);
+        t.equal(res.resolv.contents, resolv_contents);
+        t.equal(res.resolv.type, 'text');
 
-        t.equal(res['mako'].path, '/opt/smartdc/mako/etc/config.json');
-        t.deepEqual(res['mako'].contents, CONFIG);
-        t.equal(res['mako'].type, 'json');
+        t.equal(res.mako.path, __dirname + 'mako.config.json');
+        t.deepEqual(res.mako.contents, CONFIG);
+        t.equal(res.mako.type, 'json');
 
         t.done();
     });
@@ -243,15 +243,15 @@ test('lookup config files one last time', function (t) {
     client.lookupFile(role, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
-        t.ok(!res['resolv']);
+        t.ok(!res.resolv);
 
-        t.equal(res['mako'].path, '/opt/smartdc/mako/etc/config.json');
-        t.deepEqual(res['mako'].contents, CONFIG);
-        t.equal(res['mako'].type, 'json');
+        t.equal(res.mako.path, __dirname + 'mako.config.json');
+        t.deepEqual(res.mako.contents, CONFIG);
+        t.equal(res.mako.type, 'json');
 
         t.done();
     });
@@ -365,9 +365,9 @@ test('lookup zone config file', function (t) {
     client.lookupFile(newrole, opts, function (err, res) {
         t.ifError(err);
 
-        t.equal(res['nsswitch'].path, nsswitch);
-        t.equal(res['nsswitch'].contents, nsswitch_contents);
-        t.equal(res['nsswitch'].type, 'text');
+        t.equal(res.nsswitch.path, nsswitch);
+        t.equal(res.nsswitch.contents, nsswitch_contents);
+        t.equal(res.nsswitch.type, 'text');
 
         t.done();
     });
@@ -384,7 +384,7 @@ test('overwrite configuration', function (t) {
     file.service = 'foobar';
     file.type = 'json';
     file.contents = { foo: 'bar' };
-    file.path = '/etc/foobar.conf';
+    file.path = __dirname + '/foobar.conf';
 
     var opts = {};
     opts.zoneid = newzoneid;
@@ -400,11 +400,11 @@ test('overwrite configuration', function (t) {
             client.lookupFile(newrole, opts, function (subsuberr, res) {
                 t.ifError(subsuberr);
 
-                t.equal(res['foobar'].path, '/etc/foobar.conf');
-                t.deepEqual(res['foobar'].contents, { baz: 'biz' });
-                t.equal(res['foobar'].type, 'json');
+                t.equal(res.foobar.path, __dirname + '/foobar.conf');
+                t.deepEqual(res.foobar.contents, { baz: 'biz' });
+                t.equal(res.foobar.type, 'json');
 
-                t.ok(!res['foobar'].contents.foo);
+                t.ok(!res.foobar.contents.foo);
 
                 t.done();
             });
