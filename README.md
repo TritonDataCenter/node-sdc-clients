@@ -41,13 +41,13 @@ the previous `make test` will run successfully.
 Currently, every `test/*.test.js` file can be run separately as a different
 test suite by issuing the proper commands:
 
-    AMON_IP=10.99.99.206 \
+    AMON_IP=10.99.99.20 \
     MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make amon_test
 
-    CA_IP=10.99.99.113 make ca_test
+    CA_IP=10.99.99.24 make ca_test
 
-    UFDS_IP=10.99.99.13 make config_test
+    UFDS_IP=10.99.99.14 make config_test
 
     make cnapi_test
 
@@ -87,10 +87,12 @@ core zones, if the associated IP env variables are not provided, the test
 suites will set them to the default values into a COAL image running the
 headnode; that is:
 
-    CNAPI_IP=10.99.99.16
-    UFDS_IP=10.99.99.13
-    VMAPI_IP=10.99.99.18
+    CNAPI_IP=10.99.99.18
+    UFDS_IP=10.99.99.14
+    VMAPI_IP=10.99.99.22
     NAPI_IP=10.99.99.10
+    AMON_IP=10.99.99.20
+    CA_IP=10.99.99.24
 
 There are no default values pointing to the headnode zones for AMON and CA.
 The default test values for these APIs point to `localhost` so, you may want
@@ -98,16 +100,15 @@ to either run them locally or pass in the values for these zones IPs.
 
 So, in brief, requirements to run these test suites:
 
-- Headnode setup, including AMON and CA zones. (Rememeber you need to provision
-  Redis zone before you can create amon zone into the headnode).
+- Headnode setup, including AMON and CA zones. 
 - Run the following command:
 
-    CNAPI_IP=10.99.99.16 \
-    VMAPI_IP=10.99.99.18 \
-    UFDS_IP=10.99.99.13 \
+    CNAPI_IP=10.99.99.18 \
+    VMAPI_IP=10.99.99.22 \
+    UFDS_IP=10.99.99.14 \
     NAPI_IP=10.99.99.10 \
-    CA_IP=10.99.99.113 \
-    AMON_IP=10.99.99.206 \
+    CA_IP=10.99.99.24 \
+    AMON_IP=10.99.99.20 \
     MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make test
 
