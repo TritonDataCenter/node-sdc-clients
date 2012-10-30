@@ -39,7 +39,6 @@ var another_entry = {
     zfs_io_priority: 1,
     'default': true,
     vcpus: 1,
-    urn: 'sdc:' + uuid() + ':regular_256:1.0.0',
     active: true
 };
 
@@ -142,6 +141,7 @@ exports.test_list_packages = function (t) {
         t.ifError(err);
         t.ok(pkg);
         t.ok(pkg.uuid);
+        t.equal(pkg.urn, 'sdc:'+uuid+':'+pkg.name+':'+pkg.version);
         pack.list(function (err2, packages) {
             t.ifError(err2);
             t.ok(util.isArray(packages));
