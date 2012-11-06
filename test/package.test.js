@@ -24,7 +24,6 @@ var entry = {
     zfs_io_priority: 1,
     'default': true,
     vcpus: 1,
-    urn: 'sdc:' + uuid() + ':regular_128:1.0.0',
     active: true
 };
 
@@ -80,12 +79,11 @@ exports.test_create_package = function (t) {
 };
 
 
-exports.test_get_package_by_urn = function (t) {
-    pack.get(PKG.urn, function (err, pkg) {
+exports.test_get_package_by_uuid = function (t) {
+    pack.get(PKG.uuid, function (err, pkg) {
         t.ifError(err);
         t.ok(pkg);
         t.equal(pkg.uuid, PKG.uuid);
-        t.equal(pkg.urn, PKG.urn);
         t.done();
     });
 };
@@ -141,7 +139,6 @@ exports.test_list_packages = function (t) {
         t.ifError(err);
         t.ok(pkg);
         t.ok(pkg.uuid);
-        t.equal(pkg.urn, 'sdc:'+uuid+':'+pkg.name+':'+pkg.version);
         pack.list(function (err2, packages) {
             t.ifError(err2);
             t.ok(util.isArray(packages));
@@ -151,22 +148,12 @@ exports.test_list_packages = function (t) {
 };
 
 
-exports.test_urn_must_be_unique = function (t) {
-    var changes = clone(PKG);
-    delete changes.dn;
-    pack.add(changes, function (err, pkg) {
-        t.ok(err);
-        t.ok(/already exists/.test(err.message));
-        t.done();
-    });
-};
-
-
 exports.test_instantiate_with_ufds_instance = function (t) {
     var instance = new Package(pack.ufds);
     t.ok(instance);
     t.done();
 };
+
 
 exports.tearDown = function (callback) {
     pack.ufds.close(function () {
