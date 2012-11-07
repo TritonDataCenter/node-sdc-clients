@@ -119,7 +119,7 @@ exports.test_delete_probe = function (test) {
     amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
         test.ifError(err);
         amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
-            test.equal(err.httpCode, 404);
+            test.equal(err.statusCode, 404);
             test.done();
         });
     });
@@ -156,7 +156,7 @@ exports.test_delete_monitor = function (test) {
         test.ifError(err);
         setTimeout(function () {
             amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err) {
-                test.equal(err.httpCode, 404);
+                test.equal(err.statusCode, 404);
                 test.done();
             });
         }, 3000);

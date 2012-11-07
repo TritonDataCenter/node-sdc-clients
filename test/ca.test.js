@@ -42,7 +42,7 @@ exports.test_create_instrumentation_bad_params = function (test) {
     ca.createInstrumentation(customer, {}, function (err, instrumentation) {
         test.ok(err);
         test.ok(!instrumentation);
-        test.equal(err.httpCode, 409);
+        test.equal(err.statusCode, 409);
         test.equal(err.restCode, 'InvalidArgument');
         test.ok(err.message);
         test.done();
@@ -93,7 +93,7 @@ exports.test_get_instrumentation_bad = function (test) {
     ca.getInstrumentation(customer, uuid(), function (err, instrumentation) {
         test.ok(err);
         test.ok(!instrumentation);
-        test.equal(err.httpCode, 404);
+        test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
         test.done();
@@ -123,7 +123,7 @@ exports.test_get_heatmap_bad = function (test) {
     ca.getHeatmap(customer, uuid(), function (err, heatmap) {
         test.ok(err);
         test.ok(!heatmap);
-        test.equal(err.httpCode, 404);
+        test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
 
@@ -139,7 +139,7 @@ exports.test_get_heatmap_details_bad = function (test) {
     }, function (err, heatmap) {
         test.ok(err);
         test.ok(!heatmap);
-        test.equal(err.httpCode, 404);
+        test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
         test.done();
@@ -150,7 +150,7 @@ exports.test_get_heatmap_details_bad = function (test) {
 exports.test_delete_instrumentation_bad = function (test) {
     ca.deleteInstrumentation(customer, uuid(), function (err) {
         test.ok(err);
-        test.equal(err.httpCode, 404);
+        test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
         test.done();
