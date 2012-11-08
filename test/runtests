@@ -2,9 +2,11 @@
 #
 # Run the node-sdc-clients tests in a running SDC.
 #
+# Run `./runtests -h` for usage info.
+#
 
 if [[ -n "$TRACE" ]]; then
-    export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+    export PS4='[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
     set -o xtrace
 fi
 set -o errexit
@@ -12,10 +14,19 @@ set -o pipefail
 
 
 
-#---- globals/config
+#---- guard
 
-TOP=$(cd $(dirname $0)/../; pwd)
-NODEUNIT=$TOP/node_modules/nodeunit/bin/nodeunit
+if [[ ! -f "/lib/sdc/.sdc-test-no-production-data" ]]; then
+    cat <<EOF
+To run this test you must create the file:
+
+    /lib/sdc/.sdc-test-no-production-data
+
+after ensuring you have no production data on this SDC.
+EOF
+    exit 2
+fi
+
 
 
 #---- support stuff
@@ -32,20 +43,70 @@ function errexit
     fatal "error exit status $1"
 }
 
+function usage
+{
+    echo "Usage:"
+    echo "  ./runtests [OPTIONS...]     # from the GZ"
+    echo ""
+    echo "Options:"
+    echo "  -f FILTER   Filter pattern (substring match) for test files to run."
+}
+
 
 
 #---- mainline
 
 trap 'errexit $?' EXIT
 
-#TODO(RELENG-386): production guard
+TOP=$(cd $(dirname $0)/../; pwd)
+PATH=/usr/node/bin:$PATH
 
-#TODO(RELENG-386): set test user: sdcclientstestuser
+#TODO(RELENG-386): set test user: sdcclientstestuser ??
+# Options.
+opt_test_pattern=
+while getopts "hf:" opt
+do
+    case "$opt" in
+        h)
+            usage
+            exit 0
+            ;;
+        f)
+            opt_test_pattern=$OPTARG
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
 
+
+# Gather DC setup info for the test files.
+export AMON_IP=$(bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1)
+export UFDS_IP=$(bash /lib/sdc/config.sh -json | json ufds_admin_ips | cut -d, -f1)
+export CNAPI_IP=$(bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1)
+export CA_IP=$(bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1)
+export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
+export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
+echo ""
+echo "# Datacenter config:"
+echo "#     AMON_IP is $AMON_IP"
+echo "#     UFDS_IP is $UFDS_IP"
+echo "#     CNAPI_IP is $CNAPI_IP"
+echo "#     CA_IP is $CA_IP"
+echo "#     NAPI_IP is $NAPI_IP"
+echo "#     VMAPI_IP is $VMAPI_IP"
+
+
+echo ""
 cd $TOP
+NODEUNIT=$TOP/node_modules/nodeunit/bin/nodeunit
 test_files=$(ls -1 test/*.test.js)
-#TODO(RELENG-386): ca.test.js times-out (needs env.CA_IP), etc.
-test_files="test/amon.test.js"
+if [[ -n "$opt_test_pattern" ]]; then
+    test_files=$(echo "$test_files" | grep "$opt_test_pattern" || true)
+    echo "# Running filtered set of test files: $test_files"
+fi
 if [[ -n "$test_files" ]]; then
     $NODEUNIT --reporter=tap $test_files
     # Note: Need https://github.com/caolan/nodeunit/pull/168 before we get
