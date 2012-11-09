@@ -217,7 +217,7 @@ exports.testCrudLimit = function (test) {
 };
 
 
-exports.testsListVms = function (test) {
+exports.testsListVmsUsage = function (test) {
     var VM_ONE = {
         objectclass: 'vmusage',
         ram: 1024,
@@ -248,13 +248,13 @@ exports.testsListVms = function (test) {
         ufds.add(util.format(VM_FMT, VM_TWO.uuid, ADMIN_UUID), VM_TWO,
             function (err2) {
             test.ifError(err2, 'Add VM_TWO error');
-            ufds.listVms(ADMIN_UUID, function (err3, vms) {
+            ufds.listVmsUsage(ADMIN_UUID, function (err3, vms) {
                 test.ifError(err3, 'Error listing Vms');
                 test.ok(Array.isArray(vms));
                 ufds.getUser('admin', function (err4, user) {
                     test.ifError(err4, 'listVms getUser error');
                     test.ok(user);
-                    user.listVms(function (err5, vms2) {
+                    user.listVmsUsage(function (err5, vms2) {
                         test.ifError(err5, 'list user vms error');
                         test.ok(Array.isArray(vms2));
                         test.ok(vms2.length >= 2);
