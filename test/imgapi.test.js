@@ -9,7 +9,7 @@ var Logger = require('bunyan'),
 
 // --- Globals
 
-var IMGAPI_URL = 'https://datasets.joyent.com';
+var IMGAPI_URL = process.env.IMGAPI_URL || 'https://datasets.joyent.com';
 
 var imgapi, IMAGES;
 
