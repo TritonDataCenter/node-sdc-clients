@@ -89,6 +89,15 @@ export CNAPI_IP=$(bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d,
 export CA_IP=$(bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1)
 export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
 export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
+
+export IMGAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
+# Need an IP for datasets hostname.
+_hostname=$(echo $IMGAPI_URL | cut -f3 -d "/" | cut -f1 -d ":")
+if [[ ! `echo "${_hostname}" | grep "^[0-9\.]*$" 2>&1` ]]; then
+  _ip=$(dig $_hostname +short)
+  IMGAPI_URL=$(echo $IMGAPI_URL | sed  "s|\(.*\)$_hostname\(.*\)|\1$_ip\2|")
+fi
+
 echo ""
 echo "# Datacenter config:"
 echo "#     AMON_IP is $AMON_IP"
@@ -97,12 +106,14 @@ echo "#     CNAPI_IP is $CNAPI_IP"
 echo "#     CA_IP is $CA_IP"
 echo "#     NAPI_IP is $NAPI_IP"
 echo "#     VMAPI_IP is $VMAPI_IP"
+echo "#     IMGAPI_URL is $IMGAPI_URL"
 
 
 echo ""
 cd $TOP
 NODEUNIT=$TOP/node_modules/nodeunit/bin/nodeunit
 test_files=$(ls -1 test/*.test.js)
+test_files=$(echo "$test_files" | grep -v amon)   #XXX exclude for now
 if [[ -n "$opt_test_pattern" ]]; then
     test_files=$(echo "$test_files" | grep "$opt_test_pattern" || true)
     echo "# Running filtered set of test files: $test_files"
