@@ -95,7 +95,6 @@ exports.test_list_network_ips = function (t) {
         t.ok(util.isArray(ips));
         IP = ips[0];
         t.ok(IP.ip);
-        t.ok(IP.nic);
         t.ok(IP.owner_uuid);
         t.ok(IP.belongs_to_uuid);
         t.ok(IP.belongs_to_type);
@@ -120,11 +119,9 @@ exports.test_list_nics = function (t) {
         t.ok(nics);
         t.ok(util.isArray(nics));
         var aNic = nics[0];
-        t.ok(aNic.ip);
         t.ok(aNic.owner_uuid);
         t.ok(aNic.belongs_to_uuid);
         t.ok(aNic.belongs_to_type);
-        t.ok(aNic.nic_tag);
         t.done();
     });
 };
