@@ -6,13 +6,14 @@ var uuid = require('node-uuid');
 
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
-
+var CNAPI = require('../lib/index').CNAPI;
 
 
 // --- Globals
 
 var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.23');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
+var CNAPI_URL = 'http://' + (process.env.CNAPI_URL || '10.99.99.18');
 
 var vmapi = null;
 var napi = null;
@@ -22,7 +23,7 @@ var QUERY = null;
 var JOB_UUID = null;
 var CUSTOMER = '00000000-0000-0000-0000-000000000000';
 var NETWORKS = null;
-
+var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
 
@@ -103,6 +104,15 @@ exports.setUp = function (callback) {
         log: logger
     });
 
+    cnapi = new CNAPI({
+        url: CNAPI_URL,
+        retry: {
+            retries: 1,
+            minTimeout: 1000
+        },
+        log: logger
+    });
+
     callback();
 };
 
@@ -160,13 +170,31 @@ exports.test_get_vm = function (test) {
 };
 
 
+exports.find_headnode = function (t) {
+    cnapi.listServers(function (err, servers) {
+        t.ifError(err);
+        t.ok(servers);
+        t.ok(Array.isArray(servers));
+        t.ok(servers.length > 0);
+        servers = servers.filter(function (server) {
+            return (server.headnode);
+        });
+        t.ok(servers.length > 0);
+        HEADNODE = servers[0];
+        t.ok(HEADNODE);
+        t.done();
+    });
+};
+
+
 exports.test_create_zone = function (test) {
     var opts = {
         owner_uuid: CUSTOMER,
         image_uuid: IMAGE_UUID,
         networks: NETWORKS,
         brand: 'joyent-minimal',
-        ram: 64
+        ram: 64,
+        server_uuid: HEADNODE.uuid
     };
 
     vmapi.createVm(opts, function (err, job) {
