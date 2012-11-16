@@ -11,7 +11,7 @@ var NAPI = require('../lib/index').NAPI;
 
 // --- Globals
 
-var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.22');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.23');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 
 var vmapi = null;
