@@ -462,6 +462,74 @@ exports.test_wait_for_reboot = function (test) {
 };
 
 
+// --- Snapshots before we destroy the zone!.
+exports.test_snapshot_zone = function (test) {
+    var SNAPSHOT_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        name: 'backup'
+    }
+    vmapi.snapshotVm(SNAPSHOT_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_snapshot_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_snapshotted = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_rollback_zone = function (test) {
+    var SNAPSHOT_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        name: 'backup'
+    }
+    vmapi.rollbackVm(SNAPSHOT_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_rollback_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_rolled_back = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+// -- EOSnapshots
+
+
 exports.test_destroy_zone = function (test) {
     vmapi.deleteVm(QUERY, function (err, job) {
         test.ifError(err);
