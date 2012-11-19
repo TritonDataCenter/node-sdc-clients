@@ -87,7 +87,12 @@
       "version": "0.1.2"
     },
     "bunyan": {
-      "version": "0.14.6"
+      "version": "0.16.5",
+      "dependencies": {
+        "dtrace-provider": {
+          "version": "0.2.4"
+        }
+      }
     },
     "vasync": {
       "version": "1.3.2",
@@ -114,7 +119,7 @@
       "version": "0.7.4",
       "dependencies": {
         "tap": {
-          "version": "0.3.1",
+          "version": "0.3.2",
           "dependencies": {
             "inherits": {
               "version": "1.0.0"
