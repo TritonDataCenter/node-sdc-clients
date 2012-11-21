@@ -24,7 +24,12 @@ var entry = {
     zfs_io_priority: 1,
     'default': true,
     vcpus: 1,
-    active: true
+    active: true,
+    traits: {
+        bool: true,
+        arr: ['one', 'two', 'three'],
+        str: 'a string'
+    }
 };
 
 var another_entry = {
@@ -73,6 +78,9 @@ exports.test_create_package = function (t) {
         t.ok(pkg.uuid);
         t.equal(pkg.vcpus, 1);
         t.equal(pkg.max_swap, 256);
+        t.equal(pkg.traits.bool, true);
+        t.deepEqual(pkg.traits.arr, ['one', 'two', 'three']);
+        t.equal(pkg.traits.str, 'a string');
         PKG = pkg;
         t.done();
     });
@@ -93,6 +101,11 @@ exports.test_modify_mutable_attribute = function (t) {
     var changes = clone(PKG);
     changes.active = 'false';
     changes['default'] = 'false';
+    changes.traits = {
+        bool: false,
+        arr: ['one', 'two', 'three'],
+        str: 'a string'
+    };
     pack.update(PKG, changes, function (err) {
         t.ifError(err);
         pack.get(PKG.uuid, function (err, pkg) {
@@ -100,6 +113,7 @@ exports.test_modify_mutable_attribute = function (t) {
             t.ok(pkg);
             t.equal(pkg.active, 'false');
             t.equal(pkg['default'], 'false');
+            t.equal(pkg.traits.bool, false);
             PKG = pkg;
             t.done();
         });

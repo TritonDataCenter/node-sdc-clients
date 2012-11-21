@@ -17,6 +17,7 @@ var CNAPI_URL = 'http://' + (process.env.CNAPI_URL || '10.99.99.18');
 
 var vmapi = null;
 var napi = null;
+var cnapi = null;
 var ZONE = null;
 var IMAGE_UUID = null;
 var QUERY = null;
@@ -468,7 +469,7 @@ exports.test_snapshot_zone = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         name: 'backup'
-    }
+    };
     vmapi.snapshotVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
@@ -500,7 +501,7 @@ exports.test_rollback_zone = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         name: 'backup'
-    }
+    };
     vmapi.rollbackVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
