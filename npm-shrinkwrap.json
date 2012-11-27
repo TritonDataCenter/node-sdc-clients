@@ -87,7 +87,7 @@
       "version": "0.1.2"
     },
     "bunyan": {
-      "version": "0.16.5",
+      "version": "0.16.7",
       "dependencies": {
         "dtrace-provider": {
           "version": "0.2.4"
@@ -114,6 +114,20 @@
           "version": "1.0.0"
         }
       }
+    },
+    "ssh-agent": {
+      "version": "0.2.1",
+      "dependencies": {
+        "ctype": {
+          "version": "0.5.0"
+        },
+        "posix-getopt": {
+          "version": "1.0.0"
+        }
+      }
+    },
+    "async": {
+      "version": "0.1.22"
     },
     "nodeunit": {
       "version": "0.7.4",
