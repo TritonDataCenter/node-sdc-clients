@@ -19,6 +19,20 @@ var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
     '5YwRC51EVhyDuqthVJWjKrYxgDMbHru8fc1oV51l0bKdmvmJWbA/VyeJvstoX+eiSGT3Jge' +
     'egSMVtc= mark@foo.local';
 
+var SSH_KEY_TWO = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCymx1xJfEugfRzb3G4H' +
+'dB8pzwZWbRo6kCSSgrpElMkOSPiPYCqaRVoD7FaX1yv1wUwQzuS/9rrf9PFvdGk81CNMpy0NG/I' +
+'6nlMH/v+mKvJYGvX5hc/fAg8izLwBwqCkJw/nek8Hv3PL4bJUZ18driqn4LUoj+gFlcmYoJy9+p' +
+'uvGkgDmXQxx5z0Vf+J6N6DQo8mymgbzvAMQNgf4xfTGCjIbUJFCVOMnH2S7XPypbGzOYS3Z8VYT' +
+'bt3AZHhEq9ZK4JfC60P8ddZvx6HFxOpqcoE6lFKj2GGziXusNndxfMKjTcZx2IHHlkR2+umeEnM' +
+'QhuWNEaoMFHiEIWU8h8HloD whatever@wherever.local';
+
+var SSH_KEY_THREE = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDY2qV5e2q8qb+kYtn' +
+'pvRxC5PM6aqPPgWcaXn2gm4jtefGAPuJX9fIkz/KTRRLxdG27IMt6hBXRXvL0Gzw0H0mSUPHAbq' +
+'g4TAyG3/xEHp8iLH/QIf/RwVgjoGB0MLZn7q+L4ThMDo9rIrc5CpfOm/AN9vC4w0Zzu/XpJbzjd' +
+'pTXOh+vmOKkiWCzN+BJ9DvX3iei5NFiSL3rpru0j4CUjBKchUg6X7mdv42g/ZdRT9rilmEP154F' +
+'X/bVsFHitmyyYgba+X90uIR8KGLFZ4eWJNPprJFnCWXrpY5bSOgcS9aWVgCoH8sqHatNKUiQpZ4' +
+'Lsqr+Z4fAf4enldx/KMW91iKn whatever@wherever.local';
+
 var ADMIN_PWD = process.env.ADMIN_PWD || 'joypass123';
 
 
@@ -127,6 +141,17 @@ exports.test_add_key = function (test) {
 };
 
 
+exports.test_add_duplicated_key_not_allowed = function (test) {
+    ufds.getUser('admin', function (err, user) {
+        test.ifError(err, 'getUser error');
+        user.addKey(SSH_KEY, function (err, key) {
+            test.ok(err, 'add duplicated key error');
+            test.done();
+        });
+    });
+};
+
+
 exports.testListAndGetKeys = function (test) {
     ufds.getUser('admin', function (err, user) {
         test.ifError(err);
@@ -146,6 +171,36 @@ exports.testListAndGetKeys = function (test) {
 };
 
 
+exports.test_add_key_by_name = function (test) {
+    ufds.getUser('admin', function (err, user) {
+        test.ifError(err);
+        user.addKey({
+            openssh: SSH_KEY_TWO,
+            name: 'id_rsa'
+        }, function (err, key) {
+            test.ifError(err);
+            test.ok(key);
+            test.equal(key.openssh, SSH_KEY_TWO);
+            test.done();
+        });
+    });
+
+};
+
+exports.test_add_duplicated_key_by_name = function (test) {
+    ufds.getUser('admin', function (err, user) {
+        test.ifError(err, 'getUser error');
+        user.addKey({
+            openssh: SSH_KEY_THREE,
+            name: 'id_rsa'
+        }, function (err, key) {
+            test.ok(err, 'add duplicated key error');
+            test.done();
+        });
+    });
+};
+
+
 exports.testDelKey = function (test) {
     ufds.getUser('admin', function (err, user) {
         test.ifError(err);
@@ -153,7 +208,10 @@ exports.testDelKey = function (test) {
             test.ifError(err);
             user.deleteKey(keys[0], function (err) {
                 test.ifError(err);
-                test.done();
+                user.deleteKey(keys[1], function (err) {
+                    test.ifError(err);
+                    test.done();
+                });
             });
         });
     });
