@@ -9,7 +9,7 @@ var amon;
 
 // --- fixtures
 
-var AMON_URL = 'http://' + (process.env.AMON_IP || 'localhost:8080');
+var AMON_URL = 'http://' + (process.env.AMON_IP || '10.99.99.20');
 
 // We hijack the admin user since it's always going to exist.
 // TODO: Should use a test user. Might be *using* 'admin' user.

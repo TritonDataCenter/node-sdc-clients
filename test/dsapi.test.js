@@ -3,7 +3,7 @@
 var Logger = require('bunyan'),
     restify = require('restify'),
     uuid = require('node-uuid'),
-    IMGAPI = require('../lib/index').IMGAPI,
+    DSAPI = require('../lib/index').DSAPI,
     util = require('util');
 
 
@@ -21,7 +21,7 @@ exports.setUp = function (callback) {
             serializers: Logger.stdSerializers
     });
 
-    imgapi = new IMGAPI({
+    imgapi = new DSAPI({
         url: IMGAPI_URL,
         retry: {
             retries: 1,

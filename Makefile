@@ -66,10 +66,10 @@ amon_test: $(NODEUNIT)
 napi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/napi.test.js
 
-imgapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/imgapi.test.js
+dsapi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
 
-test: config_test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test package_test
+test: config_test ca_test ufds_test cnapi_test napi_test package_test vmapi_test
 
 .PHONY: setup
 setup:

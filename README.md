@@ -92,7 +92,7 @@ headnode; that is:
     VMAPI_IP=10.99.99.22
     NAPI_IP=10.99.99.10
     AMON_IP=10.99.99.20
-    CA_IP=10.99.99.24
+    CA_IP=10.99.99.25
 
 There are no default values pointing to the headnode zones for AMON and CA.
 The default test values for these APIs point to `localhost` so, you may want
@@ -107,7 +107,7 @@ So, in brief, requirements to run these test suites:
     VMAPI_IP=10.99.99.22 \
     UFDS_IP=10.99.99.14 \
     NAPI_IP=10.99.99.10 \
-    CA_IP=10.99.99.24 \
+    CA_IP=10.99.99.25 \
     AMON_IP=10.99.99.20 \
     MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make test
