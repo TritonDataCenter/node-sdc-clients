@@ -3,7 +3,7 @@
 var Logger = require('bunyan');
 var restify = require('restify');
 var uuid = require('node-uuid');
-
+var util = require('util');
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
 var CNAPI = require('../lib/index').CNAPI;
@@ -527,6 +527,29 @@ exports.test_wait_for_rolled_back = function (test) {
     });
 };
 
+
+exports.test_delete_snapshot = function (test) {
+    var SNAPSHOT_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        name: 'backup'
+    };
+    vmapi.deleteSnapshot(SNAPSHOT_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.wait_delete_snapshot_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
 
 // -- EOSnapshots
 
