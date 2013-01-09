@@ -8,3 +8,4 @@ cscope.po.out
 cscope.out
 .lvimrc
 *.vim
+npm-shrinkwrap.json.old

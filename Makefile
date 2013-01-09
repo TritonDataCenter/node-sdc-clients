@@ -69,6 +69,9 @@ napi_test: $(NODEUNIT)
 dsapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
 
+usageapi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/usageapi.test.js
+
 test: config_test ca_test ufds_test cnapi_test napi_test package_test vmapi_test
 
 .PHONY: setup
