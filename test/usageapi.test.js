@@ -38,6 +38,18 @@ exports.setUp = function (callback) {
 };
 
 
+exports.test_get_not_generated_report = function (t) {
+    usageapi.getReport({
+//        owners: CUSTOMER,
+        start: start,
+        finish: finish
+    }, function (err, report) {
+        t.ok(err, 'Get Not Generated Report Error');
+        t.equal(err.statusCode, 404);
+        t.done();
+    });
+};
+
 exports.test_generate_report = function (t) {
     usageapi.generateReport({
 //        owners: CUSTOMER,
@@ -58,7 +70,7 @@ exports.test_get_report = function (t) {
             t.ok(report, 'report OK');
             if (report.status !== 'error' && report.status !== 'done') {
                 t.equal(Object.keys(report.report).length, 0);
-                return setTimeout(waitForReport, 500); 
+                setTimeout(waitForReport, 500);
             } else {
                 t.equal(report.status, 'done');
                 t.ok(Array.isArray(report.report.vms));
