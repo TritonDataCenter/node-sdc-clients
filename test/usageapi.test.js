@@ -8,7 +8,7 @@ var util = require('util');
 // --- Globals
 
 var USAGEAPI_IP = process.env.USAGEAPI_IP || '10.99.99.28';
-var USAGEAPI_URL = 'https://' + USAGEAPI_IP;
+var USAGEAPI_URL = 'http://' + USAGEAPI_IP;
 var CUSTOMER = '00000000-0000-0000-0000-000000000000';
 
 var usageapi, REPORT_LOCATION;
