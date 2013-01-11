@@ -162,6 +162,19 @@ exports.test_list_packages = function (t) {
 };
 
 
+exports.test_search_packages = function (t) {
+    var filter = '(&(objectclass=sdcpackage)(max_physical_memory=128))';
+    pack.list(filter, function (err, packages) {
+        t.ifError(err);
+        t.ok(util.isArray(packages));
+        packages.forEach(function (p) {
+            t.equal('128', p.max_physical_memory);
+        });
+        t.done();
+    });
+};
+
+
 exports.test_instantiate_with_ufds_instance = function (t) {
     var instance = new Package(pack.ufds);
     t.ok(instance);
