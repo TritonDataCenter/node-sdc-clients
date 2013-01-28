@@ -54,7 +54,7 @@ exports.setUp = function (callback) {
     pack = new Package({
         url: UFDS_URL,
         bindDN: 'cn=root',
-        bindPassword: 'secret',
+        bindPassword: 'secret123',
         log: new Logger({
             name: 'ufds_packages_unit_test',
             stream: process.stderr,

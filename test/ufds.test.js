@@ -42,7 +42,7 @@ exports.setUp = function (callback) {
     ufds = new UFDS({
         url: UFDS_URL,
         bindDN: 'cn=root',
-        bindPassword: 'secret',
+        bindPassword: 'secret123',
         log: new Logger({
             name: 'ufds_unit_test',
             stream: process.stderr,
@@ -222,7 +222,7 @@ exports.testCrudUser = function (test) {
     var entry = {
         login: 'a' + uuid().replace('-', '').substr(0, 7),
         email: uuid() + '@devnull.com',
-        userpassword: 'secret'
+        userpassword: 'secret123'
     };
     ufds.addUser(entry, function (err, user) {
         test.ifError(err);

@@ -29,7 +29,7 @@ var options = {
     ufds: {
         url: 'ldaps://' + UFDS_IP,
         bindDN: 'cn=root',
-        bindCredentials: 'secret'
+        bindCredentials: 'secret123'
     },
     log: helper.log
 };
