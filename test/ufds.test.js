@@ -42,7 +42,7 @@ exports.setUp = function (callback) {
     ufds = new UFDS({
         url: UFDS_URL,
         bindDN: 'cn=root',
-        bindPassword: 'secret123',
+        bindPassword: 'secret',
         log: new Logger({
             name: 'ufds_unit_test',
             stream: process.stderr,
