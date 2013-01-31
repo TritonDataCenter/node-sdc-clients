@@ -228,12 +228,24 @@ exports.testCrudUser = function (test) {
         test.ifError(err);
         test.ok(user);
         test.ok(user.uuid);
-        user.phone = '+1 (206) 555-1212';
-        user.save(function (err) {
+        ufds.updateUser(user, {
+            phone: '+1 (206) 555-1212',
+            pwdaccountlockedtime: Date.now() + (3600 * 1000)
+        }, function (err) {
             test.ifError(err);
-            user.destroy(function (err) {
-                test.ifError(err);
-                test.done();
+            user.authenticate(entry.userpassword, function (er) {
+                test.ok(er);
+                test.equal(er.statusCode, 401);
+                user.unlock(function (e) {
+                    test.ifError(e);
+                    user.authenticate(entry.userpassword, function (er2) {
+                        test.ifError(er2);
+                        user.destroy(function (err) {
+                            test.ifError(err);
+                            test.done();
+                        });
+                    });
+                });
             });
         });
     });
@@ -323,6 +335,7 @@ exports.testsListVmsUsage = function (test) {
         });
     });
 };
+
 
 exports.tearDown = function (callback) {
     ufds.close(function () {
