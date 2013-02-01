@@ -57,7 +57,8 @@ exports.setUp = function (callback) {
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
             serializers: Logger.stdSerializers
-        })
+        }),
+        agent: false
     });
     callback();
 };

@@ -27,7 +27,8 @@ exports.setUp = function (callback) {
             retries: 1,
             minTimeout: 1000
         },
-        log: logger
+        log: logger,
+        agent: false
     });
 
     callback();

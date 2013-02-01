@@ -53,7 +53,8 @@ exports.setUp = function (callback) {
         throw new Error('MACHINE_UUID env var is required to run amon tests');
     }
     amon = new Amon({
-        url: AMON_URL
+        url: AMON_URL,
+        agent: false
     });
     callback();
 };

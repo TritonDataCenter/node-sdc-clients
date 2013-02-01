@@ -93,7 +93,8 @@ exports.setUp = function (callback) {
             retries: 1,
             minTimeout: 1000
         },
-        log: logger
+        log: logger,
+        agent: false
     });
 
     napi = new NAPI({
@@ -102,7 +103,8 @@ exports.setUp = function (callback) {
             retries: 1,
             minTimeout: 1000
         },
-        log: logger
+        log: logger,
+        agent: false
     });
 
     cnapi = new CNAPI({
@@ -111,7 +113,8 @@ exports.setUp = function (callback) {
             retries: 1,
             minTimeout: 1000
         },
-        log: logger
+        log: logger,
+        agent: false
     });
 
     callback();

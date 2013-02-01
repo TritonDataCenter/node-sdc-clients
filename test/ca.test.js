@@ -23,7 +23,8 @@ exports.setUp = function (callback) {
         retry: {
             retries: 1,
             minTimeout: 1000
-        }
+        },
+        agent: false
     });
     callback();
 };
