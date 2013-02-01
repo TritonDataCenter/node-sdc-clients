@@ -132,9 +132,11 @@ exports.test_add_key = function (test) {
     ufds.getUser('admin', function (err, user) {
         test.ifError(err);
         user.addKey(SSH_KEY, function (err, key) {
-            test.ifError(err);
-            test.ok(key);
-            test.equal(key.openssh, SSH_KEY);
+            test.ifError(err, err);
+            test.ok(key, 'have key: ' + key);
+            if (key) {
+                test.equal(key.openssh, SSH_KEY);
+            }
             test.done();
         });
     });
