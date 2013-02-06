@@ -31,8 +31,6 @@ exports.setUp = function (callback) {
             minTimeout: 1000
         },
         log: logger,
-        username: process.env.USAGEAPI_USERNAME || 'admin',
-        password: process.env.USAGEAPI_PASSWORD || 'joypass123',
         agent: false
     });
 

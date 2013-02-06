@@ -1,9 +1,9 @@
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
-var uuid = require('node-uuid'),
-    util = require('util'),
-    clone = require('clone');
+var uuid = require('node-uuid');
+var util = require('util');
+var clone = require('clone');
 
 var UFDS = require('../lib/index').UFDS;
 
@@ -13,7 +13,7 @@ var UFDS = require('../lib/index').UFDS;
 var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.14');
 
 var ufds;
-var ADMIN_UUID = '00000000-0000-0000-0000-000000000000';
+
 var SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAvad19ePSDckmgmo6Unqmd8' +
     'n2G7o1794VN3FazVhV09yooXIuUhA+7OmT7ChiHueayxSubgL2MrO/HvvF/GGVUs/t3e0u4' +
     '5YwRC51EVhyDuqthVJWjKrYxgDMbHru8fc1oV51l0bKdmvmJWbA/VyeJvstoX+eiSGT3Jge' +
@@ -33,7 +33,12 @@ var SSH_KEY_THREE = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDY2qV5e2q8qb+kYtn' +
 'X/bVsFHitmyyYgba+X90uIR8KGLFZ4eWJNPprJFnCWXrpY5bSOgcS9aWVgCoH8sqHatNKUiQpZ4' +
 'Lsqr+Z4fAf4enldx/KMW91iKn whatever@wherever.local';
 
-var ADMIN_PWD = process.env.ADMIN_PWD || 'joypass123';
+var PWD = process.env.ADMIN_PWD || 'joypass123';
+
+var ID = uuid();
+var LOGIN = 'a' + ID.substr(0, 7);
+var EMAIL = LOGIN + '_test@joyent.com';
+var DN = util.format('uuid=%s, ou=users, o=smartdc', ID);
 
 
 // --- Tests
@@ -60,18 +65,19 @@ exports.setUp = function (callback) {
 
 
 exports.testGetUser = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    var entry = {
+        login: LOGIN,
+        email: EMAIL,
+        uuid: ID,
+        userpassword: PWD,
+        objectclass: 'sdcperson'
+    };
+
+    ufds.add(DN, entry, function (err) {
         test.ifError(err);
-        test.equal(user.login, 'admin');
-        test.ok(user.isAdmin);
-        test.ok(user.isAdmin());
-        test.ok(user.groups);
-        test.ok(user.groups());
-        test.equal(user.groups().length, 1);
-        test.equal(user.groups()[0], 'operators');
-        ufds.getUser(user, function (err, user2) {
+        ufds.getUser(LOGIN, function (err, user) {
             test.ifError(err);
-            test.deepEqual(user, user2);
+            test.equal(user.login, LOGIN);
             test.done();
         });
     });
@@ -79,11 +85,9 @@ exports.testGetUser = function (test) {
 
 
 exports.testGetUserByUuid = function (test) {
-    ufds.getUser(ADMIN_UUID, function (err, user) {
+    ufds.getUser(ID, function (err, user) {
         test.ifError(err);
-        test.equal(user.login, 'admin');
-        test.ok(user.isAdmin);
-        test.ok(user.isAdmin());
+        test.equal(user.login, LOGIN);
         test.done();
     });
 };
@@ -102,10 +106,10 @@ exports.testGetUserNotFound = function (test) {
 
 
 exports.testAuthenticate = function (test) {
-    ufds.authenticate('admin', ADMIN_PWD, function (err, user) {
+    ufds.authenticate(LOGIN, PWD, function (err, user) {
         test.ifError(err);
         test.ok(user);
-        ufds.getUser('admin', function (err, user2) {
+        ufds.getUser(LOGIN, function (err, user2) {
             test.ifError(err);
             test.equal(user.login, user2.login);
             test.done();
@@ -115,12 +119,11 @@ exports.testAuthenticate = function (test) {
 
 
 exports.testAuthenticateByUuid = function (test) {
-    ufds.authenticate(ADMIN_UUID, ADMIN_PWD, function (err, user) {
+    ufds.authenticate(ID, PWD, function (err, user) {
         test.ifError(err);
         test.ok(user);
-        test.equal(user.login, 'admin');
-        test.ok(user.isAdmin());
-        user.authenticate(ADMIN_PWD, function (err) {
+        test.equal(user.login, LOGIN);
+        user.authenticate(PWD, function (err) {
             test.ifError(err);
             test.done();
         });
@@ -129,7 +132,7 @@ exports.testAuthenticateByUuid = function (test) {
 
 
 exports.test_add_key = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
         user.addKey(SSH_KEY, function (err, key) {
             test.ifError(err, err);
@@ -144,7 +147,7 @@ exports.test_add_key = function (test) {
 
 
 exports.test_add_duplicated_key_not_allowed = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err, 'getUser error');
         user.addKey(SSH_KEY, function (err, key) {
             test.ok(err, 'add duplicated key error');
@@ -155,7 +158,7 @@ exports.test_add_duplicated_key_not_allowed = function (test) {
 
 
 exports.testListAndGetKeys = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
         user.listKeys(function (err, keys) {
             test.ifError(err);
@@ -174,7 +177,7 @@ exports.testListAndGetKeys = function (test) {
 
 
 exports.test_add_key_by_name = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
         user.addKey({
             openssh: SSH_KEY_TWO,
@@ -190,7 +193,7 @@ exports.test_add_key_by_name = function (test) {
 };
 
 exports.test_add_duplicated_key_by_name = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err, 'getUser error');
         user.addKey({
             openssh: SSH_KEY_THREE,
@@ -204,7 +207,7 @@ exports.test_add_duplicated_key_by_name = function (test) {
 
 
 exports.testDelKey = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
         user.listKeys(function (err, keys) {
             test.ifError(err);
@@ -255,7 +258,7 @@ exports.testCrudUser = function (test) {
 
 
 exports.testCrudLimit = function (test) {
-    ufds.getUser('admin', function (err, user) {
+    ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
         test.ok(user);
         user.addLimit(
@@ -314,16 +317,16 @@ exports.testsListVmsUsage = function (test) {
 
 
     var VM_FMT = 'vm=%s, uuid=%s, ou=users, o=smartdc';
-    ufds.add(util.format(VM_FMT, VM_ONE.uuid, ADMIN_UUID), VM_ONE,
+    ufds.add(util.format(VM_FMT, VM_ONE.uuid, ID), VM_ONE,
             function (err) {
         test.ifError(err, 'Add VM_ONE error');
-        ufds.add(util.format(VM_FMT, VM_TWO.uuid, ADMIN_UUID), VM_TWO,
+        ufds.add(util.format(VM_FMT, VM_TWO.uuid, ID), VM_TWO,
             function (err2) {
             test.ifError(err2, 'Add VM_TWO error');
-            ufds.listVmsUsage(ADMIN_UUID, function (err3, vms) {
+            ufds.listVmsUsage(ID, function (err3, vms) {
                 test.ifError(err3, 'Error listing Vms');
                 test.ok(Array.isArray(vms));
-                ufds.getUser('admin', function (err4, user) {
+                ufds.getUser(LOGIN, function (err4, user) {
                     test.ifError(err4, 'listVms getUser error');
                     test.ok(user);
                     user.listVmsUsage(function (err5, vms2) {

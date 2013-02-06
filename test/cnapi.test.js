@@ -46,8 +46,6 @@ function waitForTask(callback) {
 exports.setUp = function (callback) {
     cnapi = new CNAPI({
         url: CNAPI_URL,
-        username: 'admin',
-        password: 'lbpass123',
         retry: {
             retries: 1,
             minTimeout: 1000
