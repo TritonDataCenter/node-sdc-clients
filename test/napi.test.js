@@ -45,7 +45,7 @@ exports.setUp = function (callback) {
             name: 'vmapi_unit_test',
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
-            serializers: Logger.stdSerializers,
+            serializers: Logger.stdSerializers
     });
 
     napi = new NAPI({
