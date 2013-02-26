@@ -18,8 +18,8 @@
     },
     "ldapjs": {
       "version": "0.6.2",
-      "from": "ldapjs@0.6.2",
-      "resolved": "https://registry.npmjs.org/ldapjs/-/ldapjs-0.6.2.tgz",
+      "from": "ldapjs@git://github.com/mcavage/node-ldapjs.git#17f5518",
+      "resolved": "git://github.com/mcavage/node-ldapjs.git#17f5518846e358f2cea64aa9332b757d2a306edf",
       "dependencies": {
         "asn1": {
           "version": "0.1.11",
@@ -35,7 +35,7 @@
         },
         "nopt": {
           "version": "2.1.1",
-          "from": "nopt@~2",
+          "from": "nopt@2.1.1",
           "dependencies": {
             "abbrev": {
               "version": "1.0.4",
@@ -256,7 +256,7 @@
               }
             },
             "mkdirp": {
-              "version": "0.3.4",
+              "version": "0.3.5",
               "from": "mkdirp@~0.3"
             },
             "difflet": {
@@ -282,17 +282,13 @@
               "from": "buffer-equal@~0.0.0"
             },
             "glob": {
-              "version": "3.1.20",
+              "version": "3.1.21",
               "from": "glob@~3.1.14",
               "dependencies": {
                 "minimatch": {
-                  "version": "0.2.9",
-                  "from": "minimatch@0.2",
+                  "version": "0.2.11",
+                  "from": "minimatch@~0.2.11",
                   "dependencies": {
-                    "lru-cache": {
-                      "version": "2.0.4",
-                      "from": "lru-cache@~2.0.0"
-                    },
                     "sigmund": {
                       "version": "1.0.0",
                       "from": "sigmund@~1.0.0"
