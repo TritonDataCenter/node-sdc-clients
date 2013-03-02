@@ -29,6 +29,20 @@
           "version": "1.1.0",
           "from": "buffertools@1.1.0"
         },
+        "bunyan": {
+          "version": "0.18.2",
+          "from": "bunyan@0.18.2",
+          "dependencies": {
+            "dtrace-provider": {
+              "version": "0.2.7",
+              "from": "dtrace-provider@0.2.7"
+            },
+            "mv": {
+              "version": "0.0.4",
+              "from": "mv@0.0.4"
+            }
+          }
+        },
         "dtrace-provider": {
           "version": "0.2.8",
           "from": "dtrace-provider@0.2.8"
@@ -46,7 +60,6 @@
         "pooling": {
           "version": "0.4.1",
           "from": "pooling@0.4.1",
-          "resolved": "https://registry.npmjs.org/pooling/-/pooling-0.4.1.tgz",
           "dependencies": {
             "once": {
               "version": "1.1.1",
@@ -65,13 +78,16 @@
       "from": "node-uuid@1.4.0"
     },
     "restify": {
-      "version": "2.2.1",
-      "from": "restify@git://github.com/mcavage/node-restify.git#574f3b2",
-      "resolved": "git://github.com/mcavage/node-restify.git#574f3b27cc3365ab7c494a1cab1cf30deeb01a52",
+      "version": "2.3.2",
+      "from": "restify@2.3.2",
       "dependencies": {
         "backoff": {
           "version": "2.0.0",
           "from": "backoff@2.0.0"
+        },
+        "deep-equal": {
+          "version": "0.0.0",
+          "from": "deep-equal@0.0.0"
         },
         "dtrace-provider": {
           "version": "0.2.8",
@@ -88,6 +104,10 @@
         "mime": {
           "version": "1.2.9",
           "from": "mime@1.2.9"
+        },
+        "negotiator": {
+          "version": "0.2.5",
+          "from": "negotiator@0.2.5"
         },
         "once": {
           "version": "1.1.1",
@@ -126,16 +146,16 @@
       "from": "assert-plus@0.1.2"
     },
     "bunyan": {
-      "version": "0.18.2",
-      "from": "bunyan@0.18.2",
+      "version": "0.18.3",
+      "from": "bunyan@0.18.3",
       "dependencies": {
-        "dtrace-provider": {
-          "version": "0.2.7",
-          "from": "dtrace-provider@0.2.7"
-        },
         "mv": {
           "version": "0.0.4",
           "from": "mv@0.0.4"
+        },
+        "dtrace-provider": {
+          "version": "0.2.8",
+          "from": "dtrace-provider@0.2.8"
         }
       }
     },
