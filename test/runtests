@@ -49,7 +49,9 @@ function usage
     echo "  ./runtests [OPTIONS...]     # from the GZ"
     echo ""
     echo "Options:"
+    echo "  -h          Print this help and exit."
     echo "  -f FILTER   Filter pattern (substring match) for test files to run."
+    echo "  -r REPOTER  The nodeunit reporter to use, default is 'tap'."
 }
 
 
@@ -64,7 +66,8 @@ PATH=/usr/node/bin:$PATH
 #TODO(RELENG-386): set test user: sdcclientstestuser ??
 # Options.
 opt_test_pattern=
-while getopts "hf:" opt
+opt_reporter=tap
+while getopts "hf:r:" opt
 do
     case "$opt" in
         h)
@@ -73,6 +76,9 @@ do
             ;;
         f)
             opt_test_pattern=$OPTARG
+            ;;
+        r)
+            opt_reporter=$OPTARG
             ;;
         *)
             usage
@@ -121,7 +127,7 @@ if [[ -n "$opt_test_pattern" ]]; then
     echo "# Running filtered set of test files: $test_files"
 fi
 if [[ -n "$test_files" ]]; then
-    $NODEUNIT --reporter=tap $test_files
+    $NODEUNIT --reporter=$opt_reporter $test_files
     # Note: Need https://github.com/caolan/nodeunit/pull/168 before we get
     # a non-zero exit status on any test failures.
 fi
