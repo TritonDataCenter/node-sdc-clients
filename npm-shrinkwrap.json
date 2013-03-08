@@ -32,6 +32,7 @@
         "bunyan": {
           "version": "0.18.2",
           "from": "bunyan@0.18.2",
+          "resolved": "https://registry.npmjs.org/bunyan/-/bunyan-0.18.2.tgz",
           "dependencies": {
             "dtrace-provider": {
               "version": "0.2.7",
@@ -49,7 +50,7 @@
         },
         "nopt": {
           "version": "2.1.1",
-          "from": "nopt@2.1.1",
+          "from": "nopt@~2",
           "dependencies": {
             "abbrev": {
               "version": "1.0.4",
@@ -78,8 +79,8 @@
       "from": "node-uuid@1.4.0"
     },
     "restify": {
-      "version": "2.3.2",
-      "from": "restify@2.3.2",
+      "version": "2.3.4",
+      "from": "restify@2.3.4",
       "dependencies": {
         "backoff": {
           "version": "2.0.0",
@@ -88,10 +89,6 @@
         "deep-equal": {
           "version": "0.0.0",
           "from": "deep-equal@0.0.0"
-        },
-        "dtrace-provider": {
-          "version": "0.2.8",
-          "from": "dtrace-provider@0.2.8"
         },
         "formidable": {
           "version": "1.0.11",
@@ -122,8 +119,8 @@
           "from": "semver@1.1.2"
         },
         "spdy": {
-          "version": "1.4.3",
-          "from": "spdy@1.4.3"
+          "version": "1.4.6",
+          "from": "spdy@1.4.6"
         },
         "verror": {
           "version": "1.3.5",
@@ -134,12 +131,17 @@
               "from": "extsprintf@1.0.0"
             }
           }
+        },
+        "dtrace-provider": {
+          "version": "0.2.8",
+          "from": "dtrace-provider@0.2.8"
         }
       }
     },
     "clone": {
       "version": "0.1.5",
-      "from": "clone@0.1.5"
+      "from": "clone@0.1.5",
+      "resolved": "https://registry.npmjs.org/clone/-/clone-0.1.5.tgz"
     },
     "assert-plus": {
       "version": "0.1.2",
@@ -219,7 +221,8 @@
     },
     "async": {
       "version": "0.1.22",
-      "from": "async@0.1.22"
+      "from": "async@0.1.22",
+      "resolved": "https://registry.npmjs.org/async/-/async-0.1.22.tgz"
     },
     "nodeunit": {
       "version": "0.7.4",
