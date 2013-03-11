@@ -85,12 +85,24 @@ exports.test_create_vm = function (test) {
     var opts = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        dataset_uuid: DATASET_UUID,
+        dataset_uuid:  "01b2c898-945f-11e1-a523-af1afbe22822",
         brand: 'joyent',
-        ram: 64
+        image_uuid: "01b2c898-945f-11e1-a523-af1afbe22822",
+        image: {
+            "uuid": "01b2c898-945f-11e1-a523-af1afbe22822",
+            "files": [
+                {
+                    "sha1": "97f20b32c2016782257176fb58a35e5044f05840",
+                    "size": 46271847,
+                    "compression": "bzip2"
+                }
+            ]
+        },
+        ram: 128
     };
 
     cnapi.createVm(SERVER, opts, function (err, task) {
+        console.dir(arguments);
         test.ifError(err);
         test.ok(task);
         TASK = task.id;
