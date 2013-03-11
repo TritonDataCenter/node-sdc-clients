@@ -102,7 +102,6 @@ exports.test_create_vm = function (test) {
     };
 
     cnapi.createVm(SERVER, opts, function (err, task) {
-        console.dir(arguments);
         test.ifError(err);
         test.ok(task);
         TASK = task.id;
