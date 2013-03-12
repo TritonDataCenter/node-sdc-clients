@@ -13,7 +13,7 @@ var CNAPI = require('../lib/index').CNAPI;
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.18');
 
 var SERVER = null;
-var ZONE = uuid();
+var ZONE = '0777a40e-8b41-11e2-be6f-7f3bf8fcea65';
 var TASK = null;
 var DATASET_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
 var CUSTOMER = '00000000-0000-0000-0000-000000000000';
@@ -63,7 +63,7 @@ exports.setUp = function (callback) {
 
 
 exports.test_list_servers = function (test) {
-    cnapi.listServers(function (err, servers) {
+    cnapi.listServers({ headnode: true }, function (err, servers) {
         test.ifError(err);
         test.ok(servers);
         SERVER = servers[0].uuid;
