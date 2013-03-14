@@ -50,7 +50,8 @@
         },
         "nopt": {
           "version": "2.1.1",
-          "from": "nopt@~2",
+          "from": "nopt@2.1.1",
+          "resolved": "https://registry.npmjs.org/nopt/-/nopt-2.1.1.tgz",
           "dependencies": {
             "abbrev": {
               "version": "1.0.4",
@@ -80,7 +81,8 @@
     },
     "restify": {
       "version": "2.3.4",
-      "from": "restify@2.3.4",
+      "from": "restify@git+ssh://git@github.com:mcavage/node-restify.git#9f5e573",
+      "resolved": "git+ssh://git@github.com/:mcavage/node-restify.git#9f5e5739863aec2d4f2c4839670aae1648088f86",
       "dependencies": {
         "backoff": {
           "version": "2.0.0",
@@ -140,16 +142,16 @@
     },
     "clone": {
       "version": "0.1.5",
-      "from": "clone@0.1.5",
-      "resolved": "https://registry.npmjs.org/clone/-/clone-0.1.5.tgz"
+      "from": "clone@0.1.5"
     },
     "assert-plus": {
       "version": "0.1.2",
       "from": "assert-plus@0.1.2"
     },
     "bunyan": {
-      "version": "0.18.3",
-      "from": "bunyan@0.18.3",
+      "version": "0.19.0",
+      "from": "bunyan@0.19.0",
+      "resolved": "https://registry.npmjs.org/bunyan/-/bunyan-0.19.0.tgz",
       "dependencies": {
         "mv": {
           "version": "0.0.4",
@@ -271,6 +273,7 @@
             "nopt": {
               "version": "2.1.1",
               "from": "nopt@~2",
+              "resolved": "https://registry.npmjs.org/nopt/-/nopt-2.1.1.tgz",
               "dependencies": {
                 "abbrev": {
                   "version": "1.0.4",
