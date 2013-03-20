@@ -19,10 +19,10 @@ var vmapi = null;
 var napi = null;
 var cnapi = null;
 var ZONE = null;
-var IMAGE_UUID = null;
 var QUERY = null;
 var JOB_UUID = null;
 var CUSTOMER = '00000000-0000-0000-0000-000000000000';
+var IMAGE_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
 var NETWORKS = null;
 var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
@@ -137,10 +137,9 @@ exports.test_list_vms = function (test) {
         test.ifError(err);
         test.ok(vms);
         ZONE = vms[0].uuid;
-        IMAGE_UUID = vms[0].image_uuid;
         QUERY = {
             uuid: ZONE,
-            owner_uuid: CUSTOMER
+            owner_uuid: vms[0].owner_uuid
         };
         test.done();
     });
