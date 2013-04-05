@@ -10,7 +10,7 @@ var UFDS = require('../lib/index').UFDS;
 
 // --- Globals
 
-var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.14');
+var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.18');
 
 var ufds;
 
@@ -216,6 +216,37 @@ exports.testDelKey = function (test) {
                 user.deleteKey(keys[1], function (err) {
                     test.ifError(err);
                     test.done();
+                });
+            });
+        });
+    });
+};
+
+
+exports.testUserGroups = function (test) {
+    ufds.getUser(LOGIN, function (err, user) {
+        test.ifError(err);
+        test.ok(!user.isAdmin());
+        test.ok(!user.isReader());
+        user.addToGroup('readers', function (err2) {
+            test.ifError(err2);
+            ufds.getUser(LOGIN, function (err3, user2) {
+                test.ifError(err3);
+                test.ok(user2.isReader());
+                user2.addToGroup('operators', function (err4) {
+                    test.ifError(err4);
+                    ufds.getUser(LOGIN, function (err5, user3) {
+                        test.ifError(err5);
+                        test.ok(user3.isAdmin());
+                        user3.removeFromGroup('operators', function (err6) {
+                            test.ifError(err6);
+                            ufds.getUser(LOGIN, function (err7, user4) {
+                                test.ifError(err7);
+                                test.ok(user4.isReader() && !user4.isAdmin());
+                                test.done();
+                            });
+                        });
+                    });
                 });
             });
         });
