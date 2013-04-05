@@ -206,3 +206,22 @@ exports.test_wait_for_deleted = function (test) {
         test.done();
     });
 };
+
+exports.test_command_execute = function (test) {
+    var script = '#!/usr/bin/bash\n\necho Hello\n';
+
+    cnapi.commandExecute(SERVER, script, function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+exports.test_command_execute_with_env = function (test) {
+    var script = '#!/usr/bin/bash\n\necho Hello\n';
+    var env = { FOO: 'bar' };
+
+    cnapi.commandExecute(SERVER, script, { env: env }, function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
