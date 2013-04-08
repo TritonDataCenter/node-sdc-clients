@@ -12,7 +12,7 @@ var restify = require('restify');
 var CA_URL = 'http://' + (process.env.CA_IP || '10.99.99.25') + ':23181';
 
 var ca = null;
-var customer = '00000000-0000-0000-0000-000000000000';
+var customer = process.env.UFDS_ADMIN_UUID;
 var instrumentation = null;
 
 // --- Tests

@@ -96,6 +96,7 @@ export CA_IP=$(bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1)
 export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
 export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
 export USAGEAPI_IP=$(bash /lib/sdc/config.sh -json | json usageapi_admin_ips | cut -d, -f1)
+export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
 
 export IMGAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
 # Need an IP for datasets hostname.
@@ -115,6 +116,7 @@ echo "#     NAPI_IP is $NAPI_IP"
 echo "#     VMAPI_IP is $VMAPI_IP"
 echo "#     USAGEAPI_IP is $USAGEAPI_IP"
 echo "#     IMGAPI_URL is $IMGAPI_URL"
+echo "#     UFDS_ADMIN_UUID is $UFDS_ADMIN_UUID"
 
 
 echo ""
