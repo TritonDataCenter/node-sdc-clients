@@ -9,7 +9,7 @@ var util = require('util');
 
 var USAGEAPI_IP = process.env.USAGEAPI_IP || '10.99.99.28';
 var USAGEAPI_URL = 'http://' + USAGEAPI_IP;
-var CUSTOMER = '00000000-0000-0000-0000-000000000000';
+var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 
 var usageapi, REPORT_LOCATION;
 

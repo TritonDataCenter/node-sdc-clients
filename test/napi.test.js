@@ -131,7 +131,7 @@ exports.test_list_nics = function (t) {
 exports.test_provision_nic = function (t) {
     NIC_UUID = uuid();
     napi.provisionNic(ADMIN.uuid, {
-        owner_uuid: '00000000-0000-0000-0000-000000000000',
+        owner_uuid: process.env.UFDS_ADMIN_UUID,
         belongs_to_uuid: NIC_UUID,
         belongs_to_type: 'zone'
     }, function (err, nic) {
@@ -139,7 +139,7 @@ exports.test_provision_nic = function (t) {
         t.ok(nic);
         t.ok(nic.mac);
         MAC_1 = nic.mac;
-        t.equal(nic.owner_uuid, '00000000-0000-0000-0000-000000000000');
+        t.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
         t.equal(nic.belongs_to_uuid, NIC_UUID);
         t.equal(nic.belongs_to_type, 'zone');
         t.done();
@@ -151,7 +151,7 @@ exports.test_create_nic = function (t) {
     var sUUID = uuid(),
         mac = pseudoRandomMac();
     napi.createNic(mac, {
-        owner_uuid: '00000000-0000-0000-0000-000000000000',
+        owner_uuid: process.env.UFDS_ADMIN_UUID,
         belongs_to_uuid: sUUID,
         belongs_to_type: 'server'
     }, function (err, nic) {
@@ -159,7 +159,7 @@ exports.test_create_nic = function (t) {
         t.ok(nic);
         t.ok(nic.mac);
         MAC_2 = nic.mac;
-        t.equal(nic.owner_uuid, '00000000-0000-0000-0000-000000000000');
+        t.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
         t.equal(nic.belongs_to_uuid, sUUID);
         t.equal(nic.belongs_to_type, 'server');
         t.done();

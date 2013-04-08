@@ -16,7 +16,7 @@ var SERVER = null;
 var ZONE = '0777a40e-8b41-11e2-be6f-7f3bf8fcea65';
 var TASK = null;
 var DATASET_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
-var CUSTOMER = '00000000-0000-0000-0000-000000000000';
+var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 var cnapi;
 
 // --- Helpers

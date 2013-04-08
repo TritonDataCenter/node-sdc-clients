@@ -13,7 +13,7 @@ var AMON_URL = 'http://' + (process.env.AMON_IP || '10.99.99.20');
 
 // We hijack the admin user since it's always going to exist.
 // TODO: Should use a test user. Might be *using* 'admin' user.
-var ADMIN_UUID = '00000000-0000-0000-0000-000000000000';
+var ADMIN_UUID = process.env.UFDS_ADMIN_UUID;
 
 var MACHINE_UUID = process.env.MACHINE_UUID;
 
