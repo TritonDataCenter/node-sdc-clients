@@ -53,7 +53,10 @@ exports.setUp = function (callback) {
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
             serializers: Logger.stdSerializers
-        })
+        }),
+        tlsOptions: {
+            rejectUnauthorized: false
+        }
     });
     ufds.on('ready', function () {
         callback();
