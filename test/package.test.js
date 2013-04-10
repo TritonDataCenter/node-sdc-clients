@@ -10,7 +10,7 @@ var Package = require('../lib/index').Package;
 
 // --- Globals
 
-var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.14');
+var UFDS_URL = 'ldaps://' + (process.env.UFDS_IP || '10.99.99.18');
 var pack;
 
 var entry = {
@@ -60,7 +60,10 @@ exports.setUp = function (callback) {
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
             serializers: Logger.stdSerializers
-        })
+        }),
+        tlsOptions: {
+            rejectUnauthorized: false
+        }
     });
     pack.ufds.on('ready', function () {
         callback();

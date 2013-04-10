@@ -23,7 +23,7 @@ var client, role, zoneid;
 role = 'testsvc-' + uuid.v4().substr(0, 8);
 zoneid = uuid.v4();
 
-var UFDS_IP = process.env.UFDS_IP || '10.99.99.14';
+var UFDS_IP = process.env.UFDS_IP || '10.99.99.18';
 
 var options = {
     ufds: {
@@ -31,7 +31,10 @@ var options = {
         bindDN: 'cn=root',
         bindCredentials: 'secret'
     },
-    log: helper.log
+    log: helper.log,
+    tlsOptions: {
+        rejectUnauthorized: false
+    }
 };
 
 var CONFIG = {
