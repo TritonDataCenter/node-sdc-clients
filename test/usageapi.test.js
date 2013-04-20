@@ -64,8 +64,7 @@ exports.test_generate_report = function (t) {
 };
 
 // Disabled because this is hanging testing in staging (see BILLING-379).
-if (false) {
-exports.test_get_report = function (t) {
+function test_get_report(t) {
     function waitForReport() {
         usageapi.getReport(REPORT_LOCATION, function (err, report) {
             t.ifError(err, 'Get Report Error');
@@ -81,5 +80,4 @@ exports.test_get_report = function (t) {
         });
     }
     waitForReport();
-};
 }
