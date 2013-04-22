@@ -1,4 +1,4 @@
-// Copyright 2012 Joyent, Inc.  All rights reserved.
+// Copyright 2013 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan'),
     uuid = require('node-uuid'),
@@ -66,9 +66,11 @@ exports.setUp = function (callback) {
         }
     });
     pack.ufds.on('ready', function () {
+        pack.ufds.removeAllListeners('error');
         callback();
     });
     pack.ufds.on('error', function (err) {
+        pack.ufds.removeAllListeners('ready');
         callback(err);
     });
 };

@@ -1,4 +1,4 @@
-// Copyright 2012 Joyent, Inc.  All rights reserved.
+// Copyright 2013 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan');
 var uuid = require('node-uuid');
@@ -48,6 +48,7 @@ exports.setUp = function (callback) {
         url: UFDS_URL,
         bindDN: 'cn=root',
         bindPassword: 'secret',
+        clientTimeout: 2000,
         log: new Logger({
             name: 'ufds_unit_test',
             stream: process.stderr,
@@ -56,12 +57,19 @@ exports.setUp = function (callback) {
         }),
         tlsOptions: {
             rejectUnauthorized: false
+        },
+        retry: {
+            retries: 5,
+            maxTimeout: 10000,
+            minTimeout: 100
         }
     });
-    ufds.on('ready', function () {
+    ufds.once('ready', function () {
+        ufds.removeAllListeners('error');
         callback();
     });
-    ufds.on('error', function (err) {
+    ufds.once('error', function (err) {
+        ufds.removeAllListeners('ready');
         callback(err);
     });
 };
