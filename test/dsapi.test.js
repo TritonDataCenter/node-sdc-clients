@@ -28,7 +28,8 @@ exports.setUp = function (callback) {
             minTimeout: 1000
         },
         log: logger,
-        agent: false
+        agent: false,
+        rejectUnauthorized: false
     });
 
     callback();
@@ -39,14 +40,16 @@ exports.test_list_images = function (t) {
     imgapi.listImages(function (err, images) {
         t.ifError(err, 'listImages Error');
         t.ok(images, 'listImages OK');
-        IMAGES = images;
-        IMAGES.forEach(function (ds) {
-            t.ok(ds.name, 'ds.name OK');
-            t.ok(ds.version, 'ds.version OK');
-            t.ok(ds.os, 'ds.os OK');
-            t.ok(ds.urn, 'ds.urn OK');
-            t.ok(ds.uuid, 'ds.uuid OK');
-        });
+        if (images) {
+            IMAGES = images;
+            IMAGES.forEach(function (ds) {
+                t.ok(ds.name, 'ds.name OK');
+                t.ok(ds.version, 'ds.version OK');
+                t.ok(ds.os, 'ds.os OK');
+                t.ok(ds.urn, 'ds.urn OK');
+                t.ok(ds.uuid, 'ds.uuid OK');
+            });
+        }
         t.done();
     });
 };
