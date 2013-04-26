@@ -9,20 +9,20 @@ var Logger = require('bunyan'),
 
 // --- Globals
 
-var IMGAPI_URL = process.env.IMGAPI_URL || 'https://datasets.joyent.com';
+var DSAPI_URL = process.env.DSAPI_URL || 'https://datasets.joyent.com';
 
-var imgapi, IMAGES;
+var dsapi, IMAGES;
 
 exports.setUp = function (callback) {
     var logger = new Logger({
-            name: 'imgapi_unit_test',
+            name: 'dsapi.test',
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
             serializers: Logger.stdSerializers
     });
 
-    imgapi = new DSAPI({
-        url: IMGAPI_URL,
+    dsapi = new DSAPI({
+        url: DSAPI_URL,
         retry: {
             retries: 1,
             minTimeout: 1000
@@ -37,7 +37,7 @@ exports.setUp = function (callback) {
 
 
 exports.test_list_images = function (t) {
-    imgapi.listImages(function (err, images) {
+    dsapi.listImages(function (err, images) {
         t.ifError(err, 'listImages Error');
         t.ok(images, 'listImages OK');
         if (images) {
@@ -55,7 +55,7 @@ exports.test_list_images = function (t) {
 };
 
 exports.test_get_image = function (t) {
-    imgapi.getImage(IMAGES[0].uuid, function (err, img) {
+    dsapi.getImage(IMAGES[0].uuid, function (err, img) {
         t.ifError(err, 'getImage Error');
         t.ok(img, 'getImage OK');
         t.equal(img.urn, IMAGES[0].urn);
