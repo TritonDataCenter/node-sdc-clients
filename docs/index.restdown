@@ -468,6 +468,18 @@ Reboots a VM.
 || callback || Function || fn(error, job) ||
 
 
+## reprovisionVm(params, callback)
+
+Reprovisions a VM.
+
+|| **Name** || **Type** || **Description** ||
+|| params || Object || Filter params ||
+|| params.uuid || UUID || VM UUID. Required ||
+|| params.image_uuid || UUID || Image UUID. Required ||
+|| params.owner_uuid || UUID || VM Owner. Optional ||
+|| callback || Function || fn(error, job) ||
+
+
 ## updateVm(params, callback)
 
 Updates a VM. Params takes the following options:

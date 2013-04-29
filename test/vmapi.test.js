@@ -556,6 +556,39 @@ exports.wait_delete_snapshot_job = function (test) {
 // -- EOSnapshots
 
 
+exports.test_reprovision_zone = function (test) {
+    var REPROVISION_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        image_uuid: IMAGE_UUID
+    };
+
+    vmapi.reprovisionVm(REPROVISION_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_reprovision_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_reprovision_running = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
 exports.test_destroy_zone = function (test) {
     vmapi.deleteVm(QUERY, function (err, job) {
         test.ifError(err);
