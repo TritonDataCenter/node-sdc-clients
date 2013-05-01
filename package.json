@@ -7,7 +7,7 @@
   "main": "./lib/index.js",
   "dependencies": {
     "http-signature": "0.9.11",
-    "ldapjs": "git://github.com/mcavage/node-ldapjs.git#7f330812",
+    "ldapjs": "0.6.3",
     "lru-cache": "2.2.2",
     "node-uuid": "1.4.0",
     "restify": "2.4.1",
