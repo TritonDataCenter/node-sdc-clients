@@ -25,6 +25,7 @@ var entry = {
     'default': true,
     vcpus: 1,
     active: true,
+    networks: ['aefd7d3c-a4fd-4812-9dd7-24733974d861', 'de749393-836c-42ce-9c7b-e81072ca3a23'],
     traits: {
         bool: true,
         arr: ['one', 'two', 'three'],
@@ -84,6 +85,8 @@ exports.test_create_package = function (t) {
         t.equal(pkg.vcpus, 1);
         t.equal(pkg.max_swap, 256);
         t.equal(pkg.traits.bool, true);
+        t.ok(Array.isArray(pkg.networks));
+        t.equal(pkg.networks.length, 2);
         t.deepEqual(pkg.traits.arr, ['one', 'two', 'three']);
         t.equal(pkg.traits.str, 'a string');
         PKG = pkg;
@@ -111,6 +114,9 @@ exports.test_modify_mutable_attribute = function (t) {
         arr: ['one', 'two', 'three'],
         str: 'a string'
     };
+    changes.networks = [
+        'de749393-836c-42ce-9c7b-e81072ca3a23'
+    ];
     pack.update(PKG, changes, function (err) {
         t.ifError(err);
         pack.get(PKG.uuid, function (err, pkg) {
@@ -119,6 +125,8 @@ exports.test_modify_mutable_attribute = function (t) {
             t.equal(pkg.active, 'false');
             t.equal(pkg['default'], 'false');
             t.equal(pkg.traits.bool, false);
+            t.equal(pkg.networks.length, 1);
+            t.ok(Array.isArray(pkg.networks), 'networks is array');
             PKG = pkg;
             t.done();
         });
