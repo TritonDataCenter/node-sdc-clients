@@ -25,7 +25,10 @@ var entry = {
     'default': true,
     vcpus: 1,
     active: true,
-    networks: ['aefd7d3c-a4fd-4812-9dd7-24733974d861', 'de749393-836c-42ce-9c7b-e81072ca3a23'],
+    networks: [
+        'aefd7d3c-a4fd-4812-9dd7-24733974d861',
+        'de749393-836c-42ce-9c7b-e81072ca3a23'
+    ],
     traits: {
         bool: true,
         arr: ['one', 'two', 'three'],

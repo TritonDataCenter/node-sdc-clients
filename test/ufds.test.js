@@ -51,7 +51,7 @@ exports.setUp = function (callback) {
         clientTimeout: 2000,
         log: new Logger({
             name: 'ufds_unit_test',
-            stream: process.stderr,
+            stream: process.stdout,
             level: (process.env.LOG_LEVEL || 'info'),
             serializers: Logger.stdSerializers
         }),
