@@ -40,7 +40,7 @@ include ./tools/mk/Makefile.defs
 all:
 	$(NPM) install && $(NPM) rebuild
 
-.PHONY: test config_test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test package_test
+.PHONY: test config_test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test package_test papi_test
 
 ca_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/ca.test.js
@@ -72,7 +72,10 @@ dsapi_test: $(NODEUNIT)
 usageapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/usageapi.test.js
 
-test: config_test ca_test ufds_test cnapi_test napi_test package_test vmapi_test
+papi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/papi.test.js
+
+test: config_test ca_test ufds_test cnapi_test napi_test package_test vmapi_test papi_test
 
 .PHONY: setup
 setup:
