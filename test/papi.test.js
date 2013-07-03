@@ -8,7 +8,7 @@ var clone = require('clone');
 
 // --- Globals
 
-var PAPI_IP = process.env.PAPI_IP || '10.99.99.29';
+var PAPI_IP = process.env.PAPI_IP || '10.99.99.30';
 var PAPI_URL = 'http://' + PAPI_IP;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 

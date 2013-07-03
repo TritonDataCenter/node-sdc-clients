@@ -10,7 +10,7 @@ var CNAPI = require('../lib/index').CNAPI;
 
 // --- Globals
 
-var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.18');
+var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 
 var SERVER = null;
 var ZONE = '0777a40e-8b41-11e2-be6f-7f3bf8fcea65';

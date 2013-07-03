@@ -11,9 +11,9 @@ var CNAPI = require('../lib/index').CNAPI;
 
 // --- Globals
 
-var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.23');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.28');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
-var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.18');
+var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 
 var vmapi = null;
 var napi = null;
