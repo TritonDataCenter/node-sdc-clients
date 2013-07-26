@@ -1,6 +1,17 @@
 # sdc-clients Changelog
 
+## sdc-clients 8.1.0
+
+- [Backward incompatible change.] `imgapi.createFromVm` and
+  `imgapi.createFromVmAndWait` have been renamed to `imgapi.createImageFromVm`
+  and `imgapi.createImageFromVmAndWait`, respectively.  There is only one
+  user (AFAICT, cloudapi) so not bothering with backward compat shim.
+
+- Add incremental support to `imgadm.createImageFromVm[AndWait]`.
+
+
 ## sdc-clients 8.0.0
+
 - Backward incompatible version. Entire repo modified to work with SDC 7.0
   instead of SDC 6.5. Added clients for all the new API services replacing
   previous MAPI.
@@ -55,7 +66,7 @@
 - PROV-1370: MAPI.{count,list}{Zones,VMs}: drop 'all*' options. Just always
   set 'X-Joyent-Ignore-Provisioning-State' header.
 
-- PROV-1369: `count` in callback from `MAPI.countVMs` and `MAPI.countZones` 
+- PROV-1369: `count` in callback from `MAPI.countVMs` and `MAPI.countZones`
 
 
 ## sdc-clients 6.1.0
