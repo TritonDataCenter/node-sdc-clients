@@ -1,7 +1,11 @@
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
-var uuid = require('node-uuid'),
-    util = require('util');
+var util = require('util');
+
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 var CA = require('../lib/index').CA;
 var restify = require('restify');

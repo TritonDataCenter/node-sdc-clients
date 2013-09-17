@@ -2,10 +2,13 @@
 
 var Logger = require('bunyan'),
     restify = require('restify'),
-    uuid = require('node-uuid'),
     DSAPI = require('../lib/index').DSAPI,
     util = require('util');
 
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 // --- Globals
 

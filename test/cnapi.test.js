@@ -2,7 +2,10 @@
 
 var Logger = require('bunyan');
 var restify = require('restify');
-var uuid = require('node-uuid');
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 var CNAPI = require('../lib/index').CNAPI;
 

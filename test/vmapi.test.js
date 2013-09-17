@@ -2,7 +2,10 @@
 
 var Logger = require('bunyan');
 var restify = require('restify');
-var uuid = require('node-uuid');
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 var util = require('util');
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;

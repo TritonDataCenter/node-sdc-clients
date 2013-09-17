@@ -1,9 +1,13 @@
 // Copyright 2013 Joyent, Inc.  All rights reserved.
 
 var Logger = require('bunyan'),
-    uuid = require('node-uuid'),
     util = require('util'),
     clone = require('clone');
+
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 var Package = require('../lib/index').Package;
 

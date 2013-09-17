@@ -2,10 +2,13 @@
 
 var Logger = require('bunyan'),
     restify = require('restify'),
-    uuid = require('node-uuid'),
     util = require('util'),
     NAPI = require('../lib/index').NAPI;
 
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 // --- Helper
 function pseudoRandomMac() {

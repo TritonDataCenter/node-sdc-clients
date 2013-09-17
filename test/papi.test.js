@@ -3,7 +3,10 @@
 var Logger = require('bunyan');
 var PAPI = require('../lib/index').PAPI;
 var util = require('util');
-var uuid = require('node-uuid');
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 var clone = require('clone');
 
 // --- Globals

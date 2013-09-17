@@ -2,7 +2,10 @@ var util = require('util');
 var sdcClients = require('../lib/index');
 var restify = require('restify');
 var Amon = sdcClients.Amon;
-var uuid = require('node-uuid');
+var libuuid = require('libuuid');
+function uuid() {
+    return (libuuid.create());
+}
 
 var amon;
 
