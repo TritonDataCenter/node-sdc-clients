@@ -395,6 +395,30 @@ exports.testsListVmsUsage = function (test) {
 };
 
 
+exports.testMetadata = function (t) {
+    var meta = {
+        whatever: 'A meaningful value for whatever setting it'
+    };
+    var key = 'some-app';
+    var META_FMT = 'metadata=%s, uuid=%s, ou=users, o=smartdc';
+
+    ufds.getUser(LOGIN, function (err, user) {
+        t.ifError(err, 'testMetadata getUser error');
+        t.ok(user);
+        ufds.addMetadata(user, key, meta, function (err2, metadata) {
+            t.ifError(err2, 'testMetadata addMetadata error');
+            t.ok(metadata.cn);
+            t.equal(key, metadata.cn);
+            t.ok(metadata.dn);
+            t.equal(metadata.dn, util.format(META_FMT, key));
+            t.ok(metadata.objectclass);
+            t.equal('capimetadata', metadata.objectclass);
+            t.done();
+        });
+    });
+};
+
+
 exports.tearDown = function (callback) {
     ufds.close(function () {
         callback();
