@@ -107,6 +107,14 @@ exports.testGetUserByUuid = function (test) {
 };
 
 
+exports.testGetUserByEmail = function (test) {
+    ufds.getUserByEmail(EMAIL, function (err, user) {
+        test.ifError(err);
+        test.equal(user.login, LOGIN);
+        test.done();
+    });
+};
+
 exports.testGetUserNotFound = function (test) {
     ufds.getUser(uuid(), function (err, user) {
         test.ok(err);
