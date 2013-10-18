@@ -410,10 +410,20 @@ exports.testMetadata = function (t) {
             t.ok(metadata.cn);
             t.equal(key, metadata.cn);
             t.ok(metadata.dn);
-            t.equal(metadata.dn, util.format(META_FMT, key));
+            t.equal(metadata.dn, util.format(META_FMT, key, user.uuid));
             t.ok(metadata.objectclass);
             t.equal('capimetadata', metadata.objectclass);
-            t.done();
+            // CAPI-319: getMetadata w/o object
+            ufds.getMetadata(LOGIN, key, function (err3, meta3) {
+                t.ifError(err3, 'testMetadata getMetadata error');
+                t.ok(meta3);
+                // And now with object:
+                ufds.getMetadata(user, key, function (err4, meta4) {
+                    t.ifError(err4, 'testMetadata getMetadata error');
+                    t.ok(meta4);
+                    t.done();
+                });
+            });
         });
     });
 };
