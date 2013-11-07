@@ -635,24 +635,26 @@ exports.test_sub_users_crud = function (test) {
 
 
 exports.test_account_roles = function (test) {
-    var cn = 'a' + uuid().substr(0, 7);
+    var role_uuid = uuid();
+    var cn = 'a' + role_uuid.substr(0, 7);
     var entry = {
         role: cn,
         policydocument: 'Any string would be OK here',
         uniquemember: util.format(
                 'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
         account: ID,
+        uuid: role_uuid,
         description: 'This is completely optional'
     };
     ufds.addRole(ID, entry, function (err, role) {
         test.ifError(err, 'addRole error');
         test.equal(role.dn, util.format(
-                'role=%s, uuid=%s, ou=users, o=smartdc', cn, ID));
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc', role_uuid, ID));
         ufds.listRoles(ID, function (err, roles) {
             test.ifError(err, 'listRoles error');
             test.ok(Array.isArray(roles), 'Array of roles');
             test.equal(roles[0].dn, util.format(
-                'role=%s, uuid=%s, ou=users, o=smartdc', cn, ID));
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc', role_uuid, ID));
             ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
                 test.ifError(err, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
@@ -660,23 +662,23 @@ exports.test_account_roles = function (test) {
                 test.ok(Array.isArray(subuser.roles), 'roles is an array');
                 ufds.getUser(ID, function (err, user) {
                     test.ifError(err, 'get User error');
-                    user.addToRole(role.role, function (err) {
+                    user.addToRole(role.uuid, function (err) {
                         test.ifError(err, 'addToRole error');
                         ufds.getUser(ID, function (err, user) {
                             test.ifError(err, 'get User error');
                             test.ok(user.roles.length);
-                            user.removeFromRole(role.role, function (err) {
+                            user.removeFromRole(role.uuid, function (err) {
                                 test.ifError(err, 'removeFromRole error');
                                 entry.policydocument = [
                                     'Fred can read *.js when dirname = ' +
                                     'examples and sourceip = 10.0.0.0/8',
                                     'John, Jack and Jane can ops_* *'
                                 ];
-                                ufds.modifyRole(ID, entry.role, entry,
+                                ufds.modifyRole(ID, entry.uuid, entry,
                                     function (err, role) {
                                     test.ifError(err, 'modify role error');
                                     test.equal(role.policydocument.length, 2);
-                                    ufds.deleteRole(ID, entry.role,
+                                    ufds.deleteRole(ID, entry.uuid,
                                         function (err) {
                                         test.ifError(err, 'deleteRole error');
                                         test.done();
@@ -687,29 +689,32 @@ exports.test_account_roles = function (test) {
                     });
                 });
             });
-
         });
     });
 };
 
 
 exports.test_account_groups = function (test) {
-    var cn = 'a' + uuid().substr(0, 7);
+    var group_uuid = uuid();
+    var cn = 'a' + group_uuid.substr(0, 7);
     var entry = {
         cn: cn,
         uniquemember: util.format(
                 'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
-        account: ID
+        account: ID,
+        uuid: group_uuid
     };
     ufds.addGroup(ID, entry, function (err, group) {
         test.ifError(err, 'addGroup error');
         test.equal(group.dn, util.format(
-                'group=%s, uuid=%s, ou=users, o=smartdc', cn, ID));
+                'group-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                group_uuid, ID));
         ufds.listGroups(ID, function (err, groups) {
             test.ifError(err, 'listGroups error');
             test.ok(Array.isArray(groups), 'Array of groups');
             test.equal(groups[0].dn, util.format(
-                'group=%s, uuid=%s, ou=users, o=smartdc', cn, ID));
+                'group-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                group_uuid, ID));
             ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
                 test.ifError(err, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
@@ -717,22 +722,23 @@ exports.test_account_groups = function (test) {
                 test.ok(Array.isArray(subuser.memberof), 'groups is an array');
                 ufds.getUser(ID, function (err, user) {
                     test.ifError(err, 'get User error');
-                    user.addToGroup(group.cn, entry.account, function (err) {
+                    user.addToGroup(group.uuid, entry.account, function (err) {
                         test.ifError(err, 'addToGroup error');
                         ufds.getUser(ID, function (err, user) {
                             test.ifError(err, 'get User error');
                             test.ok(user.memberof.length);
-                            user.removeFromGroup(group.cn, entry.account,
+                            user.removeFromGroup(group.uuid, entry.account,
                                 function (err) {
                                 test.ifError(err, 'removeFromGroup error');
                                 entry.memberrole = util.format(
-                                    'role=%s, uuid=%s, ou=users, o=smartdc',
-                                    cn, ID);
-                                ufds.modifyGroup(ID, entry.cn, entry,
+                                    'role-uuid=%s, uuid=%s, ' +
+                                    'ou=users, o=smartdc',
+                                    group_uuid, ID);
+                                ufds.modifyGroup(ID, entry.uuid, entry,
                                     function (err, group) {
                                     test.ifError(err, 'modify group error');
                                     test.ok(group.memberrole);
-                                    ufds.deleteGroup(ID, entry.cn,
+                                    ufds.deleteGroup(ID, entry.uuid,
                                         function (err) {
                                         test.ifError(err, 'deleteGroup error');
                                         test.done();
@@ -743,7 +749,6 @@ exports.test_account_groups = function (test) {
                     });
                 });
             });
-
         });
     });
 };
