@@ -200,7 +200,9 @@ exports.test_create_zone = function (test) {
         networks: NETWORKS,
         brand: 'joyent-minimal',
         ram: 64,
-        server_uuid: HEADNODE.uuid
+        server_uuid: HEADNODE.uuid,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.createVm(opts, function (err, job) {
@@ -242,7 +244,9 @@ exports.test_update_zone = function (test) {
     var UPDATE_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        alias: 'foobar'
+        alias: 'foobar',
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.updateVm(UPDATE_QUERY, function (err, job) {
@@ -275,7 +279,9 @@ exports.test_add_metadata = function (test) {
     var MDATA_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        foo: 'bar'
+        foo: 'bar',
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.addMetadata('tags', MDATA_QUERY, function (err, job) {
@@ -358,7 +364,9 @@ exports.test_wait_for_set_metadata = function (test) {
 exports.test_delete_metadata = function (test) {
     var MDATA_QUERY = {
         uuid: ZONE,
-        owner_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.deleteAllMetadata('tags', MDATA_QUERY, function (err, job) {
@@ -473,7 +481,9 @@ exports.test_snapshot_zone = function (test) {
     var SNAPSHOT_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        name: 'backup'
+        name: 'backup',
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
     vmapi.snapshotVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
@@ -505,7 +515,9 @@ exports.test_rollback_zone = function (test) {
     var SNAPSHOT_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        name: 'backup'
+        name: 'backup',
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
     vmapi.rollbackVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
@@ -537,7 +549,9 @@ exports.test_delete_snapshot = function (test) {
     var SNAPSHOT_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        name: 'backup'
+        name: 'backup',
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
     vmapi.deleteSnapshot(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
@@ -563,7 +577,9 @@ exports.test_reprovision_zone = function (test) {
     var REPROVISION_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        image_uuid: IMAGE_UUID
+        image_uuid: IMAGE_UUID,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.reprovisionVm(REPROVISION_QUERY, function (err, job) {
