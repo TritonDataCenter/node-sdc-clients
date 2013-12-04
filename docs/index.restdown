@@ -487,13 +487,17 @@ Updates a VM. Params takes the following options:
 || **Name** || **Type** || **Description** ||
 || uuid || UUID || VM UUID. Required ||
 || owner_uuid || UUID || VM Owner. Optional ||
+|| payload || Object || VM attributes to be updated. Required ||
 
-Additionally the following  parameters are allowed for update:
+The following parameters are allowed for the VM 'payload':
 
 || **Name** || **Type** || **Description** ||
 || alias || String || VM Alias ||
 || ram || Number || Amount of memory of the VM ||
 || max_swap || Number || Amount of swap of the VM ||
+|| quota || Number || VM quota ||
+|| new_owner_uuid || UUID || New owner for the VM ||
+|| zfs_io_priority || Number || VM ZFS IO priority ||
 || tags || Object || New tags to assign to the VM ||
 || customer_metadata || Object || New customer_metadata to assign to the VM ||
 || internal_metadata || Object || New internal_metadata to assign to the VM ||
@@ -529,15 +533,12 @@ Gets existing metadata for a VM.
 
 ## addMetadata(type, params, callback)
 
-Adds (appends) metadata to a VM. Existing metadata will not be replaced. For
-specifying metadata to be added to the VM, add values to the params object other
-than uuid or owner_uuid. If we wanted to add foo=bar as metadata tags for a VM
-then the params argument would look like:
+Adds (appends) metadata to a VM. Existing metadata will not be replaced. If we wanted to add foo=bar as metadata tags for a VM then the params argument would look like:
 
         {
             uuid: <uuid>,
             owner_uuid: <owner_uuid>,
-            foo: 'bar'
+            metadata: { foo: 'bar' }
         }
 
 
@@ -546,21 +547,18 @@ then the params argument would look like:
 || params || Object || Filter params ||
 || params.uuid || UUID || VM UUID. Required ||
 || params.owner_uuid || UUID || VM Owner. Optional ||
-|| params.<key> || String/Number/Boolean || Additional metadata keys ||
+|| params.metadata || Object || Metadata to be added to the VM ||
 || callback || Function || fn(error, jobs) ||
 
 
 ## setMetadata(type, params, callback)
 
-Sets (replaces) metadata to a VM. Existing metadata will be replaced. For
-specifying metadata to be added to the VM, add values to the params object other
-than uuid or owner_uuid. If we wanted to add foo=bar as metadata tags for a VM
-then the params argument would look like:
+Sets (replaces) metadata to a VM. Existing metadata will be replaced. If we wanted to add foo=bar as metadata tags for a VM then the params argument would look like:
 
         {
             uuid: <uuid>,
             owner_uuid: <owner_uuid>,
-            foo: 'bar'
+            metadata: { foo: 'bar' }
         }
 
 
@@ -569,7 +567,7 @@ then the params argument would look like:
 || params || Object || Filter params ||
 || params.uuid || UUID || VM UUID. Required ||
 || params.owner_uuid || UUID || VM Owner. Optional ||
-|| params.<key> || String/Number/Boolean || Additional metadata keys ||
+|| params.metadata || Object || Metadata to be set for the VM ||
 || callback || Function || fn(error, jobs) ||
 
 
