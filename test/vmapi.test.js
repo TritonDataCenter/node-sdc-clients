@@ -212,7 +212,9 @@ exports.test_create_zone = function (test) {
         JOB_UUID = job.job_uuid;
         QUERY = {
             uuid: ZONE,
-            owner_uuid: CUSTOMER
+            owner_uuid: CUSTOMER,
+            origin: 'sdc-clients-test',
+            creator_uuid: CUSTOMER
         };
         test.done();
     });
@@ -244,7 +246,7 @@ exports.test_update_zone = function (test) {
     var UPDATE_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        alias: 'foobar',
+        payload: { alias: 'foobar' },
         origin: 'sdc-clients-test',
         creator_uuid: CUSTOMER
     };
@@ -279,7 +281,7 @@ exports.test_add_metadata = function (test) {
     var MDATA_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        foo: 'bar',
+        metadata: { foo: 'bar' },
         origin: 'sdc-clients-test',
         creator_uuid: CUSTOMER
     };
@@ -332,7 +334,9 @@ exports.test_set_metadata = function (test) {
     var MDATA_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        bar: 'baz'
+        metadata: { bar: 'baz' },
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
     };
 
     vmapi.setMetadata('tags', MDATA_QUERY, function (err, job) {
