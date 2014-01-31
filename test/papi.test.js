@@ -147,7 +147,7 @@ exports.test_modify_immutable_attribute = function (t) {
 
 
 exports.test_delete_package = function (t) {
-    papi.del(PKG, function (err) {
+    papi.del(PKG.uuid, {}, function (err) {
         t.ok(err);
         t.equal(err.message, 'Packages cannot be deleted');
         t.equal(err.statusCode, 405);
@@ -161,7 +161,7 @@ exports.test_list_packages = function (t) {
         t.ifError(err);
         t.ok(pkg);
         t.ok(pkg.uuid);
-        papi.list(function (err2, packages) {
+        papi.list({}, {}, function (err2, packages) {
             t.ifError(err2);
             t.ok(util.isArray(packages));
             t.done();
@@ -171,8 +171,8 @@ exports.test_list_packages = function (t) {
 
 
 exports.test_search_packages = function (t) {
-    var filter = '(&(max_physical_memory=128))';
-    papi.list(filter, function (err, packages) {
+    var filter = '(max_physical_memory=128)';
+    papi.list(filter, {}, function (err, packages) {
         t.ifError(err);
         t.ok(util.isArray(packages));
         packages.forEach(function (p) {
