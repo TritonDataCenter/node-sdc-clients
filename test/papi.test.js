@@ -55,6 +55,22 @@ var another_entry = {
     active: true
 };
 
+var entry_with_owner = {
+    name: 'test_1024',
+    version: '1.0.0',
+    max_physical_memory: 1024,
+    quota: 10240,
+    max_swap: 10240,
+    cpu_cap: 700,
+    max_lwps: 2000,
+    zfs_io_priority: 1,
+    'default': true,
+    vcpus: 2,
+    active: true,
+    owner_uuids: ['48bc0dd5-97f9-4fcc-bbd9-c48eadc772a0']
+};
+
+
 var PKG;
 
 
@@ -79,6 +95,7 @@ exports.setUp = function (callback) {
     callback();
 };
 
+
 // Por aquí:
 exports.test_create_package = function (t) {
     papi.add(entry, function (err, pkg) {
@@ -99,10 +116,40 @@ exports.test_create_package = function (t) {
 
 
 exports.test_get_package_by_uuid = function (t) {
-    papi.get(PKG.uuid, function (err, pkg) {
+    papi.get(PKG.uuid, {}, function (err, pkg) {
         t.ifError(err);
         t.ok(pkg);
         t.equal(pkg.uuid, PKG.uuid);
+        t.done();
+    });
+};
+
+
+exports.test_get_package_by_uuid_with_owner = function (t) {
+    papi.add(entry_with_owner, function (err, pkg) {
+        t.ifError(err);
+        t.ok(pkg);
+        t.ok(pkg.uuid);
+
+        entry_with_owner.uuid = pkg.uuid;
+
+        papi.get(pkg.uuid,
+                 { owner_uuids: entry_with_owner.owner_uuids[0] },
+                 function (err2, pkg2) {
+            t.ifError(err2);
+            t.ok(pkg2);
+            t.equal(pkg2.uuid, pkg.uuid);
+            t.done();
+        });
+    });
+};
+
+
+exports.test_get_package_by_uuid_with_bad_owner = function (t) {
+    papi.get(entry_with_owner.uuid,
+             { owner_uuids: '3621c8c3-a5d6-42c6-bcae-f7076353d150' },
+             function (err, pkg) {
+        t.ok(err);
         t.done();
     });
 };
