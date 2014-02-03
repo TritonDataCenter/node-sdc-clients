@@ -170,6 +170,27 @@ exports.test_list_packages = function (t) {
 };
 
 
+exports.test_list_packages_using_wildcards_with_escaping = function (t) {
+    papi.list({ name: 'regular_*' }, {}, function (err, packages) {
+        t.ifError(err);
+        t.ok(util.isArray(packages));
+        t.ok(packages.length === 0);
+        t.done();
+    });
+};
+
+
+exports.test_list_packages_using_wildcards_without_escaping = function (t) {
+    papi.list({ name: 'regular_*' }, { escape: false },
+              function (err, packages) {
+        t.ifError(err);
+        t.ok(util.isArray(packages));
+        t.ok(packages.length > 0);
+        t.done();
+    });
+};
+
+
 exports.test_search_packages = function (t) {
     var filter = '(max_physical_memory=128)';
     papi.list(filter, {}, function (err, packages) {
