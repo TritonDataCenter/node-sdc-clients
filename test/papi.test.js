@@ -120,7 +120,7 @@ exports.test_modify_mutable_attribute = function (t) {
     changes.networks = [
         'de749393-836c-42ce-9c7b-e81072ca3a23'
     ];
-    papi.update(PKG, changes, function (err, pkg) {
+    papi.update(PKG.uuid, changes, function (err, pkg) {
         t.ifError(err);
         t.ok(pkg);
         t.equal(pkg.active, false);
@@ -137,7 +137,7 @@ exports.test_modify_mutable_attribute = function (t) {
 exports.test_modify_immutable_attribute = function (t) {
     var changes = clone(PKG);
     changes.max_physical_memory = 256;
-    papi.update(PKG, changes, function (err) {
+    papi.update(PKG.uuid, changes, function (err) {
         t.ok(err);
         t.ok(/immutable/.test(err.message));
         t.ok(/max_physical_memory/.test(err.message));

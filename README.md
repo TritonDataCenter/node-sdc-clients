@@ -61,6 +61,8 @@ test suite by issuing the proper commands:
 
     make imgapi_test
 
+    make papi_test
+
 Each one of this commands assumes you've got a running version of the proper
 API service.
 
@@ -73,6 +75,7 @@ indicate the IP addresses where these services are running:
     UFDS_IP
     VMAPI_IP
     NAPI_IP
+    PAPI_IP
 
 Of course, you provide each one of these environment variables to the proper
 test suite make command and, in case you plan to run `make test`, i.e, all the
@@ -93,6 +96,7 @@ headnode; that is:
     NAPI_IP=10.99.99.10
     AMON_IP=10.99.99.20
     CA_IP=10.99.99.25
+    PAPI_IP=10.99.99.30
 
 There are no default values pointing to the headnode zones for AMON and CA.
 The default test values for these APIs point to `localhost` so, you may want
@@ -109,6 +113,7 @@ So, in brief, requirements to run these test suites:
     NAPI_IP=10.99.99.10 \
     CA_IP=10.99.99.25 \
     AMON_IP=10.99.99.20 \
+    PAPI_IP=10.99.99.30 \
     MACHINE_UUID=f56dbb40-1c81-4047-9d56-73fc3adf2b99 \
     make test
 
