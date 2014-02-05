@@ -634,61 +634,41 @@ exports.test_sub_users_crud = function (test) {
 };
 
 
-exports.test_account_roles = function (test) {
-    var role_uuid = uuid();
-    var cn = 'a' + role_uuid.substr(0, 7);
+exports.test_account_policies = function (test) {
+    var policy_uuid = uuid();
+    var cn = 'a' + policy_uuid.substr(0, 7);
     var entry = {
-        role: cn,
+        name: cn,
         policydocument: 'Any string would be OK here',
-        uniquemember: util.format(
-                'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
         account: ID,
-        uuid: role_uuid,
+        uuid: policy_uuid,
         description: 'This is completely optional'
     };
-    ufds.addRole(ID, entry, function (err, role) {
-        test.ifError(err, 'addRole error');
-        test.equal(role.dn, util.format(
-                'role-uuid=%s, uuid=%s, ou=users, o=smartdc', role_uuid, ID));
-        ufds.listRoles(ID, function (err, roles) {
-            test.ifError(err, 'listRoles error');
-            test.ok(Array.isArray(roles), 'Array of roles');
-            test.equal(roles[0].dn, util.format(
-                'role-uuid=%s, uuid=%s, ou=users, o=smartdc', role_uuid, ID));
-            ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
-                test.ifError(err, 'sub user limits getUser error');
-                test.ok(subuser, 'subuser');
-                test.ok(subuser.roles, 'subuser.roles');
-                test.ok(Array.isArray(subuser.roles), 'roles is an array');
-                ufds.getUser(ID, function (err, user) {
-                    test.ifError(err, 'get User error');
-                    user.addToRole(role.uuid, function (err) {
-                        test.ifError(err, 'addToRole error');
-                        ufds.getUser(ID, function (err, user) {
-                            test.ifError(err, 'get User error');
-                            test.ok(user.roles.length);
-                            user.removeFromRole(role.uuid, function (err) {
-                                test.ifError(err, 'removeFromRole error');
-                                entry.policydocument = [
-                                    'Fred can read *.js when dirname = ' +
-                                    'examples and sourceip = 10.0.0.0/8',
-                                    'John, Jack and Jane can ops_* *'
-                                ];
-                                ufds.modifyRole(ID, entry.uuid, entry,
-                                    function (err, role) {
-                                    test.ifError(err, 'modify role error');
-                                    test.equal(role.policydocument.length, 2);
-                                    ufds.deleteRole(ID, entry.uuid,
-                                        function (err) {
-                                        test.ifError(err, 'deleteRole error');
-                                        test.done();
-                                    });
-                                });
-                            });
-                        });
-                    });
+    ufds.addPolicy(ID, entry, function (err, policy) {
+        test.ifError(err, 'addPolicy error');
+        test.equal(policy.dn, util.format(
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc', policy_uuid, ID));
+        ufds.listPolicies(ID, function (err, policies) {
+            test.ifError(err, 'listPolicies error');
+            test.ok(Array.isArray(policies), 'Array of policies');
+            test.equal(policies[0].dn, util.format(
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc', policy_uuid, ID));
+            entry.policydocument = [
+                'Fred can read *.js when dirname = ' +
+                'examples and sourceip = 10.0.0.0/8',
+                'John, Jack and Jane can ops_* *'
+            ];
+            ufds.modifyPolicy(ID, entry.uuid, entry,
+                function (err, policy) {
+                test.ifError(err, 'modify policy error');
+                test.equal(policy.policydocument.length, 2);
+                ufds.deletePolicy(ID, entry.uuid,
+                    function (err) {
+                    test.ifError(err, 'deletePolicy error');
+                    test.done();
                 });
             });
+
         });
     });
 };
