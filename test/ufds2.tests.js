@@ -647,12 +647,14 @@ exports.test_account_policies = function (test) {
     ufds.addPolicy(ID, entry, function (err, policy) {
         test.ifError(err, 'addPolicy error');
         test.equal(policy.dn, util.format(
-                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc', policy_uuid, ID));
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                policy_uuid, ID));
         ufds.listPolicies(ID, function (err, policies) {
             test.ifError(err, 'listPolicies error');
             test.ok(Array.isArray(policies), 'Array of policies');
             test.equal(policies[0].dn, util.format(
-                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc', policy_uuid, ID));
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                policy_uuid, ID));
             entry.policydocument = [
                 'Fred can read *.js when dirname = ' +
                 'examples and sourceip = 10.0.0.0/8',
