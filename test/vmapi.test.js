@@ -26,7 +26,10 @@ var QUERY = null;
 var JOB_UUID = null;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 var IMAGE_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
-var NETWORKS = null;
+var ADMIN_NETWORK = null;
+var ADMIN_MAC = null;
+var EXTERNAL_NETWORK = null;
+var EXTERNAL_NIC = null;
 var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
@@ -126,11 +129,17 @@ exports.setUp = function (callback) {
 
 
 exports.test_list_networks = function (test) {
-    napi.listNetworks({}, function (err, networks) {
+    napi.listNetworks({ name: 'admin' }, function (err, nets1) {
         test.ifError(err);
-        test.ok(networks);
-        NETWORKS = networks[0].uuid;
-        test.done();
+        test.ok(nets1);
+        ADMIN_NETWORK = nets1[0].uuid;
+
+        napi.listNetworks({ name: 'external' }, function (err, nets2) {
+            test.ifError(err);
+            test.ok(nets1);
+            EXTERNAL_NETWORK = nets1[0].uuid;
+            test.done();
+        });
     });
 };
 
@@ -197,7 +206,7 @@ exports.test_create_zone = function (test) {
     var opts = {
         owner_uuid: CUSTOMER,
         image_uuid: IMAGE_UUID,
-        networks: NETWORKS,
+        networks: [ ADMIN_NETWORK ],
         brand: 'joyent-minimal',
         ram: 64,
         server_uuid: HEADNODE.uuid,
@@ -238,6 +247,16 @@ exports.test_wait_for_running = function (test) {
             // too early
             test.done();
         }, 10000);
+    });
+};
+
+
+exports.test_get_new_vm = function (test) {
+    vmapi.getVm(QUERY, function (err, vm) {
+        test.ifError(err);
+        test.ok(vm);
+        ADMIN_MAC = vm.nics[0].mac;
+        test.done();
     });
 };
 
@@ -473,6 +492,128 @@ exports.test_wait_for_reboot_job = function (test) {
 
 
 exports.test_wait_for_reboot = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_add_nics = function (test) {
+    var NICS_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        networks: [ { uuid: EXTERNAL_NETWORK, primary: true } ],
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.addNics(NICS_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_add_nics_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_add_nics_running = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_get_new_vm_nics = function (test) {
+    vmapi.getVm(QUERY, function (err, vm) {
+        test.ifError(err);
+        test.ok(vm);
+        EXTERNAL_MAC = vm.nics[1].mac;
+        test.done();
+    });
+};
+
+
+exports.test_update_nics = function (test) {
+    var NICS_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        nics: [
+            {
+                mac: ADMIN_MAC,
+                primary: true
+            }, {
+                mac: EXTERNAL_MAC
+            }
+        ],
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.updateNics(NICS_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_update_nics_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_update_nics_running = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_remove_nics = function (test) {
+    var NICS_QUERY = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        macs: [ EXTERNAL_MAC ],
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.removeNics(NICS_QUERY, function (err, job) {
+        test.ifError(err);
+        test.ok(job);
+        JOB_UUID = job.job_uuid;
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_remove_nics_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_remove_nics_running = function (test) {
     waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
         test.ifError(err);
         test.done();
