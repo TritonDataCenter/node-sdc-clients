@@ -700,19 +700,21 @@ exports.test_account_roles = function (test) {
             ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
                 test.ifError(err, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
-                // FIXME: user.roles() method
-                // test.ok(subuser.memberof, 'subuser.groups');
-                // test.ok(Array.isArray(subuser.memberof), 'groups is an array');
-
-                entry.description = 'This is completely optional';
-                ufds.modifyRole(ID, entry.uuid, entry, function (err, role) {
-                    test.ifError(err, 'modify role error');
-                    test.ok(role.description);
-                    ufds.deleteRole(ID, entry.uuid,
-                        function (err) {
-                        test.ifError(err, 'deleteRole error');
-                        test.done();
+                subuser.roles(function (err, rls) {
+                    test.ifError(err, 'sub user roles');
+                    test.ok(Array.isArray(rls), 'user roles is an array');
+                    entry.description = 'This is completely optional';
+                    ufds.modifyRole(ID, entry.uuid, entry,
+                        function (err, role) {
+                        test.ifError(err, 'modify role error');
+                        test.ok(role.description);
+                        ufds.deleteRole(ID, entry.uuid,
+                            function (err) {
+                            test.ifError(err, 'deleteRole error');
+                            test.done();
+                        });
                     });
+
                 });
             });
         });
