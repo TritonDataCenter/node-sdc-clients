@@ -639,7 +639,7 @@ exports.test_account_policies = function (test) {
     var cn = 'a' + policy_uuid.substr(0, 7);
     var entry = {
         name: cn,
-        policydocument: 'Any string would be OK here',
+        rule: 'Any string would be OK here',
         account: ID,
         uuid: policy_uuid,
         description: 'This is completely optional'
@@ -655,7 +655,7 @@ exports.test_account_policies = function (test) {
             test.equal(policies[0].dn, util.format(
                 'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 policy_uuid, ID));
-            entry.policydocument = [
+            entry.rule = [
                 'Fred can read *.js when dirname = ' +
                 'examples and sourceip = 10.0.0.0/8',
                 'John, Jack and Jane can ops_* *'
@@ -663,7 +663,7 @@ exports.test_account_policies = function (test) {
             ufds.modifyPolicy(ID, entry.uuid, entry,
                 function (err, policy) {
                 test.ifError(err, 'modify policy error');
-                test.equal(policy.policydocument.length, 2);
+                test.equal(policy.rule.length, 2);
                 ufds.deletePolicy(ID, entry.uuid,
                     function (err) {
                     test.ifError(err, 'deletePolicy error');
@@ -676,58 +676,42 @@ exports.test_account_policies = function (test) {
 };
 
 
-exports.test_account_groups = function (test) {
-    var group_uuid = uuid();
-    var cn = 'a' + group_uuid.substr(0, 7);
+exports.test_account_roles = function (test) {
+    var role_uuid = uuid();
+    var cn = 'a' + role_uuid.substr(0, 7);
     var entry = {
-        cn: cn,
+        name: cn,
         uniquemember: util.format(
                 'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
         account: ID,
-        uuid: group_uuid
+        uuid: role_uuid
     };
-    ufds.addGroup(ID, entry, function (err, group) {
+    ufds.addRole(ID, entry, function (err, role) {
         test.ifError(err, 'addGroup error');
-        test.equal(group.dn, util.format(
-                'group-uuid=%s, uuid=%s, ou=users, o=smartdc',
-                group_uuid, ID));
-        ufds.listGroups(ID, function (err, groups) {
-            test.ifError(err, 'listGroups error');
-            test.ok(Array.isArray(groups), 'Array of groups');
-            test.equal(groups[0].dn, util.format(
-                'group-uuid=%s, uuid=%s, ou=users, o=smartdc',
-                group_uuid, ID));
+        test.equal(role.dn, util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                role_uuid, ID));
+        ufds.listRoles(ID, function (err, roles) {
+            test.ifError(err, 'listRoles error');
+            test.ok(Array.isArray(roles), 'Array of roles');
+            test.equal(roles[0].dn, util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                role_uuid, ID));
             ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
                 test.ifError(err, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
-                test.ok(subuser.memberof, 'subuser.groups');
-                test.ok(Array.isArray(subuser.memberof), 'groups is an array');
-                ufds.getUser(ID, function (err, user) {
-                    test.ifError(err, 'get User error');
-                    user.addToGroup(group.uuid, entry.account, function (err) {
-                        test.ifError(err, 'addToGroup error');
-                        ufds.getUser(ID, function (err, user) {
-                            test.ifError(err, 'get User error');
-                            test.ok(user.memberof.length);
-                            user.removeFromGroup(group.uuid, entry.account,
-                                function (err) {
-                                test.ifError(err, 'removeFromGroup error');
-                                entry.memberrole = util.format(
-                                    'role-uuid=%s, uuid=%s, ' +
-                                    'ou=users, o=smartdc',
-                                    group_uuid, ID);
-                                ufds.modifyGroup(ID, entry.uuid, entry,
-                                    function (err, group) {
-                                    test.ifError(err, 'modify group error');
-                                    test.ok(group.memberrole);
-                                    ufds.deleteGroup(ID, entry.uuid,
-                                        function (err) {
-                                        test.ifError(err, 'deleteGroup error');
-                                        test.done();
-                                    });
-                                });
-                            });
-                        });
+                // FIXME: user.roles() method
+                // test.ok(subuser.memberof, 'subuser.groups');
+                // test.ok(Array.isArray(subuser.memberof), 'groups is an array');
+
+                entry.description = 'This is completely optional';
+                ufds.modifyRole(ID, entry.uuid, entry, function (err, role) {
+                    test.ifError(err, 'modify role error');
+                    test.ok(role.description);
+                    ufds.deleteRole(ID, entry.uuid,
+                        function (err) {
+                        test.ifError(err, 'deleteRole error');
+                        test.done();
                     });
                 });
             });
