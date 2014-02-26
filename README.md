@@ -47,8 +47,6 @@ test suite by issuing the proper commands:
 
     CA_IP=10.99.99.24 make ca_test
 
-    UFDS_IP=10.99.99.14 make config_test
-
     make cnapi_test
 
     make ufds_test
