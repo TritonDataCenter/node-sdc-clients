@@ -60,9 +60,6 @@ amon_test: $(NODEUNIT)
 napi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/napi.test.js
 
-dsapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
-
 usageapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/usageapi.test.js
 
