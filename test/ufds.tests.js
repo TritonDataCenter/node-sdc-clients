@@ -349,56 +349,6 @@ exports.testCrudLimit = function (test) {
 };
 
 
-exports.testsListVmsUsage = function (test) {
-    var VM_ONE = {
-        objectclass: 'vmusage',
-        ram: 1024,
-        quota: 10240,
-        uuid: uuid(),
-        image_uuid: uuid(),
-        image_os: 'smartos',
-        image_name: 'percona',
-        billing_id: uuid()
-    };
-
-    var VM_TWO = {
-        objectclass: 'vmusage',
-        ram: 2048,
-        quota: 10240,
-        uuid: uuid(),
-        image_uuid: uuid(),
-        image_os: 'smartos',
-        image_name: 'smartos',
-        billing_id: uuid()
-    };
-
-
-    var VM_FMT = 'vm=%s, uuid=%s, ou=users, o=smartdc';
-    ufds.add(util.format(VM_FMT, VM_ONE.uuid, ID), VM_ONE,
-            function (err) {
-        test.ifError(err, 'Add VM_ONE error');
-        ufds.add(util.format(VM_FMT, VM_TWO.uuid, ID), VM_TWO,
-            function (err2) {
-            test.ifError(err2, 'Add VM_TWO error');
-            ufds.listVmsUsage(ID, function (err3, vms) {
-                test.ifError(err3, 'Error listing Vms');
-                test.ok(Array.isArray(vms));
-                ufds.getUser(LOGIN, function (err4, user) {
-                    test.ifError(err4, 'listVms getUser error');
-                    test.ok(user);
-                    user.listVmsUsage(function (err5, vms2) {
-                        test.ifError(err5, 'list user vms error');
-                        test.ok(Array.isArray(vms2));
-                        test.ok(vms2.length >= 2);
-                        test.done();
-                    });
-                });
-            });
-        });
-    });
-};
-
-
 exports.testMetadata = function (t) {
     var meta = {
         whatever: 'A meaningful value for whatever setting it'
