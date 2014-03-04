@@ -43,6 +43,10 @@ var LOGIN = 'a' + ID.substr(0, 7);
 var EMAIL = LOGIN + '_test@joyent.com';
 var DN = util.format('uuid=%s, ou=users, o=smartdc', ID);
 
+var SUB_ID = uuid();
+var SUB_LOGIN = 'a' + SUB_ID.substr(0, 7);
+var SUB_EMAIL = SUB_LOGIN + '_test@joyent.com';
+var SUB_UUID;
 
 // --- Tests
 
@@ -421,10 +425,306 @@ exports.testMetadata = function (t) {
                 ufds.getMetadata(user, key, function (err4, meta4) {
                     t.ifError(err4, 'testMetadata getMetadata error');
                     t.ok(meta4);
-                    t.done();
+                    ufds.deleteMetadata(user, key, function (er5, meta5) {
+                        t.ifError(er5);
+                        t.done();
+                    });
                 });
             });
         });
+    });
+};
+
+
+// Account users and roles:
+exports.test_add_sub_user_to_account = function (test) {
+    var entry = {
+        login: SUB_LOGIN,
+        email: SUB_EMAIL,
+        userpassword: PWD,
+        objectclass: 'sdcperson',
+        account: ID
+    };
+
+    ufds.addUser(entry, function (err, user) {
+        test.ifError(err);
+        test.equal(user.login, SUB_LOGIN);
+        test.ok(user.uuid);
+        SUB_UUID = user.uuid;
+        ufds.getUser(SUB_UUID, ID, function (e1, u1) {
+            test.equal(user.login, SUB_LOGIN);
+            test.done();
+        });
+    });
+
+};
+
+
+exports.test_subuser_key = function (test) {
+    ufds.getUser(SUB_LOGIN, ID, function (err, user) {
+        test.ifError(err);
+        user.addKey(SSH_KEY, function (err, key) {
+            test.ifError(err, err);
+            test.ok(key, 'have key: ' + key);
+            if (key) {
+                test.equal(key.openssh, SSH_KEY);
+            }
+            user.listKeys(function (er2, keys) {
+                test.ifError(er2);
+                test.ok(keys);
+                test.ok(keys.length);
+                test.equal(keys[0].openssh, SSH_KEY);
+                user.getKey(keys[0].fingerprint, user.account,
+                    function (er3, key2) {
+                    test.ifError(er3);
+                    test.ok(key2);
+                    test.deepEqual(keys[0], key2);
+                    user.deleteKey(keys[0], function (err) {
+                        test.ifError(err);
+                        test.done();
+                    });
+                });
+            });
+        });
+    });
+};
+
+
+exports.test_sub_users_metadata = function (t) {
+    var meta = {
+        whatever: 'A meaningful value for whatever setting it'
+    };
+    var key = 'some-app';
+    var SUB_META_FMT = 'metadata=%s, uuid=%s, uuid=%s, ou=users, o=smartdc';
+
+    ufds.getUser(SUB_LOGIN, ID, function (err, user) {
+        t.ifError(err, 'testMetadata getUser error');
+        t.ok(user, 'metadata user');
+        ufds.addMetadata(user, key, meta, function (err2, metadata) {
+            t.ifError(err2, 'testMetadata addMetadata error');
+            t.ok(metadata.cn, 'metadata cn');
+            t.equal(key, metadata.cn, 'metadata cn value');
+            t.ok(metadata.dn, 'metadata dn');
+            t.equal(metadata.dn,
+                util.format(SUB_META_FMT, key, user.uuid, user.account),
+                'metadata dn value');
+            t.ok(metadata.objectclass, 'meta objectclass');
+            t.equal('capimetadata', metadata.objectclass,
+                'meta objectclass val');
+            // CAPI-319: getMetadata w/o object
+            ufds.getMetadata(SUB_LOGIN, key, user.account,
+                function (err3, meta3) {
+                t.ifError(err3, 'testMetadata getMetadata error');
+                t.ok(meta3, 'get meta w/o object');
+                // And now with object:
+                ufds.getMetadata(user, key, function (err4, meta4) {
+                    t.ifError(err4, 'testMetadata getMetadata error');
+                    t.ok(meta4, 'get meta with object');
+                    ufds.deleteMetadata(user, key, function (er5, meta5) {
+                        t.ifError(er5);
+                        t.done();
+                    });
+                });
+            });
+        });
+    });
+};
+
+
+// Sub-users limits are the same than main account user limits:
+exports.test_sub_users_limits = function (test) {
+    ufds.getUser(LOGIN, function (err, user) {
+        test.ifError(err);
+        test.ok(user);
+        user.addLimit(
+          {datacenter: 'coal', smartos: '123'},
+          function (err, limit) {
+            test.ifError(err);
+            test.ok(limit);
+            test.ok(limit.smartos);
+            ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
+                test.ifError(err, 'sub user limits getUser error');
+                test.ok(subuser, 'subuser');
+                subuser.listLimits(function (err, limits) {
+                    test.ifError(err);
+                    test.ok(limits);
+                    test.ok(limits.length);
+                    test.ok(limits[0].smartos);
+                    subuser.getLimit(limits[0].datacenter,
+                        function (err, limit) {
+                        test.ifError(err);
+                        test.ok(limit);
+                        test.ok(limit.smartos);
+                        user.deleteLimit(limit, function (err) {
+                            test.ifError(err);
+                            test.done();
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
+
+exports.test_sub_users_vms_usage = function (test) {
+    ufds.listVmsUsage(SUB_LOGIN, ID, function (err3, vms) {
+        test.ifError(err3, 'Error listing Vms');
+        test.ok(Array.isArray(vms));
+        ufds.getUser(SUB_LOGIN, ID, function (err4, user) {
+            test.ifError(err4, 'listVms getUser error');
+            test.ok(user);
+            user.listVmsUsage(function (err5, vms2) {
+                test.ifError(err5, 'list user vms error');
+                test.ok(Array.isArray(vms2));
+                test.ok(vms2.length >= 2);
+                test.done();
+            });
+        });
+    });
+};
+
+
+exports.test_sub_users_crud = function (test) {
+    var id = uuid();
+    var login = 'a' + id.substr(0, 7);
+    var email = login + '_test@joyent.com';
+
+    var entry = {
+        login: login,
+        email: email,
+        userpassword: PWD,
+        objectclass: 'sdcperson',
+        account: ID
+    };
+
+    ufds.addUser(entry, function (err, user) {
+        test.ifError(err);
+        test.equal(user.login, login);
+        ufds.getUserByEmail(entry.email, entry.account,
+            function (err2, user2) {
+                test.ifError(err2);
+                test.equal(user2.login, login);
+
+                ufds.updateUser(user.uuid, {
+                    phone: '+1 (206) 555-1212',
+                    pwdaccountlockedtime: Date.now() + (3600 * 1000)
+                }, user.account, function (err) {
+                    test.ifError(err);
+                    user.authenticate(entry.userpassword, function (er) {
+                        test.ok(er);
+                        test.equal(er.statusCode, 401);
+                        user.unlock(function (e) {
+                            test.ifError(e);
+                            user.authenticate(entry.userpassword,
+                                function (er2) {
+                                test.ifError(er2);
+                                user.destroy(function (er3) {
+                                    test.ifError(er3);
+                                    test.done();
+                                });
+                            });
+                        });
+                    });
+                });
+
+        });
+    });
+};
+
+
+exports.test_account_policies = function (test) {
+    var policy_uuid = uuid();
+    var cn = 'a' + policy_uuid.substr(0, 7);
+    var entry = {
+        name: cn,
+        rule: 'Any string would be OK here',
+        account: ID,
+        uuid: policy_uuid,
+        description: 'This is completely optional'
+    };
+    ufds.addPolicy(ID, entry, function (err, policy) {
+        test.ifError(err, 'addPolicy error');
+        test.equal(policy.dn, util.format(
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                policy_uuid, ID));
+        ufds.listPolicies(ID, function (err, policies) {
+            test.ifError(err, 'listPolicies error');
+            test.ok(Array.isArray(policies), 'Array of policies');
+            test.equal(policies[0].dn, util.format(
+                'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                policy_uuid, ID));
+            entry.rule = [
+                'Fred can read *.js when dirname = ' +
+                'examples and sourceip = 10.0.0.0/8',
+                'John, Jack and Jane can ops_* *'
+            ];
+            ufds.modifyPolicy(ID, entry.uuid, entry,
+                function (err, policy) {
+                test.ifError(err, 'modify policy error');
+                test.equal(policy.rule.length, 2);
+                ufds.deletePolicy(ID, entry.uuid,
+                    function (err) {
+                    test.ifError(err, 'deletePolicy error');
+                    test.done();
+                });
+            });
+
+        });
+    });
+};
+
+
+exports.test_account_roles = function (test) {
+    var role_uuid = uuid();
+    var cn = 'a' + role_uuid.substr(0, 7);
+    var entry = {
+        name: cn,
+        uniquemember: util.format(
+                'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
+        account: ID,
+        uuid: role_uuid
+    };
+    ufds.addRole(ID, entry, function (err, role) {
+        test.ifError(err, 'addGroup error');
+        test.equal(role.dn, util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                role_uuid, ID));
+        ufds.listRoles(ID, function (err, roles) {
+            test.ifError(err, 'listRoles error');
+            test.ok(Array.isArray(roles), 'Array of roles');
+            test.equal(roles[0].dn, util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                role_uuid, ID));
+            ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
+                test.ifError(err, 'sub user limits getUser error');
+                test.ok(subuser, 'subuser');
+                subuser.roles(function (err, rls) {
+                    test.ifError(err, 'sub user roles');
+                    test.ok(Array.isArray(rls), 'user roles is an array');
+                    entry.description = 'This is completely optional';
+                    ufds.modifyRole(ID, entry.uuid, entry,
+                        function (err, role) {
+                        test.ifError(err, 'modify role error');
+                        test.ok(role.description);
+                        ufds.deleteRole(ID, entry.uuid,
+                            function (err) {
+                            test.ifError(err, 'deleteRole error');
+                            test.done();
+                        });
+                    });
+
+                });
+            });
+        });
+    });
+};
+
+
+exports.test_remove_user_from_account = function (test) {
+    ufds.deleteUser(SUB_LOGIN, ID, function (err) {
+        test.ifError(err);
+        test.done();
     });
 };
 
