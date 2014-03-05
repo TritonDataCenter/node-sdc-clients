@@ -96,6 +96,9 @@ exports.testGetUser = function (test) {
         ufds.getUser(LOGIN, function (err, user) {
             test.ifError(err);
             test.equal(user.login, LOGIN);
+            // Testing no hidden attributes are available:
+            test.ok(!user._owner);
+            test.ok(!user._parent);
             test.done();
         });
     });
@@ -660,6 +663,53 @@ exports.test_remove_user_from_account = function (test) {
         test.done();
     });
 };
+
+
+
+exports.test_hidden_control = function (test) {
+    var ufds2 = new UFDS({
+        url: UFDS_URL,
+        bindDN: 'cn=root',
+        bindPassword: 'secret',
+        clientTimeout: 2000,
+        hidden: true,
+        log: new Logger({
+            name: 'ufds_unit_test',
+            stream: process.stdout,
+            level: (process.env.LOG_LEVEL || 'info'),
+            serializers: Logger.stdSerializers
+        }),
+        tlsOptions: {
+            rejectUnauthorized: false
+        },
+        retry: {
+            retries: 5,
+            maxTimeout: 10000,
+            minTimeout: 100
+        }
+    });
+
+    ufds2.once('ready', function () {
+        ufds2.removeAllListeners('error');
+        ufds2.getUser(LOGIN, function (err, user) {
+            test.ifError(err);
+            test.equal(user.login, LOGIN);
+            // Testing hidden attributes are available:
+            test.ok(user._owner);
+            test.ok(user._parent);
+            ufds2.close(function () {
+                test.done();
+            });
+        });
+    });
+
+    ufds2.once('error', function (err) {
+        ufds2.removeAllListeners('ready');
+        test.ifError(err);
+        test.done();
+    });
+};
+
 
 
 exports.tearDown = function (callback) {
