@@ -517,23 +517,6 @@ exports.test_sub_users_limits = function (test) {
 };
 
 
-exports.test_sub_users_vms_usage = function (test) {
-    ufds.listVmsUsage(SUB_LOGIN, ID, function (err3, vms) {
-        test.ifError(err3, 'Error listing Vms');
-        test.ok(Array.isArray(vms));
-        ufds.getUser(SUB_LOGIN, ID, function (err4, user) {
-            test.ifError(err4, 'listVms getUser error');
-            test.ok(user);
-            user.listVmsUsage(function (err5, vms2) {
-                test.ifError(err5, 'list user vms error');
-                test.ok(Array.isArray(vms2));
-                test.ok(vms2.length >= 2);
-                test.done();
-            });
-        });
-    });
-};
-
 
 exports.test_sub_users_crud = function (test) {
     var id = uuid();
