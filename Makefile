@@ -69,7 +69,10 @@ usageapi_test: $(NODEUNIT)
 papi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/papi.test.js
 
-test: ca_test ufds_test cnapi_test napi_test vmapi_test papi_test
+securetoken_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/securetoken.test.js
+
+test: ca_test ufds_test cnapi_test napi_test vmapi_test papi_test securetoken_test
 
 .PHONY: setup
 setup:
