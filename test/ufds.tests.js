@@ -574,7 +574,7 @@ exports.test_account_policies = function (test) {
     var cn = 'a' + policy_uuid.substr(0, 7);
     var entry = {
         name: cn,
-        rule: 'Any string would be OK here',
+        rule: 'John, Jack and Jane can ops_* *',
         account: ID,
         uuid: policy_uuid,
         description: 'This is completely optional'
