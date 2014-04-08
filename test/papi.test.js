@@ -186,8 +186,14 @@ exports.test_modify_immutable_attribute = function (t) {
     changes.max_physical_memory = 256;
     papi.update(PKG.uuid, changes, function (err) {
         t.ok(err);
-        t.ok(/immutable/.test(err.message));
-        t.ok(/max_physical_memory/.test(err.message));
+        t.ok(/Attempt to update immutables/.test(err.message));
+
+        t.deepEqual(err.body.errors, [ {
+            field: 'max_physical_memory',
+            code: 'Invalid',
+            message: 'is immutable'
+        } ]);
+
         t.done();
     });
 };
