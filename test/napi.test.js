@@ -84,6 +84,29 @@ exports.test_list_networks = function (test) {
 };
 
 
+exports.test_get_network = function (test) {
+    napi.getNetwork(NETWORKS[0].uuid, function (err, network) {
+        test.ifError(err);
+        test.ok(network);
+        test.equal(network.uuid, NETWORKS[0].uuid);
+        test.done();
+    });
+};
+
+
+// should fail since network doesn't belong to given owner
+exports.test_get_network_with_params = function (test) {
+    var params = { provisionable_by: uuid() };
+
+    napi.getNetwork(NETWORKS[0].uuid, { params: params },
+                    function (err, network) {
+        test.ok(err);
+        test.equal(err.message, 'network not found');
+        test.done();
+    });
+};
+
+
 exports.test_ping = function (t) {
     napi.ping(function (err) {
         t.ifError(err);
