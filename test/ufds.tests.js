@@ -618,6 +618,8 @@ exports.test_account_roles = function (test) {
         name: cn,
         uniquemember: util.format(
                 'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
+        uniquememberdefault: util.format(
+                'uuid=%s, uuid=%s, ou=users, o=smartdc', SUB_UUID, ID),
         account: ID,
         uuid: role_uuid
     };
@@ -638,18 +640,22 @@ exports.test_account_roles = function (test) {
                 subuser.roles(function (err, rls) {
                     test.ifError(err, 'sub user roles');
                     test.ok(Array.isArray(rls), 'user roles is an array');
-                    entry.description = 'This is completely optional';
-                    ufds.modifyRole(ID, entry.uuid, entry,
-                        function (err, role) {
-                        test.ifError(err, 'modify role error');
-                        test.ok(role.description);
-                        ufds.deleteRole(ID, entry.uuid,
-                            function (err) {
-                            test.ifError(err, 'deleteRole error');
-                            test.done();
+                    subuser.defaultRoles(function (err, drls) {
+                        test.ifError(err, 'sub user default roles');
+                        test.ok(Array.isArray(drls),
+                            'sub user default roles is an array');
+                        entry.description = 'This is completely optional';
+                        ufds.modifyRole(ID, entry.uuid, entry,
+                            function (err, role) {
+                            test.ifError(err, 'modify role error');
+                            test.ok(role.description);
+                            ufds.deleteRole(ID, entry.uuid,
+                                function (err) {
+                                test.ifError(err, 'deleteRole error');
+                                test.done();
+                            });
                         });
                     });
-
                 });
             });
         });
