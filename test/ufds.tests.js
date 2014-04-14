@@ -717,6 +717,45 @@ exports.test_hidden_control = function (test) {
 };
 
 
+exports.test_account_resources = function (test) {
+    var res_uuid = uuid();
+    var entry = {
+        name: util.format('/%s/users', ID),
+        memberrole: [ util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                uuid(), ID) ],
+        account: ID,
+        uuid: res_uuid
+    };
+    ufds.addResource(ID, entry, function (err, resource) {
+        test.ifError(err, 'addResource error');
+        test.equal(resource.dn, util.format(
+                'resource-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                res_uuid, ID));
+        ufds.listResources(ID, function (err, resources) {
+            test.ifError(err, 'listResources error');
+            test.ok(Array.isArray(resources), 'Array of resources');
+            test.equal(resources[0].dn, util.format(
+                'resource-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                res_uuid, ID));
+            entry.memberrole.push(util.format(
+                'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
+                uuid(), ID));
+            ufds.modifyResource(ID, entry.uuid, entry,
+                function (err, resource) {
+                test.ifError(err, 'modify resource error');
+                test.equal(resource.memberrole.length, 2);
+                ufds.deleteResource(ID, entry.uuid,
+                    function (err) {
+                    test.ifError(err, 'deleteResource error');
+                    test.done();
+                });
+            });
+        });
+    });
+};
+
+
 
 exports.tearDown = function (callback) {
     ufds.close(function () {
