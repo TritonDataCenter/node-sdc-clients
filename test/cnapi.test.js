@@ -210,6 +210,7 @@ exports.test_wait_for_deleted = function (test) {
     });
 };
 
+
 exports.test_command_execute = function (test) {
     var script = '#!/usr/bin/bash\n\necho Hello\n';
 
@@ -219,12 +220,57 @@ exports.test_command_execute = function (test) {
     });
 };
 
+
 exports.test_command_execute_with_env = function (test) {
     var script = '#!/usr/bin/bash\n\necho Hello\n';
     var env = { FOO: 'bar' };
 
     cnapi.commandExecute(SERVER, script, { env: env }, function (err) {
         test.ifError(err);
+        test.done();
+    });
+};
+
+
+// this test is sadly not ideal -- we'd like to check it picks only one server,
+// and it's the correct server, but that only works if the test is run with
+// a standup containing multiple CNs. With a standup of only COAL, this test
+// is ambiguous.
+exports.test_capacity_1 = function (test) {
+    var headers = { 'x-request-id': 12345 };
+
+    cnapi.capacity([SERVER], { headers: headers }, function (err, res) {
+        test.ifError(err);
+        test.equal(typeof (res), 'object');
+        test.equal(typeof (res.capacities), 'object');
+        test.equal(typeof (res.errors), 'object');
+        test.equal(Object.keys(res.capacities).length, 1);
+
+        var server = res.capacities[SERVER];
+        test.equal(typeof (server.cpu), 'number');
+        test.equal(typeof (server.ram), 'number');
+        test.equal(typeof (server.disk), 'number');
+
+        test.done();
+    });
+};
+
+
+exports.test_capacity_2 = function (test) {
+    cnapi.capacity(null, function (err, res) {
+        test.ifError(err);
+        test.equal(typeof (res), 'object');
+        test.equal(typeof (res.capacities), 'object');
+        test.equal(typeof (res.errors), 'object');
+        test.ok(Object.keys(res.capacities).length >= 1);
+
+        Object.keys(res.capacities).forEach(function (serverUuid) {
+            var server = res.capacities[serverUuid];
+            test.equal(typeof (server.cpu), 'number');
+            test.equal(typeof (server.ram), 'number');
+            test.equal(typeof (server.disk), 'number');
+        });
+
         test.done();
     });
 };
