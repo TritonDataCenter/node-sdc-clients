@@ -3,6 +3,7 @@
 var Logger = require('bunyan');
 var restify = require('restify');
 var libuuid = require('libuuid');
+var util = require('util');
 function uuid() {
     return (libuuid.create());
 }
@@ -24,23 +25,109 @@ var cnapi;
 
 // --- Helpers
 
-function waitForTask(callback) {
+function waitForVmState(state, callback) {
+    var finished = false;
+    var error;
+
+    var timeout = setTimeout(function () {
+        if (finished) {
+            return;
+        }
+
+        if (error) {
+            callback(error);
+            return;
+        } else {
+            callback(new Error('timed out waiting on vm state'));
+            return;
+        }
+    }, 30000);
+
     function check() {
-        return cnapi.getTask(TASK, function (err, task) {
-            if (err)
-                return callback(err);
+        cnapi.getVm(SERVER, ZONE, function (err, vm) {
+            error = err;
+            if (err) {
+                setTimeout(check, 3000);
+                return;
+            }
+            console.log('vm state was %s', vm.state);
 
-            if (task.status == 'failure')
-                return callback('Task failed');
+            if (vm.state === state) {
+                clearTimeout(timeout);
+                callback();
+                return;
+            }
 
-            if (task.status == 'complete')
-                return callback(null);
-
-            return setTimeout(check, 3000);
+            setTimeout(check, 3000);
         });
     }
 
-    return check();
+    check();
+}
+
+function waitForTask(callback) {
+    var finished = false;
+    var error;
+
+    var tasktimeout;
+
+    var timeout = setTimeout(function () {
+        clearTimeout(tasktimeout);
+        if (finished) {
+            return;
+        }
+
+        if (error) {
+            callback(error);
+            return;
+        } else {
+            callback(new Error('timed out waiting on task'));
+            return;
+        }
+    }, 50000);
+
+    function check() {
+        cnapi.getTask(TASK, function (err, task) {
+            error = err;
+            if (finished) {
+                return;
+            }
+            if (err) {
+                console.warn(err.message);
+                if (err.message === 'no such task found') {
+                    setTimeout(check, 3000);
+                    return;
+                }
+                clearTimeout(timeout);
+                finished = true;
+                callback(err);
+                return;
+            }
+
+            console.log('task status %s', task.status);
+
+            if (task.status == 'failure') {
+                clearTimeout(timeout);
+                finished = true;
+                callback(new Error(
+                    'Task failed ' + util.inspect(task, { depth: null })));
+                return;
+            }
+
+            if (task.status == 'complete') {
+                console.warn('ALL DONE');
+                clearTimeout(timeout);
+                finished = true;
+                callback(null);
+                return;
+            }
+
+            tasktimeout = setTimeout(check, 3000);
+            return;
+        });
+    }
+
+    check();
 }
 
 
@@ -116,7 +203,11 @@ exports.test_create_vm = function (test) {
 exports.test_wait_for_running = function (test) {
     waitForTask(function (err) {
         test.ifError(err);
-        test.done();
+
+        waitForVmState('running', function (err2) {
+            test.ifError(err2);
+            test.done();
+        });
     });
 };
 
@@ -145,7 +236,11 @@ exports.test_stop_vm = function (test) {
 exports.test_wait_for_stopped = function (test) {
     waitForTask(function (err) {
         test.ifError(err);
-        test.done();
+        waitForVmState('stopped', function (err2) {
+            test.ifError(err2);
+
+            test.done();
+        });
     });
 };
 
@@ -159,14 +254,17 @@ exports.test_start_vm = function (test) {
             TASK = task.id;
             test.done();
         });
-    }, 3000);
+    }, 6000);
 };
 
 
 exports.test_wait_for_started = function (test) {
     waitForTask(function (err) {
         test.ifError(err);
-        test.done();
+        waitForVmState('running', function (err2) {
+            test.ifError(err2);
+            test.done();
+        });
     });
 };
 
@@ -179,14 +277,17 @@ exports.test_reboot_vm = function (test) {
             TASK = task.id;
             test.done();
         });
-    }, 3000);
+    }, 6000);
 };
 
 
 exports.test_wait_for_reboot = function (test) {
     waitForTask(function (err) {
         test.ifError(err);
-        test.done();
+        waitForVmState('running', function (err2) {
+            test.ifError(err2);
+            test.done();
+        });
     });
 };
 
