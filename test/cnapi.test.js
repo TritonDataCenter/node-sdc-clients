@@ -19,7 +19,7 @@ var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 var SERVER = null;
 var ZONE = '0777a40e-8b41-11e2-be6f-7f3bf8fcea65';
 var TASK = null;
-var DATASET_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
+var DATASET_UUID = 'fd2cc906-8938-11e3-beab-4359c665ac99';
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 var cnapi;
 
