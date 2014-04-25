@@ -175,18 +175,18 @@ exports.test_create_vm = function (test) {
     var opts = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        dataset_uuid:  '01b2c898-945f-11e1-a523-af1afbe22822',
+        dataset_uuid:  'fd2cc906-8938-11e3-beab-4359c665ac99',
         brand: 'joyent',
-        image_uuid: '01b2c898-945f-11e1-a523-af1afbe22822',
+        image_uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
         image: {
-            uuid: '01b2c898-945f-11e1-a523-af1afbe22822',
-            files: [
+            uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
+            "files": [
                 {
-                    sha1: '97f20b32c2016782257176fb58a35e5044f05840',
-                    size: 46271847,
-                    compression: 'bzip2'
+                    "sha1": "97f20b32c2016782257176fb58a35e5044f05840",
+                    "size": 46271847,
+                    "compression": "bzip2"
                 }
-            ]
+            ],
         },
         ram: 128
     };
