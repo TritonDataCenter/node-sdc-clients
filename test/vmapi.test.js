@@ -25,7 +25,7 @@ var ZONE = null;
 var QUERY = null;
 var JOB_UUID = null;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
-var IMAGE_UUID = '01b2c898-945f-11e1-a523-af1afbe22822';
+var IMAGE_UUID = 'fd2cc906-8938-11e3-beab-4359c665ac99';
 var ADMIN_NETWORK = null;
 var ADMIN_MAC = null;
 var EXTERNAL_NETWORK = null;
@@ -33,6 +33,10 @@ var EXTERNAL_MAC = null;
 var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
+
+// VM Role Tags
+var ROLE_TAG_ONE = '17f34b3c-cf2c-11e3-9b4d-5bf35f098486';
+var ROLE_TAG_TWO = '25a852d6-cf2c-11e3-a59f-77a5d70ae240';
 
 
 // In seconds
@@ -416,6 +420,97 @@ exports.test_wait_for_no_metadata = function (test) {
         test.done();
     });
 };
+
+
+// VM Role Tags
+
+exports.test_add_role_tags = function (test) {
+    var params = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        role_tags: [ ROLE_TAG_ONE, ROLE_TAG_TWO ],
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.addRoleTags(params, function (err, role_tags) {
+        test.ifError(err);
+        test.ok(role_tags);
+        test.equal(role_tags.length, 2);
+        test.equal(role_tags[0], ROLE_TAG_ONE);
+        test.done();
+    });
+};
+
+
+exports.test_list_role_tags = function (test) {
+    var params = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.listRoleTags(params, function (err, role_tags) {
+        test.ifError(err);
+        test.ok(role_tags);
+        test.done();
+    });
+};
+
+
+exports.test_set_role_tags = function (test) {
+    var params = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        role_tags: [ ROLE_TAG_TWO ],
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.setRoleTags(params, function (err, role_tags) {
+        test.ifError(err);
+        test.ok(role_tags);
+        test.equal(role_tags.length, 1);
+        test.equal(role_tags[0], ROLE_TAG_TWO);
+        test.done();
+    });
+};
+
+
+exports.test_delete_role_tag = function (test) {
+    var params = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.deleteRoleTag(params, ROLE_TAG_TWO, function (err, role_tags) {
+        test.ifError(err);
+        test.ok(role_tags);
+        test.done();
+    });
+};
+
+
+exports.test_delete_role_tags = function (test) {
+    var params = {
+        uuid: ZONE,
+        owner_uuid: CUSTOMER,
+        origin: 'sdc-clients-test',
+        creator_uuid: CUSTOMER
+    };
+
+    vmapi.deleteAllRoleTags(params, function (err, role_tags) {
+        test.ifError(err);
+        test.ok(role_tags);
+        test.done();
+    });
+};
+
+
+// END VM Role Tags
 
 
 exports.test_stop_zone = function (test) {
