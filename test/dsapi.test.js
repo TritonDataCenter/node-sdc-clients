@@ -40,7 +40,7 @@ exports.setUp = function (callback) {
 
 
 exports.test_list_images = function (t) {
-    dsapi.listImages(function (err, images) {
+    dsapi.listImages(function (err, images, res) {
         t.ifError(err, 'listImages Error');
         t.ok(images, 'listImages OK');
         if (images) {
@@ -53,6 +53,7 @@ exports.test_list_images = function (t) {
                 t.ok(ds.uuid, 'ds.uuid OK');
             });
         }
+        t.ok(res, 'listImages response object');
         t.done();
     });
 };
