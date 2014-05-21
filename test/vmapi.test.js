@@ -29,7 +29,7 @@ var IMAGE_UUID = 'fd2cc906-8938-11e3-beab-4359c665ac99';
 var ADMIN_NETWORK = null;
 var ADMIN_MAC = null;
 var EXTERNAL_NETWORK = null;
-var EXTERNAL_MAC = null;
+var EXTERNAL_MACS = null;
 var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
@@ -594,7 +594,7 @@ exports.test_wait_for_reboot = function (test) {
 };
 
 
-exports.test_add_nics = function (test) {
+exports.test_add_nics_using_networks = function (test) {
     var NICS_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
@@ -612,7 +612,7 @@ exports.test_add_nics = function (test) {
 };
 
 
-exports.test_wait_for_add_nics_job = function (test) {
+exports.test_wait_for_add_nics_using_networks_job = function (test) {
     waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
       function (err) {
         test.ifError(err);
@@ -621,7 +621,52 @@ exports.test_wait_for_add_nics_job = function (test) {
 };
 
 
-exports.test_wait_for_add_nics_running = function (test) {
+exports.test_wait_for_add_nics_using_networks_running = function (test) {
+    waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_add_nics_using_macs = function (test) {
+    var napiQuery = {
+        belongs_to_type: 'zone',
+        belongs_to_uuid: ZONE,
+        owner_uuid: CUSTOMER
+    };
+
+    napi.provisionNic(EXTERNAL_NETWORK, napiQuery, function (err, nic) {
+        test.ifError(err);
+
+        var vmQuery = {
+            uuid: ZONE,
+            owner_uuid: CUSTOMER,
+            macs: [ nic.mac ],
+            origin: 'sdc-clients-test',
+            creator_uuid: CUSTOMER
+        };
+
+        vmapi.addNics(vmQuery, function (err2, job) {
+            test.ifError(err2);
+            test.ok(job);
+            JOB_UUID = job.job_uuid;
+            test.done();
+        });
+    });
+};
+
+
+exports.test_wait_for_add_nics_using_macs_job = function (test) {
+    waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
+      function (err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+
+exports.test_wait_for_add_nics_using_macs_running = function (test) {
     waitForValue(vmapi.getVm, QUERY, 'state', 'running', function (err) {
         test.ifError(err);
         test.done();
@@ -633,7 +678,7 @@ exports.test_get_new_vm_nics = function (test) {
     vmapi.getVm(QUERY, function (err, vm) {
         test.ifError(err);
         test.ok(vm);
-        EXTERNAL_MAC = vm.nics[1].mac;
+        EXTERNAL_MACS = vm.nics.slice(1, 3).map(function (n) { return n.mac; });
         test.done();
     });
 };
@@ -648,7 +693,7 @@ exports.test_update_nics = function (test) {
                 mac: ADMIN_MAC,
                 primary: true
             }, {
-                mac: EXTERNAL_MAC
+                mac: EXTERNAL_MACS[0]
             }
         ],
         origin: 'sdc-clients-test',
@@ -685,7 +730,7 @@ exports.test_remove_nics = function (test) {
     var NICS_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        macs: [ EXTERNAL_MAC ],
+        macs: EXTERNAL_MACS,
         origin: 'sdc-clients-test',
         creator_uuid: CUSTOMER
     };
