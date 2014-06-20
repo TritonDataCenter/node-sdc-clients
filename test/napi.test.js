@@ -101,7 +101,7 @@ exports.test_get_network_with_params = function (test) {
     napi.getNetwork(NETWORKS[0].uuid, { params: params },
                     function (err, network) {
         test.ok(err);
-        test.equal(err.message, 'Owner cannot provision on network');
+        test.equal(err.message, 'owner cannot provision on network');
         test.done();
     });
 };
