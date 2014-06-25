@@ -16,7 +16,7 @@
     "bunyan": "0.22.3",
     "clone": "0.1.8",
     "http-signature": "0.9.11",
-    "ufds": "git+ssh://git@github.com:joyent/node-ufds.git#f1f154",
+    "ufds": "git+ssh://git@github.com:joyent/node-ufds.git#a5dd01",
     "lru-cache": "2.3.0",
     "libuuid": "0.1.2",
     "once": "1.1.1",
