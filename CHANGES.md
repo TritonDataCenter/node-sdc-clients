@@ -1,5 +1,9 @@
 # sdc-clients Changelog
 
+## sdc-clients 8.1.1
+
+- Channel support for imgapi.js.
+
 ## sdc-clients 8.1.0
 
 - [Backward incompatible change.] `imgapi.createFromVm` and
@@ -8,7 +12,6 @@
   user (AFAICT, cloudapi) so not bothering with backward compat shim.
 
 - Add incremental support to `imgadm.createImageFromVm[AndWait]`.
-
 
 ## sdc-clients 8.0.0
 
