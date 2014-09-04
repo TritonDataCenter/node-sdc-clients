@@ -8,38 +8,16 @@
     Copyright (c) 2014, Joyent, Inc.
 -->
 
-# Node.js Clients for SmartDataCenter Services
+# node-sdc-clients
 
-Repository: <git@git.joyent.com:node-sdc-clients.git>
-Browsing: <https://mo.joyent.com/node-sdc-clients>
-Who: Mark Cavage and others
-Tickets: <https://devhub.joyent.com/jira/browse/TOOLS> or the specific service
-
-
-# Overview
+This repository is part of the Joyent SmartDataCenter project (SDC).  For
+contribution guidelines, issues, and general documentation, visit the main
+[SDC](http://github.com/joyent/sdc) project page.
 
 Node.js client libraries for the various SDC REST API services: Amon, CA,
 CNAPI, NAPI, UFDS, Packages on top of UFDS and VMAPI so far.
 
-# Repository
-
-    lib/                 Source files.
-    test/                Test suite (using whiskey)
-    tools/               Dev support tools
-    Makefile
-    package.json         npm module info (holds the project version)
-    npm-shrinkwrap.json  Frozen npm module versions to setup.
-    README.md            This.
-    CHANGES.md           Changelog
-
-
-# Development
-
-Before commiting/pushing run `make prepush` and, if possible, get a code
-review. Refer to the test section below for reference on setup and how to run
-the test suites.
-
-# Testing
+## Testing
 
 Short version:
 

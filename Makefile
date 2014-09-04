@@ -71,9 +71,6 @@ napi_test: $(NODEUNIT)
 dsapi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
 
-usageapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/usageapi.test.js
-
 papi_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/papi.test.js
 
