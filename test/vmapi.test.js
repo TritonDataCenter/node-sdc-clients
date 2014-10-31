@@ -22,7 +22,7 @@ var CNAPI = require('../lib/index').CNAPI;
 
 // --- Globals
 
-var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.28');
+var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.27');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 
@@ -41,6 +41,17 @@ var EXTERNAL_MACS = null;
 var HEADNODE = null;
 var ADD_METADATA = { foo: 'bar' };
 var SET_METADATA = { bar: 'baz' };
+
+var CONTEXT = {
+    caller: {
+        type: 'signature',
+        ip: '127.0.0.68',
+        keyId: '/foo@joyent.com/keys/id_rsa'
+    },
+    params: {
+        foo: 'bar'
+    }
+};
 
 // VM Role Tags
 var ROLE_TAG_ONE = '17f34b3c-cf2c-11e3-9b4d-5bf35f098486';
@@ -223,7 +234,8 @@ exports.test_create_zone = function (test) {
         ram: 64,
         server_uuid: HEADNODE.uuid,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.createVm(opts, function (err, job) {
@@ -235,7 +247,8 @@ exports.test_create_zone = function (test) {
             uuid: ZONE,
             owner_uuid: CUSTOMER,
             origin: 'sdc-clients-test',
-            creator_uuid: CUSTOMER
+            owner_uuid: CUSTOMER,
+            context: CONTEXT
         };
         test.done();
     });
@@ -279,7 +292,8 @@ exports.test_update_zone = function (test) {
         owner_uuid: CUSTOMER,
         payload: { alias: 'foobar' },
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.updateVm(UPDATE_QUERY, function (err, job) {
@@ -314,7 +328,8 @@ exports.test_add_metadata = function (test) {
         owner_uuid: CUSTOMER,
         metadata: { foo: 'bar' },
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.addMetadata('tags', MDATA_QUERY, function (err, job) {
@@ -367,7 +382,8 @@ exports.test_set_metadata = function (test) {
         owner_uuid: CUSTOMER,
         metadata: { bar: 'baz' },
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.setMetadata('tags', MDATA_QUERY, function (err, job) {
@@ -401,7 +417,8 @@ exports.test_delete_metadata = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.deleteAllMetadata('tags', MDATA_QUERY, function (err, job) {
@@ -438,7 +455,8 @@ exports.test_add_role_tags = function (test) {
         owner_uuid: CUSTOMER,
         role_tags: [ ROLE_TAG_ONE, ROLE_TAG_TWO ],
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.addRoleTags(params, function (err, role_tags) {
@@ -456,7 +474,7 @@ exports.test_list_role_tags = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER
     };
 
     vmapi.listRoleTags(params, function (err, role_tags) {
@@ -473,7 +491,8 @@ exports.test_set_role_tags = function (test) {
         owner_uuid: CUSTOMER,
         role_tags: [ ROLE_TAG_TWO ],
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.setRoleTags(params, function (err, role_tags) {
@@ -491,7 +510,8 @@ exports.test_delete_role_tag = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.deleteRoleTag(params, ROLE_TAG_TWO, function (err, role_tags) {
@@ -507,7 +527,8 @@ exports.test_delete_role_tags = function (test) {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.deleteAllRoleTags(params, function (err, role_tags) {
@@ -608,7 +629,8 @@ exports.test_add_nics_using_networks = function (test) {
         owner_uuid: CUSTOMER,
         networks: [ { uuid: EXTERNAL_NETWORK, primary: true } ],
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.addNics(NICS_QUERY, function (err, job) {
@@ -652,7 +674,8 @@ exports.test_add_nics_using_macs = function (test) {
             owner_uuid: CUSTOMER,
             macs: [ nic.mac ],
             origin: 'sdc-clients-test',
-            creator_uuid: CUSTOMER
+            owner_uuid: CUSTOMER,
+            context: CONTEXT
         };
 
         vmapi.addNics(vmQuery, function (err2, job) {
@@ -705,7 +728,8 @@ exports.test_update_nics = function (test) {
             }
         ],
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.updateNics(NICS_QUERY, function (err, job) {
@@ -740,7 +764,8 @@ exports.test_remove_nics = function (test) {
         owner_uuid: CUSTOMER,
         macs: EXTERNAL_MACS,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.removeNics(NICS_QUERY, function (err, job) {
@@ -776,8 +801,10 @@ exports.test_snapshot_zone = function (test) {
         owner_uuid: CUSTOMER,
         name: 'backup',
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
+
     vmapi.snapshotVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
@@ -810,8 +837,10 @@ exports.test_rollback_zone = function (test) {
         owner_uuid: CUSTOMER,
         name: 'backup',
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
+
     vmapi.rollbackVm(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
@@ -844,8 +873,10 @@ exports.test_delete_snapshot = function (test) {
         owner_uuid: CUSTOMER,
         name: 'backup',
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
+
     vmapi.deleteSnapshot(SNAPSHOT_QUERY, function (err, job) {
         test.ifError(err);
         test.ok(job);
@@ -872,7 +903,8 @@ exports.test_reprovision_zone = function (test) {
         owner_uuid: CUSTOMER,
         image_uuid: IMAGE_UUID,
         origin: 'sdc-clients-test',
-        creator_uuid: CUSTOMER
+        owner_uuid: CUSTOMER,
+        context: CONTEXT
     };
 
     vmapi.reprovisionVm(REPROVISION_QUERY, function (err, job) {
@@ -942,10 +974,34 @@ exports.test_list_jobs = function (test) {
     });
 };
 
+
 exports.test_get_job = function (test) {
     vmapi.getJob(JOB_UUID, function (err, job) {
         test.ifError(err);
         test.ok(job);
+        test.done();
+    });
+};
+
+
+exports.test_check_expected_jobs = function (test) {
+    vmapi.listJobs({ vm_uuid: ZONE }, function (err, jobs) {
+        test.ifError(err);
+
+        var expectedJobs = [
+            'destroy', 'reprovision', 'delete-snapshot', 'rollback', 'snapshot',
+            'remove-nics', 'update-nics', 'add-nics', 'add-nics', 'reboot',
+            'start', 'stop', 'update', 'update', 'update', 'update', 'provision'
+        ];
+
+        for (var i = 0; i !== expectedJobs.length; i++) {
+            var expected = expectedJobs[i];
+            var job = jobs[i];
+
+            test.ok(job.name.indexOf(expected) !== -1);
+            test.deepEqual(job.params.context, CONTEXT);
+        }
+
         test.done();
     });
 };
