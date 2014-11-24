@@ -6,7 +6,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:joyent/node-sdc-clients.git"
+    "url": "git://github.com/joyent/node-sdc-clients.git"
   },
   "main": "./lib/index.js",
   "dependencies": {
@@ -16,7 +16,7 @@
     "bunyan": "0.23.1",
     "clone": "0.1.8",
     "http-signature": "0.9.11",
-    "ufds": "git+ssh://git@github.com:joyent/node-ufds.git#5aa8791",
+    "ufds": "git://github.com/joyent/node-ufds.git#5aa8791",
     "lru-cache": "2.3.0",
     "libuuid": "0.1.2",
     "once": "1.1.1",
