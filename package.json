@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
   "description": "Contains node.js client libraries for SDC REST APIs.",
-  "version": "8.1.2",
+  "version": "8.1.3",
   "homepage": "http://www.joyent.com",
   "private": true,
   "repository": {

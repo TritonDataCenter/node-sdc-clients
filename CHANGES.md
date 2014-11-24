@@ -10,6 +10,11 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 8.1.3
+
+- TOOLS-720: imgapi.js supports an IMGAPI URL with a base path.
+
+
 ## sdc-clients 8.1.1
 
 - Channel support for imgapi.js.
