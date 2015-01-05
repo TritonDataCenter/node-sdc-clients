@@ -15,7 +15,6 @@
     "backoff": "2.3.0",
     "bunyan": "0.23.1",
     "clone": "0.1.8",
-    "http-signature": "0.9.11",
     "ufds": "git://github.com/joyent/node-ufds.git#5aa8791",
     "lru-cache": "2.3.0",
     "libuuid": "0.1.2",
