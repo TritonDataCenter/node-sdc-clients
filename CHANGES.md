@@ -10,10 +10,13 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 8.1.4
+
+- TOOLS-913: sdc-clients' imgapi.js ListImages?marker=$MARKER drops first hit even if it isn't that $MARKER image
+
 ## sdc-clients 8.1.3
 
 - TOOLS-720: imgapi.js supports an IMGAPI URL with a base path.
-
 
 ## sdc-clients 8.1.1
 
