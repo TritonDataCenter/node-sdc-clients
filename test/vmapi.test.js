@@ -207,6 +207,13 @@ exports.test_get_vm = function (test) {
     });
 };
 
+exports.test_get_vm_vnc = function (test) {
+    vmapi.getVm({ uuid: ZONE }, function (err, vm) {
+        test.ifError(err);
+        test.ok(vm);
+        test.done();
+    });
+};
 
 exports.find_headnode = function (t) {
     cnapi.listServers(function (err, servers) {
