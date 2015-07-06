@@ -66,6 +66,7 @@ exports.test_list_images = function (t) {
     });
 };
 
+
 exports.test_get_image = function (t) {
     dsapi.getImage(IMAGES[0].uuid, function (err, img) {
         t.ifError(err, 'getImage Error');
@@ -73,4 +74,10 @@ exports.test_get_image = function (t) {
         t.equal(img.urn, IMAGES[0].urn);
         t.done();
     });
+};
+
+
+exports.tearDown = function (callback) {
+    dsapi.close();
+    callback();
 };

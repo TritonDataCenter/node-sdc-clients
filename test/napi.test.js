@@ -246,3 +246,9 @@ exports.test_delete_nic_2 = function (t) {
         t.done();
     });
 };
+
+
+exports.tearDown = function (callback) {
+    napi.close();
+    callback();
+};

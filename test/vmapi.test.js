@@ -1010,3 +1010,9 @@ exports.test_check_expected_jobs = function (test) {
         test.done();
     });
 };
+
+
+exports.tearDown = function (callback) {
+    vmapi.close();
+    callback();
+};
