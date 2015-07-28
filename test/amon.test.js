@@ -178,5 +178,7 @@ exports.test_delete_monitor = function (test) {
 };
 
 exports.tearDown = function (callback) {
+    if (amon)
+        amon.close();
     callback();
 };

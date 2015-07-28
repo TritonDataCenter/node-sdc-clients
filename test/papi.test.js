@@ -263,3 +263,9 @@ exports.test_search_packages = function (t) {
         t.done();
     });
 };
+
+
+exports.tearDown = function (callback) {
+    papi.close();
+    callback();
+};

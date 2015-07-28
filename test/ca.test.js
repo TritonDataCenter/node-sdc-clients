@@ -191,5 +191,6 @@ exports.test_delete_instrumentation = function (test) {
 
 
 exports.tearDown = function (callback) {
+    ca.close();
     callback();
 };

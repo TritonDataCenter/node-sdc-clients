@@ -383,3 +383,9 @@ exports.test_capacity_2 = function (test) {
         test.done();
     });
 };
+
+
+exports.tearDown = function (callback) {
+    cnapi.close();
+    callback();
+};
