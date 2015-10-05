@@ -3,7 +3,6 @@
   "description": "Contains node.js client libraries for SDC REST APIs.",
   "version": "9.0.0",
   "homepage": "http://www.joyent.com",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/joyent/node-sdc-clients.git"
