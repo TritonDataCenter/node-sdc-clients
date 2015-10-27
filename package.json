@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
   "description": "Contains node.js client libraries for SDC REST APIs.",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "homepage": "http://www.joyent.com",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     "restify": "git://github.com/joyent/node-restify.git#fd5d5b5",
     "vasync": "^1.6.2",
     "verror": "^1.6.0",
-    "smartdc-auth": "2.1.2"
+    "smartdc-auth": "2.1.6"
   },
   "devDependencies": {
     "nodeunit": "0.8.0"
