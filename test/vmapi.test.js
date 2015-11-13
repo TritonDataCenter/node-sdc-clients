@@ -8,23 +8,26 @@
  * Copyright (c) 2014, Joyent, Inc.
  */
 
-var Logger = require('bunyan');
-var restify = require('restify');
+
+var assert = require('assert-plus');
+var ldapfilter = require('ldap-filter');
 var libuuid = require('libuuid');
-function uuid() {
-    return (libuuid.create());
-}
+var bunyan = require('bunyan');
+var moray = require('moray');
 var util = require('util');
+var vasync = require('vasync');
+
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
 var CNAPI = require('../lib/index').CNAPI;
-
 
 // --- Globals
 
 var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.27');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
+
+var VMAPI_VMS_BUCKET_NAME = 'vmapi_vms';
 
 var vmapi = null;
 var napi = null;
@@ -61,6 +64,18 @@ var ROLE_TAG_TWO = '25a852d6-cf2c-11e3-a59f-77a5d70ae240';
 // In seconds
 var TIMEOUT = 90;
 
+var TEST_VMS_ALIAS = 'test-vmapi-node-sdc-clients';
+
+
+// These constants are used for the pagination tests.
+// Create a number of VMs that is large enough to make VMAPI use the pagination
+// logic when listing them. Currently, VMAPI sets the limit for the number of
+// entries that can be listed in one page to 1000.
+var LIST_VMS_PAGINATION_LIMIT = 1000;
+var NB_PAGINATION_TEST_VMS_TO_CREATE = LIST_VMS_PAGINATION_LIMIT * 2 + 1;
+
+var testPaginationVms;
+var leftoverTestPaginationVms;
 
 // --- Helpers
 
@@ -110,15 +125,124 @@ function waitForValue(fn, params, prop, value, callback) {
     return check();
 }
 
+function connectToMoray(callback) {
+    var MORAY_CLIENT_CONFIG = {
+        host: process.env.MORAY_IP || '10.99.99.17',
+        port: 2020,
+        log: bunyan.createLogger({
+            name: 'moray',
+            level: 'info',
+            serializers: bunyan.stdSerializers
+        })
+    };
+    var morayClient = moray.createClient(MORAY_CLIENT_CONFIG);
+
+    morayClient.on('connect', function onConnect() {
+        return callback(null, morayClient);
+    });
+}
+
+/*
+ * Creates "nbTestVms" VMs in moray. These test VMs will be created with an
+ * alias of TEST_VMS_ALIAS to be able to differentiate test VMs from non-test
+ * VMs when, for instance, it's time to clean them up.
+ * "vmProperties" is an object that contains properties names and properties
+ * values that need to be set for all created VMs.
+ * "callback" is called with an error object as its first argument, which is
+ * null or undefined if there was no error.
+ */
+function createTestVms(nbTestVms, vmProperties, callback) {
+    assert.number(nbTestVms, 'nbTestVms');
+    assert.object(vmProperties, 'vmProperties');
+    assert.func(callback, 'callback');
+
+    vasync.waterfall([
+        connectToMoray,
+        function createVms(morayClient, next) {
+            var addVmsQueue = vasync.queue(function createTestVm(vmUuid, done) {
+                var vmObject = {
+                    uuid: vmUuid,
+                    alias: TEST_VMS_ALIAS
+                };
+
+                for (var vmPropertyName in vmProperties) {
+                    vmObject[vmPropertyName] = vmProperties[vmPropertyName];
+                }
+
+                morayClient.putObject(VMAPI_VMS_BUCKET_NAME, vmUuid, vmObject,
+                    done);
+            }, 10);
+
+            for (var i = 0; i < nbTestVms; ++i) {
+                addVmsQueue.push(libuuid.create());
+            }
+
+            addVmsQueue.close();
+            addVmsQueue.on('end', function testVmsCreationDone() {
+                return next(null, morayClient);
+            });
+        },
+        function closeMorayClient(morayClient, next) {
+            morayClient.close();
+            return next();
+        }
+    ], function creationDone(err, results) {
+        return callback(err);
+    });
+}
+
+/*
+ * Deletes VMs in moray that have the alias TEST_VMS_ALIAS and that have
+ * property values that match what is passed as the "vmProperties" parameter.
+ * "callback" is called with an error object as its first argument, which is
+ * null or undefined if there was no error.
+ */
+function cleanupTestVms(vmProperties, callback) {
+    assert.object(vmProperties, 'vmProperties');
+    assert.func(callback, 'callback');
+
+    vasync.waterfall([
+        connectToMoray,
+        function deleteRunningTestVms(morayClient, next) {
+            var filters = [
+                new ldapfilter.EqualityFilter({
+                    attribute: 'alias',
+                    value: TEST_VMS_ALIAS
+                })
+            ];
+
+            for (var vmPropertyName in vmProperties) {
+                filters.push(new ldapfilter.EqualityFilter({
+                    attribute: vmPropertyName,
+                    value: vmProperties[vmPropertyName]
+                }));
+            }
+
+            var filter = new ldapfilter.AndFilter({filters: filters});
+
+            morayClient.deleteMany(VMAPI_VMS_BUCKET_NAME, filter.toString(),
+                {noLimit: true},
+                function onVmsDeleted(err) {
+                    return next(err, morayClient);
+                });
+        },
+        function closeMorayClient(morayClient, next) {
+            morayClient.close();
+            return next();
+        }
+    ], function cleanupDone(err, results) {
+        return callback(err);
+    });
+}
 
 // --- Tests
 
 exports.setUp = function (callback) {
-    var logger = new Logger({
+    var logger = bunyan.createLogger({
             name: 'vmapi_unit_test',
             stream: process.stderr,
             level: (process.env.LOG_LEVEL || 'info'),
-            serializers: Logger.stdSerializers
+            serializers: bunyan.stdSerializers
     });
 
     vmapi = new VMAPI({
@@ -171,6 +295,45 @@ exports.test_list_networks = function (test) {
     });
 };
 
+exports.cleanup_leftover_test_vms = function (test) {
+    cleanupTestVms({state: 'running'}, function cleanupDone(err) {
+        test.ifError(err);
+        test.done();
+    });
+};
+
+// Create enough fake VMs so that listing them all requires paginating through
+// several pages.
+exports.create_test_list_pagination_vms = function (test) {
+    createTestVms(NB_PAGINATION_TEST_VMS_TO_CREATE, {state: 'running'},
+        function onTestVmsCreated(err) {
+            test.ifError(err);
+            test.done();
+        });
+};
+
+exports.test_list_pagination_vms = function (test) {
+    vmapi.listVms({
+        alias: TEST_VMS_ALIAS,
+        state: 'running'
+    }, function (err, vms) {
+        test.ifError(err);
+        test.ok(vms);
+        // Make sure _all_ vms are returned, not just the first page
+        test.equal(vms.length, NB_PAGINATION_TEST_VMS_TO_CREATE,
+            'listVms should return ' + NB_PAGINATION_TEST_VMS_TO_CREATE +
+            ' VMs, but instead returned ' + vms.length);
+        testPaginationVms = vms;
+        test.done();
+    });
+};
+
+exports.remove_test_list_pagination_vms = function (test) {
+    cleanupTestVms({state: 'running'}, function cleanupDone(err) {
+        test.ifError(err);
+        test.done();
+    });
+};
 
 exports.test_list_vms = function (test) {
     vmapi.listVms(function (err, vms) {
