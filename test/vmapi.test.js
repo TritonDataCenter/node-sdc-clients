@@ -14,11 +14,22 @@ var libuuid = require('libuuid');
 function uuid() {
     return (libuuid.create());
 }
+var async = require('async');
+
 var util = require('util');
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
 var CNAPI = require('../lib/index').CNAPI;
 
+var vmapiValidation = require('vmapi/lib/common/validation');
+var VMAPI_MAX_VMS_LIST_LIMIT = vmapiValidation.MAX_LIST_VMS_LIMIT;
+
+var vmapiTest = require('vmapi/test/lib/vm');
+var vmapiMoray = require('vmapi/lib/apis/moray');
+var vmapiMorayClient = new vmapiMoray({
+    host: process.env.MORAY_IP || '10.99.99.17',
+    "port": 2020
+});
 
 // --- Globals
 
@@ -171,6 +182,54 @@ exports.test_list_networks = function (test) {
     });
 };
 
+exports.cleanup_leftover_test_list_pagination_vms = function (test) {
+    vmapiMorayClient.connect();
+
+    vmapiMorayClient.once('moray-ready', function () {
+        vmapiTest.deleteTestVMs(vmapiMorayClient, {}, function() {
+                vmapiMorayClient.connection.close();
+                test.done();
+            });
+    });
+};
+
+// Create enough fake VMs so that listing them all requires paginating through
+// several pages.
+var NB_FAKE_VMS_TO_CREATE = VMAPI_MAX_VMS_LIST_LIMIT * 2 + 1;
+exports.create_test_list_pagination_vms = function (test) {
+    vmapiMorayClient.connect();
+
+    vmapiMorayClient.once('moray-ready', function () {
+        vmapiTest.createTestVMs(NB_FAKE_VMS_TO_CREATE, vmapiMorayClient, {}, {},
+            function() {
+                vmapiMorayClient.connection.close();
+                test.done();
+            });
+    });
+};
+
+exports.test_list_pagination_vms = function (test) {
+    vmapi.listVms({alias: vmapiTest.TEST_VMS_ALIAS}, function (err, vms) {
+        test.ifError(err);
+        test.ok(vms);
+        // Make sure _all_ vms are returned, not just the first page
+        test.equal(vms.length, NB_FAKE_VMS_TO_CREATE,
+            'listVms should return ' + NB_FAKE_VMS_TO_CREATE + ' VMs');
+        test.done();
+    });
+};
+
+// Cleanup VMs used to test pagination, as there's quite a lot of them
+exports.remove_test_list_pagination_vms = function (test) {
+    vmapiMorayClient.connect();
+
+    vmapiMorayClient.once('moray-ready', function () {
+        vmapiTest.deleteTestVMs(vmapiMorayClient, {}, function() {
+                vmapiMorayClient.connection.close();
+                test.done();
+            });
+    });
+};
 
 exports.test_list_vms = function (test) {
     vmapi.listVms(function (err, vms) {
