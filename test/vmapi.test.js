@@ -8,28 +8,16 @@
  * Copyright (c) 2014, Joyent, Inc.
  */
 
+var util = require('util');
+
 var Logger = require('bunyan');
 var restify = require('restify');
 var libuuid = require('libuuid');
-function uuid() {
-    return (libuuid.create());
-}
-var async = require('async');
+var vasync = require('vasync');
 
-var util = require('util');
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
 var CNAPI = require('../lib/index').CNAPI;
-
-var vmapiValidation = require('vmapi/lib/common/validation');
-var VMAPI_MAX_VMS_LIST_LIMIT = vmapiValidation.MAX_LIST_VMS_LIMIT;
-
-var vmapiTest = require('vmapi/test/lib/vm');
-var vmapiMoray = require('vmapi/lib/apis/moray');
-var vmapiMorayClient = new vmapiMoray({
-    host: process.env.MORAY_IP || '10.99.99.17',
-    "port": 2020
-});
 
 // --- Globals
 
@@ -72,6 +60,17 @@ var ROLE_TAG_TWO = '25a852d6-cf2c-11e3-a59f-77a5d70ae240';
 // In seconds
 var TIMEOUT = 90;
 
+var TEST_VMS_ALIAS = 'test-vmapi-node-sdc-clients';
+
+// These constants are used for the pagination tests.
+// Create a number of VMs that is large enough to make VMAPI use the pagination
+// logic when listing them. Currently, VMAPI sets the limit for the number of
+// entries that can be listed in one page to 1000.
+var LIST_VMS_PAGINATION_LIMIT = 1000;
+var NB_PAGINATION_TEST_VMS_TO_CREATE = LIST_VMS_PAGINATION_LIMIT * 2 + 1;
+
+var testPaginationVms;
+var leftoverTestPaginationVms;
 
 // --- Helpers
 
@@ -121,6 +120,31 @@ function waitForValue(fn, params, prop, value, callback) {
     return check();
 }
 
+function cleanupTestVms(cb) {
+    vasync.waterfall([
+        function listRunningTestVms(next) {
+            vmapi.listVms({
+                alias: TEST_VMS_ALIAS,
+                state: 'running'
+            }, next);
+        },
+        function destroyRunningTestVms(vms, next) {
+            function removeTestVm(vmUuid, callback) {
+                vmapi.deleteVm({uuid: vmUuid}, callback);
+            }
+
+            var removeVmsQueue = vasync.queue(removeTestVm, 10);
+            vms.forEach(function _eachTestVm(vm) {
+                removeVmsQueue.push(vm.uuid);
+            });
+
+            removeVmsQueue.close();
+            removeVmsQueue.on('end', function testVmsRemovalDone() {
+                return next();
+            });
+        }
+    ], cb);
+}
 
 // --- Tests
 
@@ -166,6 +190,21 @@ exports.setUp = function (callback) {
 };
 
 
+exports.find_headnode = function (t) {
+    cnapi.listServers(function (err, servers) {
+        t.ifError(err);
+        t.ok(servers);
+        t.ok(Array.isArray(servers));
+        t.ok(servers.length > 0);
+        servers = servers.filter(function (server) {
+            return (server.headnode);
+        });
+        t.ok(servers.length > 0);
+        HEADNODE = servers[0];
+        t.ok(HEADNODE);
+        t.done();
+    });
+};
 
 exports.test_list_networks = function (test) {
     napi.listNetworks({ name: 'admin' }, function (err, nets1) {
@@ -182,52 +221,60 @@ exports.test_list_networks = function (test) {
     });
 };
 
-exports.cleanup_leftover_test_list_pagination_vms = function (test) {
-    vmapiMorayClient.connect();
-
-    vmapiMorayClient.once('moray-ready', function () {
-        vmapiTest.deleteTestVMs(vmapiMorayClient, {}, function() {
-                vmapiMorayClient.connection.close();
-                test.done();
-            });
+exports.cleanup_leftover_test_vms = function (test) {
+    cleanupTestVms(function cleanupDone(err) {
+        test.ifError(err);
+        test.done();
     });
 };
 
 // Create enough fake VMs so that listing them all requires paginating through
 // several pages.
-var NB_FAKE_VMS_TO_CREATE = VMAPI_MAX_VMS_LIST_LIMIT * 2 + 1;
 exports.create_test_list_pagination_vms = function (test) {
-    vmapiMorayClient.connect();
+    var i = 0;
+    var vms = {};
+    var vmUuid;
 
-    vmapiMorayClient.once('moray-ready', function () {
-        vmapiTest.createTestVMs(NB_FAKE_VMS_TO_CREATE, vmapiMorayClient, {}, {},
-            function() {
-                vmapiMorayClient.connection.close();
-                test.done();
-            });
-    });
+    for (i = 0; i < NB_PAGINATION_TEST_VMS_TO_CREATE; ++i) {
+        vmUuid = libuuid.create();
+        vms[vmUuid] = {
+            uuid: vmUuid,
+            brand: 'joyent-minimal',
+            billing_id: '00000000-0000-0000-0000-000000000000',
+            owner_uuid: CUSTOMER,
+            alias: TEST_VMS_ALIAS,
+            image_uuid: IMAGE_UUID,
+            state: 'running'
+        };
+    }
+
+    vmapi.put({path: '/vms', query: {server_uuid: HEADNODE.uuid}}, {vms: vms},
+        function onPutDone(err) {
+            test.ifError(err);
+            test.done();
+        });
 };
 
 exports.test_list_pagination_vms = function (test) {
-    vmapi.listVms({alias: vmapiTest.TEST_VMS_ALIAS}, function (err, vms) {
+    vmapi.listVms({
+        alias: TEST_VMS_ALIAS,
+        state: 'running'
+    }, function (err, vms) {
         test.ifError(err);
         test.ok(vms);
         // Make sure _all_ vms are returned, not just the first page
-        test.equal(vms.length, NB_FAKE_VMS_TO_CREATE,
-            'listVms should return ' + NB_FAKE_VMS_TO_CREATE + ' VMs');
+        test.equal(vms.length, NB_PAGINATION_TEST_VMS_TO_CREATE,
+            'listVms should return ' + NB_PAGINATION_TEST_VMS_TO_CREATE +
+            ' VMs, but instead returned ' + vms.length);
+        testPaginationVms = vms;
         test.done();
     });
 };
 
-// Cleanup VMs used to test pagination, as there's quite a lot of them
 exports.remove_test_list_pagination_vms = function (test) {
-    vmapiMorayClient.connect();
-
-    vmapiMorayClient.once('moray-ready', function () {
-        vmapiTest.deleteTestVMs(vmapiMorayClient, {}, function() {
-                vmapiMorayClient.connection.close();
-                test.done();
-            });
+    cleanupTestVms(function cleanupDone(err) {
+        test.ifError(err);
+        test.done();
     });
 };
 
@@ -268,23 +315,6 @@ exports.test_get_vm = function (test) {
         test.ifError(err);
         test.ok(vm);
         test.done();
-    });
-};
-
-
-exports.find_headnode = function (t) {
-    cnapi.listServers(function (err, servers) {
-        t.ifError(err);
-        t.ok(servers);
-        t.ok(Array.isArray(servers));
-        t.ok(servers.length > 0);
-        servers = servers.filter(function (server) {
-            return (server.headnode);
-        });
-        t.ok(servers.length > 0);
-        HEADNODE = servers[0];
-        t.ok(HEADNODE);
-        t.done();
     });
 };
 
@@ -1069,7 +1099,6 @@ exports.test_check_expected_jobs = function (test) {
         test.done();
     });
 };
-
 
 exports.tearDown = function (callback) {
     vmapi.close();
