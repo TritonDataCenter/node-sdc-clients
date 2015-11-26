@@ -24,6 +24,8 @@
     "smartdc-auth": "2.1.6"
   },
   "devDependencies": {
+    "ldapjs": "^1.0.0",
+    "moray": "git+ssh://git@github.com:joyent/node-moray.git#441fd44",
     "nodeunit": "0.8.0"
   },
   "engines": {

@@ -14,6 +14,9 @@ var Logger = require('bunyan');
 var restify = require('restify');
 var libuuid = require('libuuid');
 var vasync = require('vasync');
+var moray = require('moray');
+var ldapjs = require('ldapjs');
+var assert = require('assert-plus');
 
 var VMAPI = require('../lib/index').VMAPI;
 var NAPI = require('../lib/index').NAPI;
@@ -24,6 +27,8 @@ var CNAPI = require('../lib/index').CNAPI;
 var VMAPI_URL = 'http://' + (process.env.VMAPI_IP || '10.99.99.27');
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
+
+var VMAPI_VMS_BUCKET_NAME = 'vmapi_vms';
 
 var vmapi = null;
 var napi = null;
@@ -120,30 +125,120 @@ function waitForValue(fn, params, prop, value, callback) {
     return check();
 }
 
-function cleanupTestVms(cb) {
+function connectToMoray(callback) {
+    var MORAY_CLIENT_CONFIG = {
+        host: process.env.MORAY_IP || '10.99.99.17',
+        port: 2020,
+        log: new Logger({
+            name: 'moray',
+            level: 'info',
+            serializers: restify.bunyan.serializers
+        }),
+        connectTimeout: 200,
+        retry: {
+            retries: 2,
+            minTimeout: 500
+        }
+    };
+    var morayClient = moray.createClient(MORAY_CLIENT_CONFIG);
+
+    morayClient.on('connect', function onConnect() {
+        return callback(null, morayClient);
+    });
+}
+
+/*
+ * Creates "nbTestVms" VMs in moray. These test VMs will be created with an
+ * alias of TEST_VMS_ALIAS to be able to differentiate test VMs from non-test
+ * VMs when, for instance, it's time to clean them up.
+ * "vmProperties" is an object that contains properties names and properties
+ * values that need to be set for all created VMs.
+ * "callback" is called with an error object as its first argument, which is
+ * null or undefined if there was no error.
+ */
+function createTestVms(nbTestVms, vmProperties, callback) {
+    assert.number(nbTestVms, 'nbTestVms must be a number');
+    assert.object(vmProperties, 'vmProperties must be an object');
+    assert.func(callback, 'cb must be a function');
+
     vasync.waterfall([
-        function listRunningTestVms(next) {
-            vmapi.listVms({
-                alias: TEST_VMS_ALIAS,
-                state: 'running'
-            }, next);
-        },
-        function destroyRunningTestVms(vms, next) {
-            function removeTestVm(vmUuid, callback) {
-                vmapi.deleteVm({uuid: vmUuid}, callback);
+        connectToMoray,
+        function createVms(morayClient, next) {
+            var addVmsQueue = vasync.queue(createTestVm, 10);
+            for (var i = 0; i < nbTestVms; ++i) {
+                addVmsQueue.push(libuuid.create());
             }
 
-            var removeVmsQueue = vasync.queue(removeTestVm, 10);
-            vms.forEach(function _eachTestVm(vm) {
-                removeVmsQueue.push(vm.uuid);
+            addVmsQueue.close();
+            addVmsQueue.on('end', function testVmsCreationDone() {
+                return next(null, morayClient);
             });
 
-            removeVmsQueue.close();
-            removeVmsQueue.on('end', function testVmsRemovalDone() {
-                return next();
-            });
+            function createTestVm(vmUuid, callback) {
+                var vmObject = {
+                    uuid: vmUuid,
+                    alias: TEST_VMS_ALIAS
+                };
+
+                for (var vmPropertyName in vmProperties) {
+                    vmObject[vmPropertyName] = vmProperties[vmPropertyName];
+                }
+
+                morayClient.putObject(VMAPI_VMS_BUCKET_NAME, vmUuid, vmObject,
+                    callback);
+            }
+        },
+        function closeMorayClient(morayClient, next) {
+            morayClient.close();
+            return next();
         }
-    ], cb);
+    ], function creationDone(err, results) {
+        return callback(err);
+    });
+}
+
+/*
+ * Deletes VMs in moray that have the alias TEST_VMS_ALIAS and that have
+ * property values that match what is passed as the "vmProperties" parameter.
+ * "callback" is called with an error object as its first argument, which is
+ * null or undefined if there was no error.
+ */
+function cleanupTestVms(vmProperties, callback) {
+    assert.object(vmProperties, 'vmProperties must be an object');
+    assert.func(callback, 'callback must be a function');
+
+    vasync.waterfall([
+        connectToMoray,
+        function deleteRunningTestVms(morayClient, next) {
+            var filters = [
+                new ldapjs.EqualityFilter({
+                    attribute: 'alias',
+                    value: TEST_VMS_ALIAS
+                })
+            ];
+
+            for (var vmPropertyName in vmProperties) {
+                filters.push(new ldapjs.EqualityFilter({
+                    attribute: vmPropertyName,
+                    value: vmProperties[vmPropertyName]
+                }));
+            }
+
+            var filter = new ldapjs.AndFilter({filters: filters});
+
+            morayClient.deleteMany(VMAPI_VMS_BUCKET_NAME, filter.toString(),
+                {noLimit: true},
+                function onVmsDeleted(err) {
+                    return next(err, morayClient);
+                });
+        },
+        function closeMorayClient(morayClient, next) {
+            morayClient.close();
+            return next();
+        }
+    ], function cleanupDone(err, results) {
+        return callback(err);
+    });
 }
 
 // --- Tests
@@ -190,21 +285,6 @@ exports.setUp = function (callback) {
 };
 
 
-exports.find_headnode = function (t) {
-    cnapi.listServers(function (err, servers) {
-        t.ifError(err);
-        t.ok(servers);
-        t.ok(Array.isArray(servers));
-        t.ok(servers.length > 0);
-        servers = servers.filter(function (server) {
-            return (server.headnode);
-        });
-        t.ok(servers.length > 0);
-        HEADNODE = servers[0];
-        t.ok(HEADNODE);
-        t.done();
-    });
-};
 
 exports.test_list_networks = function (test) {
     napi.listNetworks({ name: 'admin' }, function (err, nets1) {
@@ -222,7 +302,7 @@ exports.test_list_networks = function (test) {
 };
 
 exports.cleanup_leftover_test_vms = function (test) {
-    cleanupTestVms(function cleanupDone(err) {
+    cleanupTestVms({state: 'running'}, function cleanupDone(err) {
         test.ifError(err);
         test.done();
     });
@@ -231,25 +311,8 @@ exports.cleanup_leftover_test_vms = function (test) {
 // Create enough fake VMs so that listing them all requires paginating through
 // several pages.
 exports.create_test_list_pagination_vms = function (test) {
-    var i = 0;
-    var vms = {};
-    var vmUuid;
-
-    for (i = 0; i < NB_PAGINATION_TEST_VMS_TO_CREATE; ++i) {
-        vmUuid = libuuid.create();
-        vms[vmUuid] = {
-            uuid: vmUuid,
-            brand: 'joyent-minimal',
-            billing_id: '00000000-0000-0000-0000-000000000000',
-            owner_uuid: CUSTOMER,
-            alias: TEST_VMS_ALIAS,
-            image_uuid: IMAGE_UUID,
-            state: 'running'
-        };
-    }
-
-    vmapi.put({path: '/vms', query: {server_uuid: HEADNODE.uuid}}, {vms: vms},
-        function onPutDone(err) {
+    createTestVms(NB_PAGINATION_TEST_VMS_TO_CREATE, {state: 'running'},
+        function onTestVmsCreated(err) {
             test.ifError(err);
             test.done();
         });
@@ -272,7 +335,7 @@ exports.test_list_pagination_vms = function (test) {
 };
 
 exports.remove_test_list_pagination_vms = function (test) {
-    cleanupTestVms(function cleanupDone(err) {
+    cleanupTestVms({state: 'running'}, function cleanupDone(err) {
         test.ifError(err);
         test.done();
     });
@@ -315,6 +378,23 @@ exports.test_get_vm = function (test) {
         test.ifError(err);
         test.ok(vm);
         test.done();
+    });
+};
+
+
+exports.find_headnode = function (t) {
+    cnapi.listServers(function (err, servers) {
+        t.ifError(err);
+        t.ok(servers);
+        t.ok(Array.isArray(servers));
+        t.ok(servers.length > 0);
+        servers = servers.filter(function (server) {
+            return (server.headnode);
+        });
+        t.ok(servers.length > 0);
+        HEADNODE = servers[0];
+        t.ok(HEADNODE);
+        t.done();
     });
 };
 
@@ -1099,6 +1179,7 @@ exports.test_check_expected_jobs = function (test) {
         test.done();
     });
 };
+
 
 exports.tearDown = function (callback) {
     vmapi.close();
