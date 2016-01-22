@@ -102,14 +102,14 @@ exports.test_list_probes = function (test) {
         test.ifError(err);
         test.ok(probe);
 
-        amon.listProbes(ADMIN_UUID, MONITOR.name, function (err, probes) {
-            test.ifError(err);
+        amon.listProbes(ADMIN_UUID, MONITOR.name, function (err2, probes) {
+            test.ifError(err2);
             test.ok(probes);
             test.equal(probes.length, 2);
 
             amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name,
-              function (err) {
-                test.ifError(err);
+              function (err3) {
+                test.ifError(err3);
                 test.done();
             });
         });
@@ -132,8 +132,8 @@ exports.test_get_probe = function (test) {
 exports.test_delete_probe = function (test) {
     amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
         test.ifError(err);
-        amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
-            test.equal(err.statusCode, 404);
+        amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err2) {
+            test.equal(err2.statusCode, 404);
             test.done();
         });
     });
@@ -143,12 +143,12 @@ exports.test_list_monitors = function (test) {
     amon.putMonitor(ADMIN_UUID, MONITOR_2.name, MONITOR_2,
         function (err, monitor) {
         test.ifError(err);
-        amon.listMonitors(ADMIN_UUID, function (err, monitors) {
-            test.ifError(err);
+        amon.listMonitors(ADMIN_UUID, function (err2, monitors) {
+            test.ifError(err2);
             test.ok(monitors);
             test.ok((monitors.length > 2), 'Found less than 2 monitors');
-            amon.deleteMonitor(ADMIN_UUID, MONITOR_2.name, function (err) {
-                test.ifError(err);
+            amon.deleteMonitor(ADMIN_UUID, MONITOR_2.name, function (err3) {
+                test.ifError(err3);
                 test.done();
             });
         });
@@ -169,8 +169,8 @@ exports.test_delete_monitor = function (test) {
     amon.deleteMonitor(ADMIN_UUID, MONITOR.name, function (err) {
         test.ifError(err);
         setTimeout(function () {
-            amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err) {
-                test.equal(err.statusCode, 404);
+            amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err2) {
+                test.equal(err2.statusCode, 404);
                 test.done();
             });
         }, 3000);

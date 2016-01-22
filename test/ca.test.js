@@ -52,9 +52,9 @@ exports.test_list_schema = function (test) {
 
 
 exports.test_create_instrumentation_bad_params = function (test) {
-    ca.createInstrumentation(customer, {}, function (err, instrumentation) {
+    ca.createInstrumentation(customer, {}, function (err, inst) {
         test.ok(err);
-        test.ok(!instrumentation);
+        test.ok(!inst);
         test.equal(err.statusCode, 409);
         test.equal(err.restCode, 'InvalidArgument');
         test.ok(err.message);
@@ -70,10 +70,13 @@ exports.test_create_instrumentation = function (test) {
         decomposition: 'latency'
     };
     ca.createInstrumentation(customer, params, function (err, inst) {
-        test.ifError(err);
+        var uri;
+        test.ifError(err, err);
         test.ok(inst);
-        var uri = inst.uri;
-        instrumentation = uri.substr(uri.lastIndexOf('/') + 1);
+        if (inst) {
+            uri = inst.uri;
+            instrumentation = uri.substr(uri.lastIndexOf('/') + 1);
+        }
         test.done();
     });
 };
@@ -103,9 +106,9 @@ exports.test_list_instrumentations_bogus_customer = function (test) {
 
 
 exports.test_get_instrumentation_bad = function (test) {
-    ca.getInstrumentation(customer, uuid(), function (err, instrumentation) {
+    ca.getInstrumentation(customer, uuid(), function (err, inst) {
         test.ok(err);
-        test.ok(!instrumentation);
+        test.ok(!inst);
         test.equal(err.statusCode, 404);
         test.equal(err.restCode, 'ResourceNotFound');
         test.ok(err.message);
@@ -174,8 +177,8 @@ exports.test_delete_instrumentation_bad = function (test) {
 exports.test_clone_instrumentation = function (test) {
     ca.cloneInstrumentation(customer, instrumentation, function (err, inst) {
         test.ifError(err);
-        ca.deleteInstrumentation(customer, inst.id, function (err) {
-            test.ifError(err);
+        ca.deleteInstrumentation(customer, inst.id, function (err2) {
+            test.ifError(err2);
             test.done();
         });
     });

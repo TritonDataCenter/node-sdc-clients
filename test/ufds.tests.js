@@ -101,8 +101,8 @@ exports.testGetUser = function (test) {
 
     ufds.add(DN, entry, function (err) {
         test.ifError(err);
-        ufds.getUser(LOGIN, function (err, user) {
-            test.ifError(err);
+        ufds.getUser(LOGIN, function (err2, user) {
+            test.ifError(err2);
             test.equal(user.login, LOGIN);
             // Testing no hidden attributes are available:
             test.ok(!user._owner);
@@ -146,8 +146,8 @@ exports.testAuthenticate = function (test) {
     ufds.authenticate(LOGIN, PWD, function (err, user) {
         test.ifError(err);
         test.ok(user);
-        ufds.getUser(LOGIN, function (err, user2) {
-            test.ifError(err);
+        ufds.getUser(LOGIN, function (err2, user2) {
+            test.ifError(err2);
             test.equal(user.login, user2.login);
             test.done();
         });
@@ -160,8 +160,8 @@ exports.testAuthenticateByUuid = function (test) {
         test.ifError(err);
         test.ok(user);
         test.equal(user.login, LOGIN);
-        user.authenticate(PWD, function (err) {
-            test.ifError(err);
+        user.authenticate(PWD, function (err2) {
+            test.ifError(err2);
             test.done();
         });
     });
@@ -171,8 +171,8 @@ exports.testAuthenticateByUuid = function (test) {
 exports.test_add_key = function (test) {
     ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
-        user.addKey(SSH_KEY, function (err, key) {
-            test.ifError(err, err);
+        user.addKey(SSH_KEY, function (err2, key) {
+            test.ifError(err2, err2);
             test.ok(key, 'have key: ' + key);
             if (key) {
                 test.equal(key.openssh, SSH_KEY);
@@ -186,8 +186,8 @@ exports.test_add_key = function (test) {
 exports.test_add_duplicated_key_not_allowed = function (test) {
     ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err, 'getUser error');
-        user.addKey(SSH_KEY, function (err, key) {
-            test.ok(err, 'add duplicated key error');
+        user.addKey(SSH_KEY, function (err2, key) {
+            test.ok(err2, 'add duplicated key error');
             test.done();
         });
     });
@@ -197,13 +197,13 @@ exports.test_add_duplicated_key_not_allowed = function (test) {
 exports.testListAndGetKeys = function (test) {
     ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
-        user.listKeys(function (err, keys) {
-            test.ifError(err);
+        user.listKeys(function (err2, keys) {
+            test.ifError(err2);
             test.ok(keys);
             test.ok(keys.length);
             test.equal(keys[0].openssh, SSH_KEY);
-            user.getKey(keys[0].fingerprint, function (err, key) {
-                test.ifError(err);
+            user.getKey(keys[0].fingerprint, function (err3, key) {
+                test.ifError(err3);
                 test.ok(key);
                 test.deepEqual(keys[0], key);
                 test.done();
@@ -219,8 +219,8 @@ exports.test_add_key_by_name = function (test) {
         user.addKey({
             openssh: SSH_KEY_TWO,
             name: 'id_rsa'
-        }, function (err, key) {
-            test.ifError(err);
+        }, function (err2, key) {
+            test.ifError(err2);
             test.ok(key);
             test.equal(key.openssh, SSH_KEY_TWO);
             test.done();
@@ -235,8 +235,8 @@ exports.test_add_duplicated_key_by_name = function (test) {
         user.addKey({
             openssh: SSH_KEY_THREE,
             name: 'id_rsa'
-        }, function (err, key) {
-            test.ok(err, 'add duplicated key error');
+        }, function (err2, key) {
+            test.ok(err2, 'add duplicated key error');
             test.done();
         });
     });
@@ -246,12 +246,12 @@ exports.test_add_duplicated_key_by_name = function (test) {
 exports.testDelKey = function (test) {
     ufds.getUser(LOGIN, function (err, user) {
         test.ifError(err);
-        user.listKeys(function (err, keys) {
-            test.ifError(err);
-            user.deleteKey(keys[0], function (err) {
-                test.ifError(err);
-                user.deleteKey(keys[1], function (err) {
-                    test.ifError(err);
+        user.listKeys(function (err2, keys) {
+            test.ifError(err2);
+            user.deleteKey(keys[0], function (err3) {
+                test.ifError(err3);
+                user.deleteKey(keys[1], function (err4) {
+                    test.ifError(err4);
                     test.done();
                 });
             });
@@ -304,8 +304,8 @@ exports.testCrudUser = function (test) {
         ufds.updateUser(user, {
             phone: '+1 (206) 555-1212',
             pwdaccountlockedtime: Date.now() + (3600 * 1000)
-        }, function (err) {
-            test.ifError(err);
+        }, function (err2) {
+            test.ifError(err2);
             user.authenticate(entry.userpassword, function (er) {
                 test.ok(er);
                 test.equal(er.statusCode, 401);
@@ -313,8 +313,8 @@ exports.testCrudUser = function (test) {
                     test.ifError(e);
                     user.authenticate(entry.userpassword, function (er2) {
                         test.ifError(er2);
-                        user.destroy(function (err) {
-                            test.ifError(err);
+                        user.destroy(function (err3) {
+                            test.ifError(err3);
                             test.done();
                         });
                     });
@@ -331,25 +331,26 @@ exports.testCrudLimit = function (test) {
         test.ok(user);
         user.addLimit(
           {datacenter: 'coal', smartos: '123'},
-          function (err, limit) {
-            test.ifError(err);
-            test.ok(limit);
-            test.ok(limit.smartos);
-            user.listLimits(function (err, limits) {
-                test.ifError(err);
+          function (err2, limit2) {
+            test.ifError(err2);
+            test.ok(limit2);
+            test.ok(limit2.smartos);
+            user.listLimits(function (err3, limits) {
+                test.ifError(err3);
                 test.ok(limits);
                 test.ok(limits.length);
                 test.ok(limits[0].smartos);
                 limits[0].nodejs = 234;
-                user.updateLimit(limits[0], function (err) {
-                    test.ifError(err);
-                    user.getLimit(limits[0].datacenter, function (err, limit) {
-                        test.ifError(err);
-                        test.ok(limit);
-                        test.ok(limit.smartos);
-                        test.ok(limit.nodejs);
-                        user.deleteLimit(limit, function (err) {
-                            test.ifError(err);
+                user.updateLimit(limits[0], function (err4) {
+                    test.ifError(err4);
+                    user.getLimit(limits[0].datacenter,
+                            function (err5, limit5) {
+                        test.ifError(err5);
+                        test.ok(limit5);
+                        test.ok(limit5.smartos);
+                        test.ok(limit5.nodejs);
+                        user.deleteLimit(limit5, function (err6) {
+                            test.ifError(err6);
                             test.done();
                         });
                     });
@@ -424,8 +425,8 @@ exports.test_add_sub_user_to_account = function (test) {
 exports.test_subuser_key = function (test) {
     ufds.getUser(SUB_LOGIN, ID, function (err, user) {
         test.ifError(err);
-        user.addKey(SSH_KEY, function (err, key) {
-            test.ifError(err, err);
+        user.addKey(SSH_KEY, function (err2, key) {
+            test.ifError(err2, err2);
             test.ok(key, 'have key: ' + key);
             if (key) {
                 test.equal(key.openssh, SSH_KEY);
@@ -440,8 +441,8 @@ exports.test_subuser_key = function (test) {
                     test.ifError(er3);
                     test.ok(key2);
                     test.deepEqual(keys[0], key2);
-                    user.deleteKey(keys[0], function (err) {
-                        test.ifError(err);
+                    user.deleteKey(keys[0], function (err3) {
+                        test.ifError(err3);
                         test.done();
                     });
                 });
@@ -499,25 +500,25 @@ exports.test_sub_users_limits = function (test) {
         test.ok(user);
         user.addLimit(
           {datacenter: 'coal', smartos: '123'},
-          function (err, limit) {
-            test.ifError(err);
+          function (err2, limit) {
+            test.ifError(err2);
             test.ok(limit);
             test.ok(limit.smartos);
-            ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
-                test.ifError(err, 'sub user limits getUser error');
+            ufds.getUser(SUB_LOGIN, ID, function (err3, subuser) {
+                test.ifError(err3, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
-                subuser.listLimits(function (err, limits) {
-                    test.ifError(err);
+                subuser.listLimits(function (err4, limits) {
+                    test.ifError(err4);
                     test.ok(limits);
                     test.ok(limits.length);
                     test.ok(limits[0].smartos);
                     subuser.getLimit(limits[0].datacenter,
-                        function (err, limit) {
-                        test.ifError(err);
-                        test.ok(limit);
-                        test.ok(limit.smartos);
-                        user.deleteLimit(limit, function (err) {
-                            test.ifError(err);
+                            function (err5, limit5) {
+                        test.ifError(err5);
+                        test.ok(limit5);
+                        test.ok(limit5.smartos);
+                        user.deleteLimit(limit5, function (err6) {
+                            test.ifError(err6);
                             test.done();
                         });
                     });
@@ -545,33 +546,31 @@ exports.test_sub_users_crud = function (test) {
     ufds.addUser(entry, function (err, user) {
         test.ifError(err);
         test.equal(user.login, login);
-        ufds.getUserByEmail(entry.email, entry.account,
-            function (err2, user2) {
-                test.ifError(err2);
-                test.equal(user2.login, login);
+        ufds.getUserByEmail(entry.email, entry.account, function (err2, user2) {
+            test.ifError(err2);
+            test.equal(user2.login, login);
 
-                ufds.updateUser(user.uuid, {
-                    phone: '+1 (206) 555-1212',
-                    pwdaccountlockedtime: Date.now() + (3600 * 1000)
-                }, user.account, function (err) {
-                    test.ifError(err);
-                    user.authenticate(entry.userpassword, function (er) {
-                        test.ok(er);
-                        test.equal(er.statusCode, 401);
-                        user.unlock(function (e) {
-                            test.ifError(e);
-                            user.authenticate(entry.userpassword,
-                                function (er2) {
-                                test.ifError(er2);
-                                user.destroy(function (er3) {
-                                    test.ifError(er3);
-                                    test.done();
-                                });
+            ufds.updateUser(user.uuid, {
+                phone: '+1 (206) 555-1212',
+                pwdaccountlockedtime: Date.now() + (3600 * 1000)
+            }, user.account, function (err3) {
+                test.ifError(err3);
+                user.authenticate(entry.userpassword, function (err4) {
+                    test.ok(err4);
+                    test.equal(err4.statusCode, 401);
+                    user.unlock(function (err5) {
+                        test.ifError(err5);
+                        user.authenticate(entry.userpassword,
+                                function (err6) {
+                            test.ifError(err6);
+                            user.destroy(function (err7) {
+                                test.ifError(err7);
+                                test.done();
                             });
                         });
                     });
                 });
-
+            });
         });
     });
 };
@@ -592,8 +591,8 @@ exports.test_account_policies = function (test) {
         test.equal(policy.dn, util.format(
                 'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 policy_uuid, ID));
-        ufds.listPolicies(ID, function (err, policies) {
-            test.ifError(err, 'listPolicies error');
+        ufds.listPolicies(ID, function (err2, policies) {
+            test.ifError(err2, 'listPolicies error');
             test.ok(Array.isArray(policies), 'Array of policies');
             test.equal(policies[0].dn, util.format(
                 'policy-uuid=%s, uuid=%s, ou=users, o=smartdc',
@@ -603,13 +602,11 @@ exports.test_account_policies = function (test) {
                 'examples and sourceip = 10.0.0.0/8',
                 'John, Jack and Jane can ops_* *'
             ];
-            ufds.modifyPolicy(ID, entry.uuid, entry,
-                function (err, policy) {
-                test.ifError(err, 'modify policy error');
-                test.equal(policy.rule.length, 2);
-                ufds.deletePolicy(ID, entry.uuid,
-                    function (err) {
-                    test.ifError(err, 'deletePolicy error');
+            ufds.modifyPolicy(ID, entry.uuid, entry, function (err3, policy3) {
+                test.ifError(err3, 'modify policy error');
+                test.equal(policy3.rule.length, 2);
+                ufds.deletePolicy(ID, entry.uuid, function (err4) {
+                    test.ifError(err4, 'deletePolicy error');
                     test.done();
                 });
             });
@@ -636,30 +633,29 @@ exports.test_account_roles = function (test) {
         test.equal(role.dn, util.format(
                 'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 role_uuid, ID));
-        ufds.listRoles(ID, function (err, roles) {
-            test.ifError(err, 'listRoles error');
+        ufds.listRoles(ID, function (err2, roles) {
+            test.ifError(err2, 'listRoles error');
             test.ok(Array.isArray(roles), 'Array of roles');
             test.equal(roles[0].dn, util.format(
                 'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 role_uuid, ID));
-            ufds.getUser(SUB_LOGIN, ID, function (err, subuser) {
-                test.ifError(err, 'sub user limits getUser error');
+            ufds.getUser(SUB_LOGIN, ID, function (err3, subuser) {
+                test.ifError(err3, 'sub user limits getUser error');
                 test.ok(subuser, 'subuser');
-                subuser.roles(function (err, rls) {
-                    test.ifError(err, 'sub user roles');
+                subuser.roles(function (err4, rls) {
+                    test.ifError(err4, 'sub user roles');
                     test.ok(Array.isArray(rls), 'user roles is an array');
-                    subuser.defaultRoles(function (err, drls) {
-                        test.ifError(err, 'sub user default roles');
+                    subuser.defaultRoles(function (err5, drls) {
+                        test.ifError(err5, 'sub user default roles');
                         test.ok(Array.isArray(drls),
                             'sub user default roles is an array');
                         entry.description = 'This is completely optional';
                         ufds.modifyRole(ID, entry.uuid, entry,
-                            function (err, role) {
-                            test.ifError(err, 'modify role error');
-                            test.ok(role.description);
-                            ufds.deleteRole(ID, entry.uuid,
-                                function (err) {
-                                test.ifError(err, 'deleteRole error');
+                                function (err6, role6) {
+                            test.ifError(err6, 'modify role error');
+                            test.ok(role6.description);
+                            ufds.deleteRole(ID, entry.uuid, function (err7) {
+                                test.ifError(err7, 'deleteRole error');
                                 test.done();
                             });
                         });
@@ -740,8 +736,8 @@ exports.test_account_resources = function (test) {
         test.equal(resource.dn, util.format(
                 'resource-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 res_uuid, ID));
-        ufds.listResources(ID, function (err, resources) {
-            test.ifError(err, 'listResources error');
+        ufds.listResources(ID, function (err2, resources) {
+            test.ifError(err2, 'listResources error');
             test.ok(Array.isArray(resources), 'Array of resources');
             test.equal(resources[0].dn, util.format(
                 'resource-uuid=%s, uuid=%s, ou=users, o=smartdc',
@@ -750,12 +746,11 @@ exports.test_account_resources = function (test) {
                 'role-uuid=%s, uuid=%s, ou=users, o=smartdc',
                 uuid(), ID));
             ufds.modifyResource(ID, entry.uuid, entry,
-                function (err, resource) {
-                test.ifError(err, 'modify resource error');
-                test.equal(resource.memberrole.length, 2);
-                ufds.deleteResource(ID, entry.uuid,
-                    function (err) {
-                    test.ifError(err, 'deleteResource error');
+                    function (err3, resource3) {
+                test.ifError(err3, 'modify resource error');
+                test.equal(resource3.memberrole.length, 2);
+                ufds.deleteResource(ID, entry.uuid, function (err4) {
+                    test.ifError(err4, 'deleteResource error');
                     test.done();
                 });
             });

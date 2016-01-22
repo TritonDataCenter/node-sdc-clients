@@ -286,8 +286,8 @@ exports.test_list_networks = function (test) {
         test.ok(nets1);
         ADMIN_NETWORK = nets1[0].uuid;
 
-        napi.listNetworks({ name: 'external' }, function (err, nets2) {
-            test.ifError(err);
+        napi.listNetworks({ name: 'external' }, function (err2, nets2) {
+            test.ifError(err2);
             test.ok(nets1);
             EXTERNAL_NETWORK = nets1[0].uuid;
             test.done();
