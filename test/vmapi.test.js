@@ -403,7 +403,8 @@ exports.test_create_zone = function (test) {
         server_uuid: HEADNODE.uuid,
         origin: 'sdc-clients-test',
         owner_uuid: CUSTOMER,
-        context: CONTEXT
+        context: CONTEXT,
+        alias: 'node-sdc-clients-vmapi-test-zone'
     };
 
     vmapi.createVm(opts, function (err, job) {
@@ -454,11 +455,14 @@ exports.test_get_new_vm = function (test) {
 };
 
 
+var NEW_ALIAS = 'node-sdc-clients-vmapi-test-zone-newname';
 exports.test_update_zone = function (test) {
     var UPDATE_QUERY = {
         uuid: ZONE,
         owner_uuid: CUSTOMER,
-        payload: { alias: 'foobar' },
+        payload: {
+            alias: NEW_ALIAS
+        },
         origin: 'sdc-clients-test',
         owner_uuid: CUSTOMER,
         context: CONTEXT
@@ -483,7 +487,7 @@ exports.test_wait_for_updated_job = function (test) {
 
 
 exports.test_wait_for_updated = function (test) {
-    waitForValue(vmapi.getVm, QUERY, 'alias', 'foobar', function (err) {
+    waitForValue(vmapi.getVm, QUERY, 'alias', NEW_ALIAS, function (err) {
         test.ifError(err);
         test.done();
     });
