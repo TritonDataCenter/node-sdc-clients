@@ -713,3 +713,75 @@ Returns a job with the specified UUID.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | uuid | UUID | Job UUID |
+
+# CNS Client
+
+For descriptions of return types of these functions, see the CNS REST API documentation (in the CNS repository).
+
+## ping([options, ]callback)
+
+Pings the CNS REST server
+
+| Name     | Type     | Description    |
+| -------- | -------- | -------------- |
+| callback | Function | fn(error) |
+
+## getVM(uuid[, options], callback)
+
+Retrieves the information that CNS has recorded about a given SDC VM,
+including the DNS records associated with it (both instance and service
+records)
+
+| Name     | Type     | Description    |
+| -------- | -------- | -------------- |
+| uuid     | UUID     | VM UUID        |
+| callback | Function | fn(error, obj) |
+
+## listPeers([options, ]callback)
+
+Lists all the peers of the CNS server (secondary nameservers that have
+used zone transfers to replicate its contents)
+
+| Name     | Type     | Description     |
+| -------- | -------- | --------------- |
+| callback | Function | fn(error, objs) |
+
+## getPeer(address[, options], callback)
+
+Gets detailed information (beyond the information included in ListPeers)
+about a particular peer.
+
+| Name     | Type     | Description        |
+| -------- | -------- | ------------------ |
+| address  | String   | IP address of peer |
+| callback | Function | fn(error, obj)     |
+
+## deletePeer(address[, options], callback)
+
+Deletes a peer from CNS, causing all state about the peer (including
+knowledge about its latest sync'd serial numbers, whether it supports
+NOTIFY etc) to be forgotten.
+
+| Name     | Type     | Description        |
+| -------- | -------- | ------------------ |
+| address  | String   | IP address of peer |
+| callback | Function | fn(error)          |
+
+## listZones([options, ]callback)
+
+Lists all zones served by the CNS server and their latest generated
+serial numbers.
+
+| Name     | Type     | Description     |
+| -------- | -------- | --------------- |
+| callback | Function | fn(error, objs) |
+
+## listAllowedPeers([options, ]callback)
+
+Lists the current contents of the peer ACL. Addresses that match an entry
+in this ACL will be allowed to perform a zone transfer and become a new
+peer.
+
+| Name     | Type     | Description     |
+| -------- | -------- | --------------- |
+| callback | Function | fn(error, objs) |

@@ -5,13 +5,14 @@
 -->
 
 <!--
-    Copyright (c) 2014, Joyent, Inc.
+    Copyright (c) 2016, Joyent, Inc.
 -->
 
 # sdc-clients Changelog
 
-## sdc-clients 9.1.0 (not yet released)
+## sdc-clients 9.1.0
 
+- PUBAPI-1225: add client for Triton CNS
 - ZAPI-655: add test for paginating listVms
 - DOCKER-74: add docker build support
 
