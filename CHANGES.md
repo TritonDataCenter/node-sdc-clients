@@ -10,6 +10,36 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 9.1.0 (not yet released)
+
+- ZAPI-655: add test for paginating listVms
+- DOCKER-74: add docker build support
+
+## sdc-clients 9.0.3
+
+- TOOLS-1009: update libuuid to 0.1.4
+
+## sdc-clients 9.0.2
+
+- PUBAPI-1163: tools using sshpk should lock in an exact version
+- TOOLS-1079: CNAPI#refreshSysinfoAndWait
+- DOCKER-587: support docker v2 pull *by digest*
+
+## sdc-clients 9.0.1
+
+- Published to npm
+
+## sdc-clients 9.0.0
+
+- PUBAPI-1146: divorce between *_KEY_ID env vars and keyId actually sent
+  to server, this affects the imgapi clients
+
+## sdc-clients 8.1.5
+
+- CNAPI-568: new waitTask, pollTask methods
+- PUBAPI-1068: fabric networks support
+- ZAPI-608: addition of vmapi.createVmAndWait function
+
 ## sdc-clients 8.1.4
 
 - TOOLS-913: sdc-clients' imgapi.js ListImages?marker=$MARKER drops first hit even if it isn't that $MARKER image
