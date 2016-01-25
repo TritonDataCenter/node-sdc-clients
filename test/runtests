@@ -109,6 +109,7 @@ export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
 export DSAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
 export PAPI_IP=$(bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1)
 export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
+export MORAY_IP=$(sdcadm insts moray -j | json 0.ip)
 
 echo ""
 echo "# Datacenter config:"
@@ -122,6 +123,7 @@ echo "#     DSAPI_URL is $DSAPI_URL"
 echo "#     UFDS_ADMIN_UUID is $UFDS_ADMIN_UUID"
 echo "#     PAPI_IP is $PAPI_IP"
 echo "#     CNS_IP is $CNS_IP"
+echo "#     MORAY_IP is $MORAY_IP"
 
 
 echo ""
