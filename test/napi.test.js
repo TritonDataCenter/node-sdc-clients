@@ -76,8 +76,9 @@ exports.setUp = function (callback) {
 
 exports.test_list_networks = function (test) {
     napi.listNetworks({}, function (err, networks) {
-        test.ifError(err);
-        test.ok(networks);
+        test.ifError(err, 'listNetworks does not error');
+        test.ok(networks, 'listNetworks returns results');
+        test.ok(networks.length > 0, 'listNetworks non-empty');
         NETWORKS = networks;
         NETWORKS.forEach(function (net) {
             test.ok(net.name, 'NAPI GET /networks name OK');
@@ -93,23 +94,29 @@ exports.test_list_networks = function (test) {
 
 
 exports.test_get_network = function (test) {
-    napi.getNetwork(NETWORKS[0].uuid, function (err, network) {
-        test.ifError(err);
-        test.ok(network);
-        test.equal(network.uuid, NETWORKS[0].uuid);
+    napi.getNetwork(ADMIN.uuid, function (err, network) {
+        test.ifError(err, 'getNetwork does not error');
+        test.ok(network, 'getNetwork returns a result');
+        test.ok(network.uuid, 'result has a uuid');
+        if (network.uuid) {
+            test.strictEqual(network.uuid, ADMIN.uuid);
+        }
         test.done();
     });
 };
 
 
-// should fail since network doesn't belong to given owner
+// should fail since admin network doesn't belong to given owner
 exports.test_get_network_with_params = function (test) {
     var params = { provisionable_by: uuid() };
 
-    napi.getNetwork(NETWORKS[0].uuid, { params: params },
+    napi.getNetwork(ADMIN.uuid, { params: params },
                     function (err, network) {
-        test.ok(err);
-        test.equal(err.message, 'owner cannot provision on network');
+        test.ok(err, 'getNetwork errs with bad provisionable_by');
+        if (err) {
+            test.equal(err.message, 'owner cannot provision on network',
+                'err message as expected');
+        }
         test.done();
     });
 };
