@@ -10,7 +10,6 @@
 
 var Logger = require('bunyan'),
     restify = require('restify'),
-    util = require('util'),
     NAPI = require('../lib/index').NAPI;
 
 var libuuid = require('libuuid');
@@ -97,7 +96,7 @@ exports.test_get_network = function (test) {
     napi.getNetwork(ADMIN.uuid, function (err, network) {
         test.ifError(err, 'getNetwork does not error');
         test.ok(network, 'getNetwork returns a result');
-        test.ok(network.uuid, 'result has a uuid');
+        test.ok(network.uuid, 'getNetwork result lacks a uuid');
         if (network.uuid) {
             test.strictEqual(network.uuid, ADMIN.uuid);
         }
@@ -112,9 +111,9 @@ exports.test_get_network_with_params = function (test) {
 
     napi.getNetwork(ADMIN.uuid, { params: params },
                     function (err, network) {
-        test.ok(err, 'getNetwork errs with bad provisionable_by');
+        test.ok(err, 'getNetwork should err with invalid provisionable_by');
         if (err) {
-            test.equal(err.message, 'owner cannot provision on network',
+            test.strictEqual(err.message, 'owner cannot provision on network',
                 'err message as expected');
         }
         test.done();
@@ -122,73 +121,81 @@ exports.test_get_network_with_params = function (test) {
 };
 
 
-exports.test_ping = function (t) {
+exports.test_ping = function (test) {
     napi.ping(function (err) {
-        t.ifError(err);
-        t.done();
+        test.ifError(err);
+        test.done();
     });
 };
 
 
-exports.test_list_network_ips = function (t) {
+exports.test_list_network_ips = function (test) {
     napi.listIPs(ADMIN.uuid, {}, function (err, ips) {
-        t.ifError(err);
-        t.ok(ips);
-        t.ok(util.isArray(ips));
-        IP = ips[0];
-        t.ok(IP.ip);
-        t.ok(IP.owner_uuid);
-        t.ok(IP.belongs_to_uuid);
-        t.ok(IP.belongs_to_type);
-        t.done();
+        test.ifError(err);
+        test.ok(ips);
+        test.ok(Array.isArray(ips));
+        test.ok(ips.length > 0);
+        if (ips.length > 0) {
+            IP = ips[0];
+            test.ok(IP.ip);
+            test.ok(IP.owner_uuid);
+            test.ok(IP.belongs_to_uuid);
+            test.ok(IP.belongs_to_type);
+        }
+        test.done();
     });
 };
 
 
-exports.test_get_ip = function (t) {
+exports.test_get_ip = function (test) {
     napi.getIP(ADMIN.uuid, IP.ip, function (err, ip) {
-        t.ifError(err);
-        t.ok(ip);
-        t.deepEqual(IP, ip);
-        t.done();
+        test.ifError(err);
+        test.ok(ip);
+        test.deepEqual(IP, ip);
+        test.done();
     });
 };
 
 
-exports.test_list_nics = function (t) {
+exports.test_list_nics = function (test) {
     napi.listNics({}, function (err, nics) {
-        t.ifError(err);
-        t.ok(nics);
-        t.ok(util.isArray(nics));
-        var aNic = nics[0];
-        t.ok(aNic.owner_uuid);
-        t.ok(aNic.belongs_to_uuid);
-        t.ok(aNic.belongs_to_type);
-        t.done();
+        test.ifError(err);
+        test.ok(nics);
+        test.ok(Array.isArray(nics));
+        test.ok(nics.length > 0);
+        if (nics.length > 0) {
+            var aNic = nics[0];
+            test.ok(aNic.owner_uuid);
+            test.ok(aNic.belongs_to_uuid);
+            test.ok(aNic.belongs_to_type);
+        }
+        test.done();
     });
 };
 
 
-exports.test_provision_nic = function (t) {
+exports.test_provision_nic = function (test) {
     NIC_UUID = uuid();
     napi.provisionNic(ADMIN.uuid, {
         owner_uuid: process.env.UFDS_ADMIN_UUID,
         belongs_to_uuid: NIC_UUID,
         belongs_to_type: 'zone'
     }, function (err, nic) {
-        t.ifError(err);
-        t.ok(nic);
-        t.ok(nic.mac);
-        MAC_1 = nic.mac;
-        t.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
-        t.equal(nic.belongs_to_uuid, NIC_UUID);
-        t.equal(nic.belongs_to_type, 'zone');
-        t.done();
+        test.ifError(err);
+        test.ok(nic);
+        if (nic) {
+            test.ok(nic.mac);
+            MAC_1 = nic.mac;
+            test.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
+            test.equal(nic.belongs_to_uuid, NIC_UUID);
+            test.equal(nic.belongs_to_type, 'zone');
+        }
+        test.done();
     });
 };
 
 
-exports.test_create_nic = function (t) {
+exports.test_create_nic = function (test) {
     var sUUID = uuid(),
         mac = pseudoRandomMac();
     napi.createNic(mac, {
@@ -196,61 +203,64 @@ exports.test_create_nic = function (t) {
         belongs_to_uuid: sUUID,
         belongs_to_type: 'server'
     }, function (err, nic) {
-        t.ifError(err);
-        t.ok(nic);
-        t.ok(nic.mac);
-        MAC_2 = nic.mac;
-        t.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
-        t.equal(nic.belongs_to_uuid, sUUID);
-        t.equal(nic.belongs_to_type, 'server');
-        t.done();
+        test.ifError(err);
+        test.ok(nic);
+        if (nic) {
+            test.ok(nic.mac);
+            MAC_2 = nic.mac;
+            test.equal(nic.owner_uuid, process.env.UFDS_ADMIN_UUID);
+            test.equal(nic.belongs_to_uuid, sUUID);
+            test.equal(nic.belongs_to_type, 'server');
+        }
+        test.done();
     });
 };
 
 
-exports.test_get_nic = function (t) {
+exports.test_get_nic = function (test) {
     napi.getNic(MAC_1, function (err, nic) {
-        t.ifError(err);
-        t.ok(nic);
-        t.done();
+        test.ifError(err);
+        test.ok(nic);
+        test.done();
     });
 };
 
 
-exports.test_update_nic = function (t) {
+exports.test_update_nic = function (test) {
     napi.updateNic(MAC_2, {
         belongs_to_uuid: NIC_UUID,
         belongs_to_type: 'zone'
     }, function (err, nic) {
-        t.ifError(err);
-        t.ok(nic);
-        t.done();
+        test.ifError(err);
+        test.ok(nic);
+        test.done();
     });
 };
 
 
-exports.test_get_nics_by_owner = function (t) {
+exports.test_get_nics_by_owner = function (test) {
     napi.getNics(NIC_UUID, function (err, nics) {
-        t.ifError(err);
-        t.ok(nics);
-        t.ok(util.isArray(nics));
-        t.done();
+        test.ifError(err);
+        test.ok(nics);
+        test.ok(Array.isArray(nics));
+        test.ok(nics.length > 0);
+        test.done();
     });
 };
 
 
-exports.test_delete_nic = function (t) {
+exports.test_delete_nic = function (test) {
     napi.deleteNic(MAC_1, function (err, nic) {
-        t.ifError(err);
-        t.done();
+        test.ifError(err);
+        test.done();
     });
 };
 
 
-exports.test_delete_nic_2 = function (t) {
+exports.test_delete_nic_2 = function (test) {
     napi.deleteNic(MAC_2, function (err, nic) {
-        t.ifError(err);
-        t.done();
+        test.ifError(err);
+        test.done();
     });
 };
 
