@@ -10,6 +10,10 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 9.1.1
+
+- TOOLS-1327, ZAPI-722, TOOLS-1328: fixes to tests
+
 ## sdc-clients 9.1.0
 
 - PUBAPI-1225: add client for Triton CNS
