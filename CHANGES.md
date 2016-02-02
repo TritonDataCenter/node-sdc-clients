@@ -10,6 +10,11 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 9.2.0
+
+- CAPI-515: update node-ufds dependency, this pulls in fixes for CAPI-513 and others,
+  as well as a lot of general cleanup work
+
 ## sdc-clients 9.1.1
 
 - TOOLS-1327, ZAPI-722, TOOLS-1328: fixes to tests
