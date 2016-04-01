@@ -338,3 +338,307 @@ peer.
 | Name     | Type     | Description     |
 | -------- | -------- | --------------- |
 | callback | Function | fn(error, objs) |
+
+# VOLAPI Client
+
+VOLAPI is the Volumes API. More documentation about this API can be found in
+[its code repository](https://github.com/joyent/sdc-volapi) and in [RFD
+26](https://github.com/joyent/rfd/blob/master/rfd/0026).
+
+## listVolumes(params, callback)
+
+List all volumes given the specified filter params. Currently the following
+parameters are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| owner\_uuid | UUID | Volume owner account |
+| name | String | volume name, unique per owner |
+| type | String | volume type ('tritonnfs' is currently the only supported type) |
+| size | String | volume size  |
+| state| String | volume state |
+| predicate | String | URL encoded JSON string representing a JavaScript object that can be used to build a LDAP filter. This LDAP filter can search for volumes on arbitrary (indexed) properties |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volumes) |
+
+## createVolume(params, options, callback)
+
+Creates a new volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume. If not present, it is automatically generated |
+| name | String | Name of the volume |
+| owner_uuid | UUID | UUID the created volume's owner |
+| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+| networks | Array | An array of network UUIDs representing networks on which this volume will be reachable |
+| size | Number | The desired storage capacity for that volume in mebibytes. Default value is 10240 mebibytes (10 gibibytes) |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
+
+## createVolumeAndWait(params, options, callback)
+
+Similar to `createVolume`, but waits for the volume to not be in state
+`creating` (not necessarily in state `ready`) before calling `callback`.
+
+If the volume transitions to state `ready`, `callback` is called with no error as its first parameter. If the volume transitions to the state `failed`, `callback` is called with an error as its first parameter.
+
+The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume. If not present, it is automatically generated |
+| name | String | Name of the volume |
+| owner_uuid | UUID | UUID the created volume's owner |
+| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+| networks | Array | An array of network UUIDs representing networks on which this volume will be reachable |
+| size | Number | The desired storage capacity for that volume in mebibytes. Default value is 10240 mebibytes (10 gibibytes) |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+| timeout | Number | the delay in miliseconds after which `callback` is called with an error as its first parameters regardless of the state of the volume |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
+
+## getVolume(params, options, callback)
+
+Gets information about an existing volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
+
+## deleteVolume(params, options, callback)
+
+Deletes an existing volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume to delete |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+| force | Boolean | `true` means that a volume will be deleted even if active VMs reference it. Default is `false`. |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## deleteVolumeAndWait(params, options, callback)
+
+Similar to `deleteVolume`, but waits for the volume to not be in state
+`deleting` (not necessarily deleted) before calling `callback`.
+
+If the volume cannot be found, `callback` is called with no error as its first parameter. If the volume transitions to the state `failed` or `ready`, `callback` is called with an error as its first parameter.
+
+The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume to delete |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+| force | Boolean | `true` means that a volume will be deleted even if active VMs reference it. Default is `false`. |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+| timeout | Number | the delay in miliseconds after which `callback` is called with an error as its first parameters regardless of the state of the volume |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## updateVolume(params, options, callback)
+
+Updates a volume, currently only allows to change a volume's `name` property.
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume to delete |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+| name | String | The new name of the volume with uuid `uuid` |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## createVolumeReservation(params, options, callback)
+
+Reserves a volume. For more information on volume reservations, please refer to
+[the relevant section of RFD
+26](https://github.com/joyent/rfd/blob/master/rfd/0026/README.md#volume-reservations).
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| volume_name | String | Name of the volume to reserve |
+| owner_uuid | UUID | The owner UUID for the volume to reserve |
+| job_uuid | UUUD | UUID of the job making the volume reservation |
+| vm_uuid | UUUD | UUID of the VM that will mount the reserved volume when it's available |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## deleteVolumeReservation(params, options, callback)
+
+Removes a volume reservation. If `callback` is called without an error object as
+its first (and only) parameter, the volume associated with the volume reservation is no longer reserved.
+
+For more information on volume reservations, please refer to [the relevant
+section of RFD
+26](https://github.com/joyent/rfd/blob/master/rfd/0026/README.md#volume-reservations).
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | UUID | The UUID of the volume reservation to remove |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## addVolumeReference(params, options, callback)
+
+Adds a reference from a VM to a volume.
+
+For more information about volume references, please refer to [the relevant
+section of RFD 26](https://github.com/joyent/rfd/blob/master/rfd/0026/README.md#deletion-and-usage-semantics).
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| volume_uuid | UUID | The UUID of the volume to which the reference should be added |
+| vm_uuid | UUID | The UUID of the VM from which the reference should be added |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## removeVolumeReference(params, options, callback)
+
+Removes a reference from a VM to a volume.
+
+For more information about volume references, please refer to [the relevant
+section of RFD 26](https://github.com/joyent/rfd/blob/master/rfd/0026/README.md#deletion-and-usage-semantics).
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| volume_uuid | UUID | The UUID of the volume to which the reference should be removed |
+| vm_uuid | UUID | The UUID of the VM from which the reference should be removed |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
+## listVolumeSizes(parans, options, callback)
+
+List the sizes available when creating new volumes
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| type | String | The volume type (e.g `tritonnfs`) for which to list available sizes. Default value is `tritonnfs`|
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volumeSizes) |

@@ -123,6 +123,10 @@ if [[ -n "$opt_headnode" ]]; then
     export PAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1')
     export CNS_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts cns -j | json 0.ip')
     export MORAY_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts moray -j | json 0.ip')
+    # sdcadm insts instance-name doesn't exit with an exit code != 0 if a zone
+    # with name "instance-name is not present, so this is safe even if VOLAPI is
+    # not setup on the DC where the tests run.
+    export VOLAPI_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts volapi -j | json 0.ip')
 else
     export AMON_IP=$(bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1)
     export CNAPI_IP=$(bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1)
@@ -135,6 +139,10 @@ else
     export IMGAPI_IP=$(sdcadm insts imgapi -j | json 0.ip)
     export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
     export MORAY_IP=$(sdcadm insts moray -j | json 0.ip)
+    # sdcadm insts instance-name doesn't exit with an exit code != 0 if a zone
+    # with name "instance-name is not present, so this is safe even if VOLAPI is
+    # not setup on the DC where the tests run.
+    export VOLAPI_IP=$(sdcadm insts volapi -j | json 0.ip)
 fi
 
 echo ""
