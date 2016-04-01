@@ -77,6 +77,9 @@ papi_test: $(NODEUNIT)
 cns_test: $(NODEUNIT)
 	$(NODEUNIT) $(NODEUNIT_ARGS) test/cns.test.js
 
+volapi_test: $(NODEUNIT)
+	$(NODEUNIT) $(NODEUNIT_ARGS) test/volapi.test.js
+
 test: ca_test ufds_test cnapi_test napi_test vmapi_test papi_test cns_test
 
 .PHONY: setup
