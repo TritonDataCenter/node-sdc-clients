@@ -785,3 +785,93 @@ peer.
 | Name     | Type     | Description     |
 | -------- | -------- | --------------- |
 | callback | Function | fn(error, objs) |
+
+# VOLAPI Client
+
+VOLAPI is the Volumes API. More documentation about this API can be found in
+[its code repository](https://www.github.com/joyent/sdc-volapi).
+
+## listVolumes(params, callback)
+
+List all volumes given the specified filter params. Currently the following
+parameters are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| owner_uuid | UUID | VM Owner |
+| name | String | volume name |
+| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volumes) |
+
+## createVolume(params, options, callback)
+
+Creates a new volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | String | Name of the volume |
+| owner_uuid | UUID | UUID the created volume's owner |
+| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+| networks | Array | An array of objects representing networks on which this volume will be reachable |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
+
+## getVolume(params, options, callback)
+
+Gets information about an existing volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
+
+## deleteVolume(params, options, callback)
+
+Deletes an existing volume. The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume to delete |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
