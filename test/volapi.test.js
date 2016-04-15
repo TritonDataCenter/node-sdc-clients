@@ -8,9 +8,10 @@
  * Copyright (c) 2016, Joyent, Inc.
  */
 
-var VOLAPI = require('../lib/index').VOLAPI;
 var bunyan = require('bunyan');
 var restify = require('restify');
+
+var VOLAPI = require('../lib/index').VOLAPI;
 
 var VOLAPI_IP = process.env.VOLAPI_IP || '10.99.99.70';
 var VOLAPI_URL = 'http://' + VOLAPI_IP;
@@ -18,20 +19,22 @@ var VOLAPI_URL = 'http://' + VOLAPI_IP;
 var volApiClient;
 
 exports.setUp = function (callback) {
-    var logger = new bunyan.createLogger({
-            name: 'vapi_unit_test',
-            stream: process.stderr,
-            level: (process.env.LOG_LEVEL || 'info'),
-            serializers: restify.bunyan.serializers
+    var log = new bunyan.createLogger({
+        name: 'volapi_unit_test',
+        stream: process.stderr,
+        level: (process.env.LOG_LEVEL || 'info'),
+        serializers: restify.bunyan.serializers
     });
 
     volApiClient = new VOLAPI({
         url: VOLAPI_URL,
+        version: '^1',
+        userAgent: 'node-sdc-clients-volapi-tests',
         retry: {
             retries: 1,
             minTimeout: 1000
         },
-        log: logger
+        log: log
     });
 
     callback();
@@ -54,6 +57,39 @@ exports.test_list_volumes = function (t) {
         t.ok(objs[0].type);
         t.done();
     });
+};
+
+exports.test_api_version_needs_to_be_specified = function (t) {
+    var apiClient;
+    t.throws(function badClient() {
+        apiClient = new VOLAPI({
+            url: VOLAPI_URL,
+            userAgent: 'node-sdc-clients-volapi-tests'
+        });
+    });
+
+    if (apiClient) {
+        apiClient.close();
+    }
+
+    t.done();
+};
+
+exports.test_api_version_star_not_allowed = function (t) {
+    var apiClient;
+    t.throws(function badClient() {
+         apiClient = new VOLAPI({
+            url: VOLAPI_URL,
+            version: '*',
+            userAgent: 'node-sdc-clients-volapi-tests'
+        });
+    });
+
+    if (apiClient) {
+        apiClient.close();
+    }
+
+    t.done();
 };
 
 exports.tearDown = function (callback) {
