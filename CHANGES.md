@@ -10,6 +10,10 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 9.3.0
+
+- IMGAPI-536: AdminChangeImageStor, GetImage?inclAdminFields=true, ListImages?inclAdminFields=true
+
 ## sdc-clients 9.2.0
 
 - CAPI-515: update node-ufds dependency, this pulls in fixes for CAPI-513 and others,
