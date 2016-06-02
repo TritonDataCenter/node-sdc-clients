@@ -10,6 +10,10 @@
 
 # sdc-clients Changelog
 
+## sdc-clients 9.4.0
+
+- CNS-144: new API for calculating DNS suffixes for a proposed (not yet provisioned) VM
+
 ## sdc-clients 9.3.0
 
 - IMGAPI-536: AdminChangeImageStor, GetImage?inclAdminFields=true, ListImages?inclAdminFields=true
