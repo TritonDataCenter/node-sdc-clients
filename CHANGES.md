@@ -10,6 +10,10 @@
 
 # sdc-clients Changelog
 
+## 9.5.0
+
+- IMGAPI-579: client support for IMGAPI AdminReloadAuthKeys endpoint
+
 ## sdc-clients 9.4.0
 
 - CNS-144: new API for calculating DNS suffixes for a proposed (not yet provisioned) VM
