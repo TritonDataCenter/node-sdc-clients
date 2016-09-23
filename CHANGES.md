@@ -12,7 +12,7 @@
 
 ## 9.5.1
 
-- IMGAPI-567: Change the endpoint URL for IMGAPI AdminReloadAuthKeys.
+- IMGAPI-586: Change the endpoint URL for IMGAPI AdminReloadAuthKeys.
 
 ## 9.5.0
 
