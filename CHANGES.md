@@ -10,6 +10,10 @@
 
 # sdc-clients Changelog
 
+## 9.5.1
+
+- IMGAPI-586: Change the endpoint URL for IMGAPI AdminReloadAuthKeys.
+
 ## 9.5.0
 
 - IMGAPI-579: client support for IMGAPI AdminReloadAuthKeys endpoint
