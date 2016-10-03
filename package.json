@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
-  "description": "Contains node.js client libraries for SDC REST APIs.",
-  "version": "9.5.1",
+  "description": "node.js client libraries for Triton core REST APIs.",
+  "version": "10.0.0",
   "homepage": "http://www.joyent.com",
   "repository": {
     "type": "git",
@@ -12,21 +12,21 @@
     "assert-plus": "0.1.5",
     "async": "~0.9.0",
     "backoff": "^2.4.1",
-    "bunyan": "^1.2.3",
+    "bunyan": "^1.8.1",
     "clone": "0.1.8",
-    "ufds": "~1.1.2",
     "lru-cache": "2.3.0",
-    "libuuid": "0.1.4",
+    "libuuid": "0.2.1",
     "once": "^1.3.1",
-    "restify": "git://github.com/joyent/node-restify.git#fd5d5b5",
+    "restify-clients": "git+https://github.com/trentm/clients.git#0b989e0bbd375ddeefce2f6e2754f66e5dbb59d1",
+    "restify-errors": "^3.0.0",
     "vasync": "^1.6.2",
     "verror": "^1.6.0",
-    "smartdc-auth": "2.1.6"
+    "smartdc-auth": "2.5.2"
   },
   "devDependencies": {
     "ldap-filter": "^0.3.1",
-    "moray": "git+ssh://git@github.com:joyent/node-moray.git#b84ef0e0b61502d3db66c26ece9b09d59316f2d1",
-    "nodeunit": "0.8.0"
+    "moray": "git+https://github.com/joyent/node-moray.git#fd5781bc25a9bfe2ba82167664639753fb9f0ca5",
+    "tape": "^4.6.0"
   },
   "engines": {
     "node": ">=0.8.14"

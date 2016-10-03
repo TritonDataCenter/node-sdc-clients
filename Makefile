@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright (c) 2014, Joyent, Inc.
+# Copyright 2016 Joyent, Inc.
 #
 
 #
@@ -26,8 +26,6 @@
 # Tools
 #
 NPM       := npm
-NODEUNIT	:= ./node_modules/.bin/nodeunit
-NODEUNIT_ARGS   ?=
 
 #
 # Files
@@ -48,46 +46,17 @@ include ./tools/mk/Makefile.defs
 all:
 	$(NPM) install && $(NPM) rebuild
 
-.PHONY: test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test papi_test
-
-ca_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/ca.test.js
-
-vmapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/vmapi.test.js
-
-cnapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
-
-ufds_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/ufds.test.js
-
-amon_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/amon.test.js
-
-napi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/napi.test.js
-
-dsapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
-
-papi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/papi.test.js
-
-cns_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/cns.test.js
-
-test: ca_test ufds_test cnapi_test napi_test vmapi_test papi_test cns_test
-
-.PHONY: setup
-setup:
-	$(NPM) install
+.PHONY: test-in-coal
+test-in-coal:
+	./test/runtests -H root@10.99.99.7
 
 # Ensure CHANGES.md and package.json have the same version.
 .PHONY: versioncheck
 versioncheck:
 	@echo version is: $(shell cat package.json | json version)
 	[[ `cat package.json | json version` == `grep '^## ' CHANGES.md | head -1 | awk '{print $$2}'` ]]
+
+check:: versioncheck
 
 .PHONY: cutarelease
 cutarelease: versioncheck

@@ -23,22 +23,6 @@ set -o errexit
 set -o pipefail
 
 
-
-#---- guard
-
-if [[ ! -f "/lib/sdc/.sdc-test-no-production-data" ]]; then
-    cat <<EOF
-To run this test you must create the file:
-
-    /lib/sdc/.sdc-test-no-production-data
-
-after ensuring you have no production data on this SDC.
-EOF
-    exit 2
-fi
-
-
-
 #---- support stuff
 
 function fatal
@@ -56,12 +40,14 @@ function errexit
 function usage
 {
     echo "Usage:"
-    echo "  ./runtests [OPTIONS...]     # from the GZ"
+    echo "  ./runtests [OPTIONS...]"
     echo ""
     echo "Options:"
-    echo "  -h          Print this help and exit."
-    echo "  -f FILTER   Filter pattern (substring match) for test files to run."
-    echo "  -r REPOTER  The nodeunit reporter to use, default is 'tap'."
+    echo "  -h           Print this help and exit."
+    echo "  -f FILTER    Filter pattern (substring match) for test files to run."
+    echo "  -H HEADNODE  If given, then attempt to run the tests against a DC"
+    echo "               with the given headnode GZ IP. If not given, this"
+    echo "               assumes we are running from the headnode GZ."
 }
 
 
@@ -71,13 +57,12 @@ function usage
 trap 'errexit $?' EXIT
 
 TOP=$(cd $(dirname $0)/../; pwd)
-PATH=/usr/node/bin:$PATH
 
 #TODO(RELENG-386): set test user: sdcclientstestuser ??
 # Options.
 opt_test_pattern=
-opt_reporter=tap
-while getopts "hf:r:" opt
+opt_headnode=
+while getopts "hf:H:" opt
 do
     case "$opt" in
         h)
@@ -87,8 +72,8 @@ do
         f)
             opt_test_pattern=$OPTARG
             ;;
-        r)
-            opt_reporter=$OPTARG
+        H)
+            opt_headnode=$OPTARG
             ;;
         *)
             usage
@@ -98,23 +83,62 @@ do
 done
 
 
+if [[ -z "$opt_headnode" && $(uname) != "SunOS" ]]; then
+    fatal "not running on SunOS (use the '-H headnode' argument to run" \
+        "this against a given DC)"
+fi
+
+# Production guard
+MARKER="/lib/sdc/.sdc-test-no-production-data"
+haveMarker=no
+if [[ -n "$opt_headnode" ]]; then
+    if $(ssh $opt_headnode "test -f $MARKER"); then
+        haveMarker=yes
+    fi
+elif [[ -f "/lib/sdc/.sdc-test-no-production-data" ]]; then
+    haveMarker=yes
+fi
+
+if [[ "$haveMarker" != "yes" ]]; then
+    cat <<EOF
+To run this test you must create the file:
+
+    $MARKER
+
+after ensuring you have no production data on this Triton DataCenter.
+EOF
+    exit 2
+fi
+
+
 # Gather DC setup info for the test files.
-export AMON_IP=$(bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1)
-export UFDS_IP=$(bash /lib/sdc/config.sh -json | json ufds_admin_ips | cut -d, -f1)
-export CNAPI_IP=$(bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1)
-export CA_IP=$(bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1)
-export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
-export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
-export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
-export DSAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
-export PAPI_IP=$(bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1)
-export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
-export MORAY_IP=$(sdcadm insts moray -j | json 0.ip)
+if [[ -n "$opt_headnode" ]]; then
+    export AMON_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1')
+    export CNAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1')
+    export CA_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1')
+    export NAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1')
+    export VMAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1')
+    export UFDS_ADMIN_UUID=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json ufds_admin_uuid')
+    export DSAPI_URL=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json dsapi_url')
+    export PAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1')
+    export CNS_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts cns -j | json 0.ip')
+    export MORAY_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts moray -j | json 0.ip')
+else
+    export AMON_IP=$(bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1)
+    export CNAPI_IP=$(bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1)
+    export CA_IP=$(bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1)
+    export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
+    export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
+    export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
+    export DSAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
+    export PAPI_IP=$(bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1)
+    export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
+    export MORAY_IP=$(sdcadm insts moray -j | json 0.ip)
+fi
 
 echo ""
 echo "# Datacenter config:"
 echo "#     AMON_IP is $AMON_IP"
-echo "#     UFDS_IP is $UFDS_IP"
 echo "#     CNAPI_IP is $CNAPI_IP"
 echo "#     CA_IP is $CA_IP"
 echo "#     NAPI_IP is $NAPI_IP"
@@ -128,15 +152,11 @@ echo "#     MORAY_IP is $MORAY_IP"
 
 echo ""
 cd $TOP
-NODEUNIT=$TOP/node_modules/nodeunit/bin/nodeunit
-test_files=$(ls -1 test/*.test.js)
-test_files=$(echo "$test_files" | grep -v amon)   #XXX exclude for now
+test_files=$(ls -1 ./test/*.test.js)
 if [[ -n "$opt_test_pattern" ]]; then
     test_files=$(echo "$test_files" | grep "$opt_test_pattern" || true)
     echo "# Running filtered set of test files: $test_files"
 fi
 if [[ -n "$test_files" ]]; then
-    $NODEUNIT --reporter=$opt_reporter $test_files
-    # Note: Need https://github.com/caolan/nodeunit/pull/168 before we get
-    # a non-zero exit status on any test failures.
+    $TOP/node_modules/.bin/tape $test_files
 fi

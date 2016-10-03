@@ -5,17 +5,16 @@
  */
 
 /*
- * Copyright (c) 2014, Joyent, Inc.
+ * Copyright 2016 Joyent, Inc.
  */
 
-var util = require('util');
-var sdcClients = require('../lib/index');
-var restify = require('restify');
-var Amon = sdcClients.Amon;
 var libuuid = require('libuuid');
-function uuid() {
-    return (libuuid.create());
-}
+var test = require('tape');
+
+var Amon = require('../lib/index').Amon;
+
+
+// --- globals
 
 var amon;
 
@@ -33,12 +32,12 @@ var MACHINE_UUID = process.env.MACHINE_UUID;
 // Monitor name needs to be 32 chars length max and first char must be
 // alpha always:
 var MONITOR = {
-    'name' : 'p' + uuid().replace(/-/g, '').substring(1),
+    'name' : 'p' + libuuid.create().replace(/-/g, '').substring(1),
     'contacts': ['email']
 };
 
 var MONITOR_2 = {
-    'name': 'p' + uuid().replace(/-/g, '').substring(1),
+    'name': 'p' + libuuid.create().replace(/-/g, '').substring(1),
     'contacts': ['email']
 };
 
@@ -61,124 +60,130 @@ var PROBE_2 = {
 
 // --- tests
 
-exports.setUp = function (callback) {
-    if (typeof (MACHINE_UUID) === 'undefined') {
-        throw new Error('MACHINE_UUID env var is required to run amon tests');
-    }
-    amon = new Amon({
-        url: AMON_URL,
-        agent: false
+// Skipping Amon tests. They are out of date (using 'monitors' which were
+// long ago replaced by 'probegroups').
+test.skip('amon', function (tt) {
+    tt.test(' setup', function (t) {
+        if (typeof (MACHINE_UUID) === 'undefined') {
+            throw new Error(
+                'MACHINE_UUID env var is required to run amon tests');
+        }
+        amon = new Amon({
+            url: AMON_URL
+        });
+        t.close();
     });
-    callback();
-};
 
-exports.test_put_monitor = function (test) {
-    amon.putMonitor(ADMIN_UUID, MONITOR.name, MONITOR, function (err, monitor) {
-        test.ifError(err);
-        test.ok(monitor);
-        test.equal(monitor.name, MONITOR.name);
-        test.equal(monitor.medium, MONITOR.medium);
-        test.done();
+    tt.test(' put monitor', function (t) {
+        amon.putMonitor(ADMIN_UUID, MONITOR.name, MONITOR, function (err, mon) {
+            t.ifError(err);
+            t.ok(mon);
+            t.equal(mon.name, MONITOR.name);
+            t.equal(mon.medium, MONITOR.medium);
+            t.end();
+        });
     });
-};
 
-exports.test_put_probe = function (test) {
-    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE.name, PROBE,
-        function (err, probe) {
-        test.ifError(err);
-        test.ok(probe);
-        test.equal(probe.name, PROBE.name);
-        test.equal(probe.user, PROBE.user);
-        test.equal(probe.machine, PROBE.machine);
-        test.equal(probe.monitor, PROBE.monitor);
-        test.equal(probe.type, PROBE.type);
-        test.done();
+    tt.test(' put probe', function (t) {
+        amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE.name, PROBE,
+            function (err, probe) {
+            t.ifError(err);
+            t.ok(probe);
+            t.equal(probe.name, PROBE.name);
+            t.equal(probe.user, PROBE.user);
+            t.equal(probe.machine, PROBE.machine);
+            t.equal(probe.monitor, PROBE.monitor);
+            t.equal(probe.type, PROBE.type);
+            t.end();
+        });
     });
-};
 
-exports.test_list_probes = function (test) {
-    amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name, PROBE_2,
-        function (err, probe) {
-        test.ifError(err);
-        test.ok(probe);
+    tt.test(' list probes', function (t) {
+        amon.putProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name, PROBE_2,
+            function (err, probe) {
+            t.ifError(err);
+            t.ok(probe);
 
-        amon.listProbes(ADMIN_UUID, MONITOR.name, function (err2, probes) {
-            test.ifError(err2);
-            test.ok(probes);
-            test.equal(probes.length, 2);
+            amon.listProbes(ADMIN_UUID, MONITOR.name, function (err2, probes) {
+                t.ifError(err2);
+                t.ok(probes);
+                t.equal(probes.length, 2);
 
-            amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name,
-              function (err3) {
-                test.ifError(err3);
-                test.done();
+                amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE_2.name,
+                  function (err3) {
+                    t.ifError(err3);
+                    t.end();
+                });
             });
         });
     });
-};
 
-exports.test_get_probe = function (test) {
-    amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err, probe) {
-        test.ifError(err);
-        test.ok(probe);
-        test.equal(probe.name, PROBE.name);
-        test.equal(probe.user, PROBE.user);
-        test.equal(probe.machine, PROBE.machine);
-        test.equal(probe.monitor, PROBE.monitor);
-        test.equal(probe.type, PROBE.type);
-        test.done();
-    });
-};
-
-exports.test_delete_probe = function (test) {
-    amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
-        test.ifError(err);
-        amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err2) {
-            test.equal(err2.statusCode, 404);
-            test.done();
+    tt.test(' get probe', function (t) {
+        amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name,
+                function (err, probe) {
+            t.ifError(err);
+            t.ok(probe);
+            t.equal(probe.name, PROBE.name);
+            t.equal(probe.user, PROBE.user);
+            t.equal(probe.machine, PROBE.machine);
+            t.equal(probe.monitor, PROBE.monitor);
+            t.equal(probe.type, PROBE.type);
+            t.end();
         });
     });
-};
 
-exports.test_list_monitors = function (test) {
-    amon.putMonitor(ADMIN_UUID, MONITOR_2.name, MONITOR_2,
-        function (err, monitor) {
-        test.ifError(err);
-        amon.listMonitors(ADMIN_UUID, function (err2, monitors) {
-            test.ifError(err2);
-            test.ok(monitors);
-            test.ok((monitors.length > 2), 'Found less than 2 monitors');
-            amon.deleteMonitor(ADMIN_UUID, MONITOR_2.name, function (err3) {
-                test.ifError(err3);
-                test.done();
+    tt.test(' delete probe', function (t) {
+        amon.deleteProbe(ADMIN_UUID, MONITOR.name, PROBE.name, function (err) {
+            t.ifError(err);
+            amon.getProbe(ADMIN_UUID, MONITOR.name, PROBE.name,
+                    function (err2) {
+                t.equal(err2.statusCode, 404);
+                t.end();
             });
         });
     });
-};
 
-exports.test_get_monitor = function (test) {
-    amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err, monitor) {
-        test.ifError(err);
-        test.ok(monitor);
-        test.equal(monitor.name, MONITOR.name);
-        test.equal(monitor.medium, MONITOR.medium);
-        test.done();
-    });
-};
-
-exports.test_delete_monitor = function (test) {
-    amon.deleteMonitor(ADMIN_UUID, MONITOR.name, function (err) {
-        test.ifError(err);
-        setTimeout(function () {
-            amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err2) {
-                test.equal(err2.statusCode, 404);
-                test.done();
+    tt.test(' list monitors', function (t) {
+        amon.putMonitor(ADMIN_UUID, MONITOR_2.name, MONITOR_2,
+            function (err, monitor) {
+            t.ifError(err);
+            amon.listMonitors(ADMIN_UUID, function (err2, monitors) {
+                t.ifError(err2);
+                t.ok(monitors);
+                t.ok((monitors.length > 2), 'Found less than 2 monitors');
+                amon.deleteMonitor(ADMIN_UUID, MONITOR_2.name, function (err3) {
+                    t.ifError(err3);
+                    t.end();
+                });
             });
-        }, 3000);
+        });
     });
-};
 
-exports.tearDown = function (callback) {
-    if (amon)
-        amon.close();
-    callback();
-};
+    tt.test(' get monitor', function (t) {
+        amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err, monitor) {
+            t.ifError(err);
+            t.ok(monitor);
+            t.equal(monitor.name, MONITOR.name);
+            t.equal(monitor.medium, MONITOR.medium);
+            t.end();
+        });
+    });
+
+    tt.test(' delete monitor', function (t) {
+        amon.deleteMonitor(ADMIN_UUID, MONITOR.name, function (err) {
+            t.ifError(err);
+            setTimeout(function () {
+                amon.getMonitor(ADMIN_UUID, MONITOR.name, function (err2) {
+                    t.equal(err2.statusCode, 404);
+                    t.end();
+                });
+            }, 3000);
+        });
+    });
+
+    tt.test(' teardown', function (t) {
+        if (amon)
+            amon.close();
+        t.end();
+    });
+});

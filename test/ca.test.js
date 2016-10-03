@@ -5,18 +5,15 @@
  */
 
 /*
- * Copyright (c) 2014, Joyent, Inc.
+ * Copyright 2016 Joyent, Inc.
  */
 
+var bunyan = require('bunyan');
+var libuuid = require('libuuid');
+var test = require('tape');
 var util = require('util');
 
-var libuuid = require('libuuid');
-function uuid() {
-    return (libuuid.create());
-}
-
 var CA = require('../lib/index').CA;
-var restify = require('restify');
 
 
 // --- Globals
@@ -27,173 +24,176 @@ var ca = null;
 var customer = process.env.UFDS_ADMIN_UUID;
 var instrumentation = null;
 
+
 // --- Tests
 
-exports.setUp = function (callback) {
-    ca = new CA({
-        url: CA_URL,
-        retry: {
-            retries: 1,
-            minTimeout: 1000
-        },
-        agent: false
+test('ca', function (tt) {
+    tt.test(' setup', function (t) {
+        ca = new CA({
+            url: CA_URL,
+            retry: {
+                retries: 1,
+                minTimeout: 1000
+            }
+        });
+        t.end();
     });
-    callback();
-};
 
 
-exports.test_list_schema = function (test) {
-    ca.listSchema(customer, function (err, schema) {
-        test.ifError(err);
-        test.ok(schema);
-        test.done();
-    });
-};
-
-
-exports.test_create_instrumentation_bad_params = function (test) {
-    ca.createInstrumentation(customer, {}, function (err, inst) {
-        test.ok(err);
-        test.ok(!inst);
-        test.equal(err.statusCode, 409);
-        test.equal(err.restCode, 'InvalidArgument');
-        test.ok(err.message);
-        test.done();
-    });
-};
-
-
-exports.test_create_instrumentation = function (test) {
-    var params = {
-        module: 'fs',
-        stat: 'logical_ops',
-        decomposition: 'latency'
-    };
-    ca.createInstrumentation(customer, params, function (err, inst) {
-        var uri;
-        test.ifError(err, err);
-        test.ok(inst);
-        if (inst) {
-            uri = inst.uri;
-            instrumentation = uri.substr(uri.lastIndexOf('/') + 1);
-        }
-        test.done();
-    });
-};
-
-
-exports.test_list_instrumentations = function (test) {
-    ca.listInstrumentations(customer, function (err, instrumentations) {
-        test.ifError(err);
-        test.ok(instrumentations);
-        test.ok(instrumentations.length);
-        var i = instrumentations[instrumentations.length - 1];
-        test.equal(i.module, 'fs');
-        test.equal(i.stat, 'logical_ops');
-        test.done();
-    });
-};
-
-
-exports.test_list_instrumentations_bogus_customer = function (test) {
-    ca.listInstrumentations(uuid(), function (err, instrumentations) {
-        test.ifError(err);
-        test.ok(instrumentations);
-        test.equal(instrumentations.length, 0);
-        test.done();
-    });
-};
-
-
-exports.test_get_instrumentation_bad = function (test) {
-    ca.getInstrumentation(customer, uuid(), function (err, inst) {
-        test.ok(err);
-        test.ok(!inst);
-        test.equal(err.statusCode, 404);
-        test.equal(err.restCode, 'ResourceNotFound');
-        test.ok(err.message);
-        test.done();
-    });
-};
-
-
-exports.test_get_instrumentation = function (test) {
-    ca.getInstrumentation(customer, instrumentation, function (err, inst) {
-        test.ifError(err);
-        test.ok(inst);
-        test.done();
-    });
-};
-
-
-exports.test_get_heatmap = function (test) {
-    ca.getHeatmap(customer, instrumentation, function (err, heatmap) {
-        test.ifError(err);
-        test.ok(heatmap);
-        test.done();
-    });
-};
-
-
-exports.test_get_heatmap_bad = function (test) {
-    ca.getHeatmap(customer, uuid(), function (err, heatmap) {
-        test.ok(err);
-        test.ok(!heatmap);
-        test.equal(err.statusCode, 404);
-        test.equal(err.restCode, 'ResourceNotFound');
-        test.ok(err.message);
-
-        test.done();
-    });
-};
-
-
-exports.test_get_heatmap_details_bad = function (test) {
-    ca.getHeatmapDetails(customer, uuid(), {
-        x: 10,
-        y: 20
-    }, function (err, heatmap) {
-        test.ok(err);
-        test.ok(!heatmap);
-        test.equal(err.statusCode, 404);
-        test.equal(err.restCode, 'ResourceNotFound');
-        test.ok(err.message);
-        test.done();
-    });
-};
-
-
-exports.test_delete_instrumentation_bad = function (test) {
-    ca.deleteInstrumentation(customer, uuid(), function (err) {
-        test.ok(err);
-        test.equal(err.statusCode, 404);
-        test.equal(err.restCode, 'ResourceNotFound');
-        test.ok(err.message);
-        test.done();
-    });
-};
-
-
-exports.test_clone_instrumentation = function (test) {
-    ca.cloneInstrumentation(customer, instrumentation, function (err, inst) {
-        test.ifError(err);
-        ca.deleteInstrumentation(customer, inst.id, function (err2) {
-            test.ifError(err2);
-            test.done();
+    tt.test(' list schema', function (t) {
+        ca.listSchema(customer, function (err, schema) {
+            t.ifError(err);
+            t.ok(schema);
+            t.end();
         });
     });
-};
 
 
-exports.test_delete_instrumentation = function (test) {
-    ca.deleteInstrumentation(customer, instrumentation, function (err) {
-        test.ifError(err);
-        test.done();
+    tt.test(' create instrumentation bad params', function (t) {
+        ca.createInstrumentation(customer, {}, function (err, inst) {
+            t.ok(err);
+            t.ok(!inst);
+            t.equal(err.statusCode, 409);
+            t.equal(err.restCode, 'InvalidArgument');
+            t.ok(err.message);
+            t.end();
+        });
     });
-};
 
 
-exports.tearDown = function (callback) {
-    ca.close();
-    callback();
-};
+    tt.test(' create instrumentation', function (t) {
+        var params = {
+            module: 'fs',
+            stat: 'logical_ops',
+            decomposition: 'latency'
+        };
+        ca.createInstrumentation(customer, params, function (err, inst) {
+            var uri;
+            t.ifError(err, err);
+            t.ok(inst);
+            if (inst) {
+                uri = inst.uri;
+                instrumentation = uri.substr(uri.lastIndexOf('/') + 1);
+            }
+            t.end();
+        });
+    });
+
+
+    tt.test(' list instrumentations', function (t) {
+        ca.listInstrumentations(customer, function (err, instrumentations) {
+            t.ifError(err);
+            t.ok(instrumentations);
+            t.ok(instrumentations.length);
+            var i = instrumentations[instrumentations.length - 1];
+            t.equal(i.module, 'fs');
+            t.equal(i.stat, 'logical_ops');
+            t.end();
+        });
+    });
+
+
+    tt.test(' list instrumentations bogus customer', function (t) {
+        ca.listInstrumentations(libuuid.create(), function (err, insts) {
+            t.ifError(err);
+            t.ok(insts);
+            t.equal(insts.length, 0);
+            t.end();
+        });
+    });
+
+
+    tt.test(' get instrumentation bad', function (t) {
+        ca.getInstrumentation(customer, libuuid.create(), function (err, inst) {
+            t.ok(err);
+            t.ok(!inst);
+            t.equal(err.statusCode, 404);
+            t.equal(err.restCode, 'ResourceNotFound');
+            t.ok(err.message);
+            t.end();
+        });
+    });
+
+
+    tt.test(' get instrumentation', function (t) {
+        ca.getInstrumentation(customer, instrumentation, function (err, inst) {
+            t.ifError(err);
+            t.ok(inst);
+            t.end();
+        });
+    });
+
+
+    tt.test(' get heatmap', function (t) {
+        ca.getHeatmap(customer, instrumentation, function (err, heatmap) {
+            t.ifError(err);
+            t.ok(heatmap);
+            t.end();
+        });
+    });
+
+
+    tt.test(' get heatmap bad', function (t) {
+        ca.getHeatmap(customer, libuuid.create(), function (err, heatmap) {
+            t.ok(err);
+            t.ok(!heatmap);
+            t.equal(err.statusCode, 404);
+            t.equal(err.restCode, 'ResourceNotFound');
+            t.ok(err.message);
+
+            t.end();
+        });
+    });
+
+
+    tt.test(' get heatmap details bad', function (t) {
+        ca.getHeatmapDetails(customer, libuuid.create(), {
+            x: 10,
+            y: 20
+        }, function (err, heatmap) {
+            t.ok(err);
+            t.ok(!heatmap);
+            t.equal(err.statusCode, 404);
+            t.equal(err.restCode, 'ResourceNotFound');
+            t.ok(err.message);
+            t.end();
+        });
+    });
+
+
+    tt.test(' delete instrumentation bad', function (t) {
+        ca.deleteInstrumentation(customer, libuuid.create(), function (err) {
+            t.ok(err);
+            t.equal(err.statusCode, 404);
+            t.equal(err.restCode, 'ResourceNotFound');
+            t.ok(err.message);
+            t.end();
+        });
+    });
+
+
+    tt.test(' clone instrumentation', function (t) {
+        ca.cloneInstrumentation(customer, instrumentation,
+                function (err, inst) {
+            t.ifError(err);
+            ca.deleteInstrumentation(customer, inst.id, function (err2) {
+                t.ifError(err2);
+                t.end();
+            });
+        });
+    });
+
+
+    tt.test(' delete instrumentation', function (t) {
+        ca.deleteInstrumentation(customer, instrumentation, function (err) {
+            t.ifError(err);
+            t.end();
+        });
+    });
+
+
+    tt.test(' teardown', function (t) {
+        ca.close();
+        t.end();
+    });
+});

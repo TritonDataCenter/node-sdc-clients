@@ -5,16 +5,13 @@
  */
 
 /*
- * Copyright (c) 2014, Joyent, Inc.
+ * Copyright 2016 Joyent, Inc.
  */
 
-var Logger = require('bunyan');
-var restify = require('restify');
+var bunyan = require('bunyan');
 var libuuid = require('libuuid');
+var test = require('tape');
 var util = require('util');
-function uuid() {
-    return (libuuid.create());
-}
 
 var CNAPI = require('../lib/index').CNAPI;
 
@@ -25,15 +22,15 @@ var CNAPI = require('../lib/index').CNAPI;
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 
 var SERVER = null;
-var ZONE = '0777a40e-8b41-11e2-be6f-7f3bf8fcea65';
+var testVmUuid = libuuid.create();
+var testVmAlias = 'nodesdcclientstest-cnapi-' + testVmUuid.split('-')[0];
 var TASK = null;
-var DATASET_UUID = 'fd2cc906-8938-11e3-beab-4359c665ac99';
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
-var cnapi;
+
 
 // --- Helpers
 
-function waitForVmState(state, callback) {
+function waitForVmState(t, cnapi, state, callback) {
     var finished = false;
     var error;
 
@@ -52,13 +49,13 @@ function waitForVmState(state, callback) {
     }, 30000);
 
     function check() {
-        cnapi.getVm(SERVER, ZONE, function (err, vm) {
+        cnapi.getVm(SERVER, testVmUuid, function (err, vm) {
             error = err;
             if (err) {
                 setTimeout(check, 3000);
                 return;
             }
-            console.log('vm state was %s', vm.state);
+            t.comment('test VM ' + testVmUuid + ' state: ' + vm.state);
 
             if (vm.state === state) {
                 clearTimeout(timeout);
@@ -73,7 +70,7 @@ function waitForVmState(state, callback) {
     check();
 }
 
-function waitForTask(callback) {
+function waitForTask(t, cnapi, callback) {
     var finished = false;
     var error;
 
@@ -89,7 +86,8 @@ function waitForTask(callback) {
             callback(error);
             return;
         } else {
-            callback(new Error('timed out waiting on task'));
+            callback(new Error('timed out waiting on task at '
+                + (new Date()).toISOString()));
             return;
         }
     }, 50000);
@@ -101,7 +99,7 @@ function waitForTask(callback) {
                 return;
             }
             if (err) {
-                console.warn(err.message);
+                t.comment('CNAPI getTask err: ' + err.message);
                 if (err.message === 'no such task found') {
                     setTimeout(check, 3000);
                     return;
@@ -112,7 +110,8 @@ function waitForTask(callback) {
                 return;
             }
 
-            console.log('task status %s', task.status);
+            t.comment('[' + (new Date()).toISOString() + '] CNAPI task '
+                + TASK + ' status: ' + task.status);
 
             if (task.status == 'failure') {
                 clearTimeout(timeout);
@@ -123,7 +122,6 @@ function waitForTask(callback) {
             }
 
             if (task.status == 'complete') {
-                console.warn('ALL DONE');
                 clearTimeout(timeout);
                 finished = true;
                 callback(null);
@@ -141,251 +139,235 @@ function waitForTask(callback) {
 
 // --- Tests
 
-exports.setUp = function (callback) {
-    cnapi = new CNAPI({
-        url: CNAPI_URL,
-        retry: {
-            retries: 1,
-            minTimeout: 1000
-        },
-        log: new Logger({
-            name: 'cnapi_unit_test',
-            stream: process.stderr,
-            level: (process.env.LOG_LEVEL || 'info'),
-            serializers: Logger.stdSerializers
-        }),
-        agent: false
+test('cnapi', function (tt) {
+    var cnapi;
+
+    tt.test(' setup', function (t) {
+        cnapi = new CNAPI({
+            url: CNAPI_URL,
+            retry: {
+                retries: 1,
+                minTimeout: 1000
+            },
+            log: new bunyan.createLogger({
+                name: 'cnapi_unit_test',
+                stream: process.stderr,
+                level: (process.env.LOG_LEVEL || 'info'),
+                serializers: bunyan.stdSerializers
+            })
+        });
+        t.end();
     });
-    callback();
-};
 
-
-exports.test_list_servers = function (test) {
-    cnapi.listServers({ headnode: true }, function (err, servers) {
-        test.ifError(err);
-        test.ok(servers);
-        SERVER = servers[0].uuid;
-        test.done();
-    });
-};
-
-
-exports.test_get_server = function (test) {
-    cnapi.getServer(SERVER, function (err, server) {
-        test.ifError(err);
-        test.ok(server);
-        test.done();
-    });
-};
-
-
-exports.test_create_vm = function (test) {
-    var opts = {
-        uuid: ZONE,
-        owner_uuid: CUSTOMER,
-        dataset_uuid:  'fd2cc906-8938-11e3-beab-4359c665ac99',
-        brand: 'joyent',
-        image_uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
-        image: {
-            uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
-            files: [
-                {
-                    'sha1': '97f20b32c2016782257176fb58a35e5044f05840',
-                    'size': 46271847,
-                    'compression': 'bzip2'
-                }
-            ]
-        },
-        ram: 128
-    };
-
-    cnapi.createVm(SERVER, opts, function (err, task) {
-        test.ifError(err);
-        test.ok(task);
-        TASK = task.id;
-        test.done();
-    });
-};
-
-
-exports.test_wait_for_running = function (test) {
-    waitForTask(function (err) {
-        test.ifError(err);
-
-        waitForVmState('running', function (err2) {
-            test.ifError(err2);
-            test.done();
+    tt.test(' list servers', function (t) {
+        cnapi.listServers({ headnode: true }, function (err, servers) {
+            t.ifError(err);
+            t.ok(servers);
+            SERVER = servers[0].uuid;
+            t.end();
         });
     });
-};
 
-
-exports.test_get_vm = function (test) {
-    setTimeout(function () {
-        cnapi.getVm(SERVER, ZONE, function (err, vm) {
-            test.ifError(err);
-            test.ok(vm);
-            test.done();
-        });
-    }, 10000);
-};
-
-
-exports.test_stop_vm = function (test) {
-    cnapi.stopVm(SERVER, ZONE, function (err, task) {
-        test.ifError(err);
-        test.ok(task);
-        TASK = task.id;
-        test.done();
-    });
-};
-
-
-exports.test_wait_for_stopped = function (test) {
-    waitForTask(function (err) {
-        test.ifError(err);
-        waitForVmState('stopped', function (err2) {
-            test.ifError(err2);
-
-            test.done();
+    tt.test(' get server', function (t) {
+        cnapi.getServer(SERVER, function (err, server) {
+            t.ifError(err);
+            t.ok(server);
+            t.end();
         });
     });
-};
 
+    tt.test(' create vm', function (t) {
+        var opts = {
+            uuid: testVmUuid,
+            alias: testVmAlias,
+            owner_uuid: CUSTOMER,
+            brand: 'joyent',
+            // This is sdc-smartos@1.6.3, which works for as long as it is
+            // an origin image used by core Triton zones.
+            image_uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
+            image: {
+                uuid: 'fd2cc906-8938-11e3-beab-4359c665ac99',
+                files: [
+                    {
+                        'sha1': '97f20b32c2016782257176fb58a35e5044f05840',
+                        'size': 46271847,
+                        'compression': 'bzip2'
+                    }
+                ]
+            },
+            ram: 128
+        };
 
-// Wait 3 seconds after the job completes
-exports.test_start_vm = function (test) {
-    setTimeout(function () {
-        cnapi.startVm(SERVER, ZONE, function (err, task) {
-            test.ifError(err);
-            test.ok(task);
+        cnapi.createVm(SERVER, opts, function (err, task) {
+            t.ifError(err);
+            t.ok(task);
             TASK = task.id;
-            test.done();
-        });
-    }, 6000);
-};
-
-
-exports.test_wait_for_started = function (test) {
-    waitForTask(function (err) {
-        test.ifError(err);
-        waitForVmState('running', function (err2) {
-            test.ifError(err2);
-            test.done();
+            t.end();
         });
     });
-};
 
+    tt.test(' wait for running', function (t) {
+        waitForTask(t, cnapi, function (err) {
+            t.ifError(err);
+            waitForVmState(t, cnapi, 'running', function (stateErr) {
+                t.ifError(stateErr);
+                t.end();
+            });
+        });
+    });
 
-exports.test_reboot_vm = function (test) {
-    setTimeout(function () {
-        cnapi.rebootVm(SERVER, ZONE, function (err, task) {
-            test.ifError(err);
-            test.ok(task);
+    tt.test(' get vm', function (t) {
+        setTimeout(function () {
+            cnapi.getVm(SERVER, testVmUuid, function (err, vm) {
+                t.ifError(err);
+                t.ok(vm);
+                t.end();
+            });
+        }, 10000);
+    });
+
+    tt.test(' stop vm', function (t) {
+        cnapi.stopVm(SERVER, testVmUuid, function (err, task) {
+            t.ifError(err);
+            t.ok(task);
             TASK = task.id;
-            test.done();
-        });
-    }, 6000);
-};
-
-
-exports.test_wait_for_reboot = function (test) {
-    waitForTask(function (err) {
-        test.ifError(err);
-        waitForVmState('running', function (err2) {
-            test.ifError(err2);
-            test.done();
+            t.end();
         });
     });
-};
 
-
-exports.test_delete_vm = function (test) {
-    setTimeout(function () {
-        cnapi.deleteVm(SERVER, ZONE, function (err, task) {
-            test.ifError(err);
-            test.ok(task);
-            TASK = task.id;
-            test.done();
+    tt.test(' wait for stopped', function (t) {
+        waitForTask(t, cnapi, function (err) {
+            t.ifError(err);
+            waitForVmState(t, cnapi, 'stopped', function (err2) {
+                t.ifError(err2);
+                t.end();
+            });
         });
-    }, 3000);
-};
-
-
-exports.test_wait_for_deleted = function (test) {
-    waitForTask(function (err) {
-        test.ifError(err);
-        test.done();
     });
-};
 
-
-exports.test_command_execute = function (test) {
-    var script = '#!/usr/bin/bash\n\necho Hello\n';
-
-    cnapi.commandExecute(SERVER, script, function (err) {
-        test.ifError(err);
-        test.done();
+    tt.test(' start vm', function (t) {
+        setTimeout(function () {
+            cnapi.startVm(SERVER, testVmUuid, function (err, task) {
+                t.ifError(err);
+                t.ok(task);
+                TASK = task.id;
+                t.end();
+            });
+        }, 6000);
     });
-};
 
-
-exports.test_command_execute_with_env = function (test) {
-    var script = '#!/usr/bin/bash\n\necho Hello\n';
-    var env = { FOO: 'bar' };
-
-    cnapi.commandExecute(SERVER, script, { env: env }, function (err) {
-        test.ifError(err);
-        test.done();
-    });
-};
-
-
-// this test is sadly not ideal -- we'd like to check it picks only one server,
-// and it's the correct server, but that only works if the test is run with
-// a standup containing multiple CNs. With a standup of only COAL, this test
-// is ambiguous.
-exports.test_capacity_1 = function (test) {
-    var headers = { 'x-request-id': 12345 };
-
-    cnapi.capacity([SERVER], { headers: headers }, function (err, res) {
-        test.ifError(err);
-        test.equal(typeof (res), 'object');
-        test.equal(typeof (res.capacities), 'object');
-        test.equal(typeof (res.errors), 'object');
-        test.equal(Object.keys(res.capacities).length, 1);
-
-        var server = res.capacities[SERVER];
-        test.equal(typeof (server.cpu), 'number');
-        test.equal(typeof (server.ram), 'number');
-        test.equal(typeof (server.disk), 'number');
-
-        test.done();
-    });
-};
-
-
-exports.test_capacity_2 = function (test) {
-    cnapi.capacity(null, function (err, res) {
-        test.ifError(err);
-        test.equal(typeof (res), 'object');
-        test.equal(typeof (res.capacities), 'object');
-        test.equal(typeof (res.errors), 'object');
-        test.ok(Object.keys(res.capacities).length >= 1);
-
-        Object.keys(res.capacities).forEach(function (serverUuid) {
-            var server = res.capacities[serverUuid];
-            test.equal(typeof (server.cpu), 'number');
-            test.equal(typeof (server.ram), 'number');
-            test.equal(typeof (server.disk), 'number');
+    tt.test(' wait for started', function (t) {
+        waitForTask(t, cnapi, function (err) {
+            t.ifError(err);
+            waitForVmState(t, cnapi, 'running', function (err2) {
+                t.ifError(err2);
+                t.end();
+            });
         });
-
-        test.done();
     });
-};
+
+    tt.test(' reboot vm', function (t) {
+        setTimeout(function () {
+            cnapi.rebootVm(SERVER, testVmUuid, function (err, task) {
+                t.ifError(err);
+                t.ok(task);
+                TASK = task.id;
+                t.end();
+            });
+        }, 6000);
+    });
+
+    tt.test(' wait for reboot', function (t) {
+        waitForTask(t, cnapi, function (err) {
+            t.ifError(err);
+            waitForVmState(t, cnapi, 'running', function (err2) {
+                t.ifError(err2);
+                t.end();
+            });
+        });
+    });
+
+    tt.test(' delete vm', function (t) {
+        setTimeout(function () {
+            cnapi.deleteVm(SERVER, testVmUuid, function (err, task) {
+                t.ifError(err);
+                t.ok(task);
+                TASK = task.id;
+                t.end();
+            });
+        }, 3000);
+    });
+
+    tt.test(' wait for deleted', function (t) {
+        waitForTask(t, cnapi, function (err) {
+            t.ifError(err);
+            t.end();
+        });
+    });
+
+    tt.test(' command execute', function (t) {
+        var script = '#!/usr/bin/bash\n\necho Hello\n';
+        cnapi.commandExecute(SERVER, script, function (err) {
+            t.ifError(err);
+            t.end();
+        });
+    });
+
+    tt.test(' command execute with env', function (t) {
+        var script = '#!/usr/bin/bash\n\necho Hello\n';
+        var env = { FOO: 'bar' };
+
+        cnapi.commandExecute(SERVER, script, { env: env }, function (err) {
+            t.ifError(err);
+            t.end();
+        });
+    });
+
+    // this test is sadly not ideal -- we'd like to check it picks only one
+    // server, and it's the correct server, but that only works if the test is
+    // run with a standup containing multiple CNs. With a standup of only COAL,
+    // this test is ambiguous.
+    tt.test(' capacity 1', function (t) {
+        var headers = { 'x-request-id': 12345 };
+
+        cnapi.capacity([SERVER], { headers: headers }, function (err, res) {
+            t.ifError(err);
+            t.equal(typeof (res), 'object');
+            t.equal(typeof (res.capacities), 'object');
+            t.equal(typeof (res.errors), 'object');
+            t.equal(Object.keys(res.capacities).length, 1);
+
+            var server = res.capacities[SERVER];
+            t.equal(typeof (server.cpu), 'number');
+            t.equal(typeof (server.ram), 'number');
+            t.equal(typeof (server.disk), 'number');
+
+            t.end();
+        });
+    });
 
 
-exports.tearDown = function (callback) {
-    cnapi.close();
-    callback();
-};
+    tt.test(' capacity 2', function (t) {
+        cnapi.capacity(null, function (err, res) {
+            t.ifError(err);
+            t.equal(typeof (res), 'object');
+            t.equal(typeof (res.capacities), 'object');
+            t.equal(typeof (res.errors), 'object');
+            t.ok(Object.keys(res.capacities).length >= 1);
+
+            Object.keys(res.capacities).forEach(function (serverUuid) {
+                var server = res.capacities[serverUuid];
+                t.equal(typeof (server.cpu), 'number');
+                t.equal(typeof (server.ram), 'number');
+                t.equal(typeof (server.disk), 'number');
+            });
+
+            t.end();
+        });
+    });
+
+    tt.test(' teardown', function (t) {
+        cnapi.close();
+        t.end();
+    });
+});

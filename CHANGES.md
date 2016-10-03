@@ -5,10 +5,28 @@
 -->
 
 <!--
-    Copyright (c) 2016, Joyent, Inc.
+    Copyright 2016 Joyent, Inc.
 -->
 
 # sdc-clients Changelog
+
+## 10.0.0
+
+- Update dependencies and code to support working with node v4. The most
+  significant change is from a forked version of restify@2.8.5 (which added
+  a few patches for HTTP proxy support) to current restify-clients@1.x
+  and restify-errors@3.x.
+
+  Note: until <https://github.com/restify/node-restify/issues/878> work is
+  upstreamed to a restify-clients release, this will still be using a fork (but
+  a more modern one).
+
+- [Backward incompatible] Drop the "UFDS" client from this package. A long
+  while back, it was split out to the separate
+  [node-ufds](https://github.com/joyent/node-ufds) repo and `ufds` npm package.
+  Users should switch to that. Get at least ufds@1.2.0 for node v4 support.
+  UFDS client docs were moved to node-ufds in CAPI-524.
+
 
 ## 9.5.1
 
