@@ -9,3 +9,4 @@ cscope.out
 .lvimrc
 *.vim
 npm-shrinkwrap.json.old
+.DS_Store

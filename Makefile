@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright (c) 2014, Joyent, Inc.
+# Copyright 2016 Joyent, Inc.
 #
 
 #
@@ -26,8 +26,6 @@
 # Tools
 #
 NPM       := npm
-NODEUNIT	:= ./node_modules/.bin/nodeunit
-NODEUNIT_ARGS   ?=
 
 #
 # Files
@@ -48,40 +46,37 @@ include ./tools/mk/Makefile.defs
 all:
 	$(NPM) install && $(NPM) rebuild
 
-.PHONY: test ca_test ufds_test vmapi_test cnapi_test amon_test napi_test imgapi_test papi_test
+.PHONY: test-in-coal
+test-in-coal:
+	./test/runtests -H root@10.99.99.7
 
-ca_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/ca.test.js
+# Ensure CHANGES.md and package.json have the same version.
+.PHONY: versioncheck
+versioncheck:
+	@echo version is: $(shell cat package.json | json version)
+	[[ `cat package.json | json version` == `grep '^## ' CHANGES.md | head -1 | awk '{print $$2}'` ]]
 
-vmapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/vmapi.test.js
+check:: versioncheck
 
-cnapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/cnapi.test.js
-
-ufds_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/ufds.test.js
-
-amon_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/amon.test.js
-
-napi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/napi.test.js
-
-dsapi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/dsapi.test.js
-
-papi_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/papi.test.js
-
-cns_test: $(NODEUNIT)
-	$(NODEUNIT) $(NODEUNIT_ARGS) test/cns.test.js
-
-test: ca_test ufds_test cnapi_test napi_test vmapi_test papi_test cns_test
-
-.PHONY: setup
-setup:
-	$(NPM) install
+.PHONY: cutarelease
+cutarelease: versioncheck
+	[[ -z `git status --short` ]]  # If this fails, the working dir is dirty.
+	@which json 2>/dev/null 1>/dev/null && \
+	    ver=$(shell json -f package.json version) && \
+	    name=$(shell json -f package.json name) && \
+	    publishedVer=$(shell npm view -j $(shell json -f package.json name)@$(shell json -f package.json version) version 2>/dev/null) && \
+	    if [[ -n "$$publishedVer" ]]; then \
+		echo "error: $$name@$$ver is already published to npm"; \
+		exit 1; \
+	    fi && \
+	    echo "** Are you sure you want to tag and publish $$name@$$ver to npm?" && \
+	    echo "** Enter to continue, Ctrl+C to abort." && \
+	    read
+	ver=$(shell cat package.json | json version) && \
+	    date=$(shell date -u "+%Y-%m-%d") && \
+	    git tag -a "v$$ver" -m "version $$ver ($$date)" && \
+	    git push --tags origin && \
+	    npm publish
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
