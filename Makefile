@@ -54,7 +54,7 @@ test-in-coal:
 .PHONY: versioncheck
 versioncheck:
 	@echo version is: $(shell cat package.json | json version)
-	[[ `cat package.json | json version` == `grep '^## ' CHANGES.md | head -1 | awk '{print $$2}'` ]]
+	[[ `cat package.json | json version` == `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]]
 
 check:: versioncheck
 
