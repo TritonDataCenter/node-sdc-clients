@@ -23,6 +23,8 @@ Node.js client libraries for other Triton APIs are in other repos. For example s
 - [node-moray](https://github.com/node-moray): client for Triton's core Moray service
 - [node-triton](https://github.com/node-triton): Triton CloudAPI client and CLI
 - [node-manta](https://github.com/node-manta): Manta client and CLI
+- [wf-client](https://github.com/sdc-wf-client): client for Triton's core
+  Workflow API service
 
 
 ## Testing
