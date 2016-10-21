@@ -12,6 +12,11 @@
 
 ## not yet released
 
+## 10.0.2
+
+- TOOLS-1584 Ensure 'filters.channel' passed to IMGAPI.listImages wins over a
+  channel set on the IMGAPI instance.
+
 ## 10.0.1
 
 - IMGAPI-596 Move from restify-clients fork to restify-clients@1.4.0 with
