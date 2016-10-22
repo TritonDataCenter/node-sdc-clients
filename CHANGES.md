@@ -12,6 +12,11 @@
 
 ## not yet released
 
+## 10.0.3
+
+- IMGAPI-599 IMGAPI client from node-sdc-clients at version 10.0.2 is not
+  usable.
+
 ## 10.0.2
 
 - TOOLS-1584 Ensure 'filters.channel' passed to IMGAPI.listImages wins over a
