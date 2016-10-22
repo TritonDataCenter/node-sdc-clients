@@ -12,6 +12,10 @@
 
 ## not yet released
 
+## 10.0.3
+
+- IMGAPI-599 IMGAPI client broken since 10.0.0.
+
 ## 10.0.2
 
 - TOOLS-1584 Ensure 'filters.channel' passed to IMGAPI.listImages wins over a
