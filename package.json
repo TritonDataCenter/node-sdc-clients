@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
   "description": "node.js client libraries for Triton core REST APIs.",
-  "version": "10.0.3",
+  "version": "10.0.4",
   "homepage": "http://www.joyent.com",
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "restify-errors": "^3.0.0",
     "vasync": "^1.6.2",
     "verror": "^1.6.0",
+    "sshpk": "^1.10.1",
     "smartdc-auth": "2.5.2"
   },
   "devDependencies": {

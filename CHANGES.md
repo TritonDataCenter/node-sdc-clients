@@ -12,6 +12,13 @@
 
 ## not yet released
 
+## 10.0.4
+
+- IMGAPI-606 Restore support to `imgapi.cliSigner` that the given keyId is
+  a *path to a private SSH key*. That feature had been dropped in v9.0.0
+  which meant sdc-imgapi-cli.git (which exposed the feature) could not
+  update.
+
 ## 10.0.3
 
 - IMGAPI-599 IMGAPI client broken since 10.0.0.
