@@ -372,6 +372,18 @@ test('vmapi', function (tt) {
         });
     });
 
+    tt.test(' sync vm', function (t) {
+        var SYNC_QUERY = {
+            uuid: ZONE,
+            sync: true
+        };
+        vmapi.getVm(SYNC_QUERY, function (err, vm) {
+            t.ifError(err);
+            t.ok(vm);
+            t.end();
+        });
+    });
+
 
     tt.test(' find headnode', function (t) {
         cnapi.listServers(function (err, servers) {

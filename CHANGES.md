@@ -12,6 +12,10 @@
 
 ## not yet released
 
+## 10.1.0
+
+- joyent/node-sdc-clients#10 Add `params.sync` to VMAPI.getVm.
+
 ## 10.0.4
 
 - IMGAPI-606 Restore support to `imgapi.cliSigner` that the given keyId is
