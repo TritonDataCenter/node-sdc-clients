@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 var bunyan = require('bunyan');
@@ -18,7 +18,7 @@ var PAPI = require('../lib/index').PAPI;
 
 // --- Globals
 
-var PAPI_IP = process.env.PAPI_IP || '10.99.99.30';
+var PAPI_IP = process.env.PAPI_IP || 'papi.coal.joyent.us';
 var PAPI_URL = 'http://' + PAPI_IP;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 
@@ -252,7 +252,7 @@ test('papi', function (tt) {
     });
 
 
-    tt.test(' list packages using wildcards withtou escaping', function (t) {
+    tt.test(' list packages using wildcards without escaping', function (t) {
         papi.list({ name: 'regular_*' }, { escape: false },
                   function (err, packages) {
             t.ifError(err);

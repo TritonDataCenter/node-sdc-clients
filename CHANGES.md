@@ -12,6 +12,8 @@
 
 ## not yet released
 
+- PUBAPI-1380 Cloudapi should support wildcards in ListPackages
+
 ## 10.1.0
 
 - joyent/node-sdc-clients#10 Add `params.sync` to VMAPI.getVm.
