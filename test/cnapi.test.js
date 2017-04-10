@@ -330,17 +330,17 @@ test('cnapi', function (tt) {
     tt.test(' capacity 1', function (t) {
         var headers = { 'x-request-id': 12345 };
 
-        cnapi.capacity([SERVER], { headers: headers }, function (err, res) {
+        cnapi.capacity([SERVER], { headers: headers }, function (err, body) {
             t.ifError(err);
-            t.equal(typeof (res), 'object');
-            t.equal(typeof (res.capacities), 'object');
-            t.equal(typeof (res.errors), 'object');
-            t.equal(Object.keys(res.capacities).length, 1);
+            t.equal(typeof (body), 'object', 'body');
+            t.equal(typeof (body.capacities), 'object', 'body.capacities');
+            t.equal(Object.keys(body.capacities).length, 1,
+                'exactly one body.capacities entry');
 
-            var server = res.capacities[SERVER];
-            t.equal(typeof (server.cpu), 'number');
-            t.equal(typeof (server.ram), 'number');
-            t.equal(typeof (server.disk), 'number');
+            var server = body.capacities[SERVER];
+            t.equal(typeof (server.cpu), 'number', 'server.cpu');
+            t.equal(typeof (server.ram), 'number', 'server.ram');
+            t.equal(typeof (server.disk), 'number', 'server.disk');
 
             t.end();
         });
@@ -348,18 +348,18 @@ test('cnapi', function (tt) {
 
 
     tt.test(' capacity 2', function (t) {
-        cnapi.capacity(null, function (err, res) {
+        cnapi.capacity(null, function (err, body) {
             t.ifError(err);
-            t.equal(typeof (res), 'object');
-            t.equal(typeof (res.capacities), 'object');
-            t.equal(typeof (res.errors), 'object');
-            t.ok(Object.keys(res.capacities).length >= 1);
+            t.equal(typeof (body), 'object', 'body');
+            t.equal(typeof (body.capacities), 'object', 'body.capacities');
+            t.ok(Object.keys(body.capacities).length >= 1,
+                'at least one body.capacities');
 
-            Object.keys(res.capacities).forEach(function (serverUuid) {
-                var server = res.capacities[serverUuid];
-                t.equal(typeof (server.cpu), 'number');
-                t.equal(typeof (server.ram), 'number');
-                t.equal(typeof (server.disk), 'number');
+            Object.keys(body.capacities).forEach(function (serverUuid) {
+                var server = body.capacities[serverUuid];
+                t.equal(typeof (server.cpu), 'number', 'server.cpu');
+                t.equal(typeof (server.ram), 'number', 'server.ram');
+                t.equal(typeof (server.disk), 'number', 'server.disk');
             });
 
             t.end();
