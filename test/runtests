@@ -6,7 +6,7 @@
 #
 
 #
-# Copyright (c) 2016, Joyent, Inc.
+# Copyright (c) 2017, Joyent, Inc.
 #
 
 #
@@ -132,6 +132,7 @@ else
     export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
     export DSAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
     export PAPI_IP=$(bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1)
+    export IMGAPI_IP=$(sdcadm insts imgapi -j | json 0.ip)
     export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
     export MORAY_IP=$(sdcadm insts moray -j | json 0.ip)
 fi

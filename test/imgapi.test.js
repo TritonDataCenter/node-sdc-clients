@@ -3,7 +3,10 @@ var test = require('tape');
 
 var IMGAPI = require('../lib/index').IMGAPI;
 
-var IMGAPI_URL = 'http://' + (process.env.IMGAPI_IP || '10.99.99.21');
+if (!process.env.IMGAPI_IP) {
+    throw new Error('IMGAPI_IP envvar is not set');
+}
+var IMGAPI_URL = 'http://' + process.env.IMGAPI_IP;
 
 var imgapi;
 
