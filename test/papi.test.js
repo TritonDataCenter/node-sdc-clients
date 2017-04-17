@@ -10,6 +10,7 @@
 
 var bunyan = require('bunyan');
 var clone = require('clone');
+var os = require('os');
 var test = require('tape');
 var util = require('util');
 
@@ -22,6 +23,8 @@ var PAPI_IP = process.env.PAPI_IP || 'papi.coal.joyent.us';
 var PAPI_URL = 'http://' + PAPI_IP;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 
+var PKG_NAME_PREFIX = 'sdcclientstest-papi-' + os.hostname() + '-';
+
 var log = bunyan.createLogger({
     name: 'papi_client_test',
     stream: process.stderr,
@@ -32,7 +35,7 @@ var log = bunyan.createLogger({
 var papi;
 
 var entry = {
-    name: 'regular_128',
+    name: pkgName('regular_128'),
     version: '1.0.0',
     max_physical_memory: 128,
     quota: 5120,
@@ -55,7 +58,7 @@ var entry = {
 };
 
 var another_entry = {
-    name: 'regular_256',
+    name: pkgName('regular_256'),
     version: '1.0.0',
     max_physical_memory: 256,
     quota: 5120,
@@ -69,7 +72,7 @@ var another_entry = {
 };
 
 var entry_with_owner = {
-    name: 'test_1024',
+    name: pkgName('test_1024'),
     version: '1.0.0',
     max_physical_memory: 1024,
     quota: 10240,
@@ -87,6 +90,43 @@ var entry_with_owner = {
 var PKG;
 
 
+// --- Helpers
+
+function pkgName(suffix) {
+    return PKG_NAME_PREFIX + suffix;
+}
+
+
+function cleanUp(t) {
+    function deletePkgs(pkgs) {
+        if (pkgs.length === 0)
+            return t.end();
+
+        var pkg = pkgs.pop();
+
+        return papi.del(pkg.uuid, {
+            force: true
+        }, function (err) {
+            if (err && err.statusCode !== 404)
+                t.ifError(err);
+
+            deletePkgs(pkgs);
+        });
+    }
+
+    papi.list({
+        name: pkgName('*')
+    }, {
+        escape: false
+    }, function (err, pkgs) {
+        t.ifError(err);
+        deletePkgs(pkgs);
+    });
+}
+
+
+// --- Tests
+
 test('papi', function (tt) {
     tt.test(' setup', function (t) {
         papi = new PAPI({
@@ -99,6 +139,9 @@ test('papi', function (tt) {
         });
         t.end();
     });
+
+
+    tt.test(' cleanup stale packages', cleanUp);
 
 
     tt.test(' create package', function (t) {
@@ -128,6 +171,7 @@ test('papi', function (tt) {
         });
     });
 
+
     /*
      * Old versions of this client exported a PAPI that wasn't a constructor,
      * so usage was `var client = PAPI(...);`. We now prefer
@@ -143,6 +187,7 @@ test('papi', function (tt) {
             t.end();
         });
     });
+
 
     tt.test(' get package by uuid with owner', function (t) {
         papi.add(entry_with_owner, function (err, pkg) {
@@ -243,7 +288,9 @@ test('papi', function (tt) {
 
 
     tt.test(' list packages using wildcards with escaping', function (t) {
-        papi.list({ name: 'regular_*' }, {}, function (err, packages) {
+        papi.list({
+            name: pkgName('regular_*')
+        }, {}, function (err, packages) {
             t.ifError(err);
             t.ok(util.isArray(packages));
             t.ok(packages.length === 0);
@@ -253,8 +300,9 @@ test('papi', function (tt) {
 
 
     tt.test(' list packages using wildcards without escaping', function (t) {
-        papi.list({ name: 'regular_*' }, { escape: false },
-                  function (err, packages) {
+        papi.list({
+            name: pkgName('regular_*')
+        }, { escape: false }, function (err, packages) {
             t.ifError(err);
             t.ok(util.isArray(packages));
             t.ok(packages.length > 0);
@@ -274,6 +322,9 @@ test('papi', function (tt) {
             t.end();
         });
     });
+
+
+    tt.test(' cleanup leftover packages', cleanUp);
 
 
     tt.test(' teardown', function (t) {
