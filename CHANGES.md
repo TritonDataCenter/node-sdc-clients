@@ -4,15 +4,15 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-<!--
-    Copyright 2016 Joyent, Inc.
--->
-
 # sdc-clients Changelog
 
 ## not yet released
 
 (nothing yet)
+
+## 10.2.1
+
+- SAPI-290 getApplicationObjects returns undefined instance list for known services
 
 ## 10.2.0
 
