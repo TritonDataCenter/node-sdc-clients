@@ -19,11 +19,11 @@ This repository holds Node.js client libraries for many of the core Triton REST 
 Amon, CA, CNS, CNAPI, FWAPI, IMGAPI, NAPI, PAPI, SAPI, VMAPI.
 
 Node.js client libraries for other Triton APIs are in other repos. For example see:
-- [node-ufds](https://github.com/node-ufds): client for Triton's core UFDS service
-- [node-moray](https://github.com/node-moray): client for Triton's core Moray service
-- [node-triton](https://github.com/node-triton): Triton CloudAPI client and CLI
-- [node-manta](https://github.com/node-manta): Manta client and CLI
-- [wf-client](https://github.com/sdc-wf-client): client for Triton's core
+- [node-ufds](https://github.com/joyent/node-ufds): client for Triton's core UFDS service
+- [node-moray](https://github.com/joyent/node-moray): client for Triton's core Moray service
+- [node-triton](https://github.com/joyent/node-triton): Triton CloudAPI client and CLI
+- [node-manta](https://github.com/joyent/node-manta): Manta client and CLI
+- [wf-client](https://github.com/joyent/sdc-wf-client): client for Triton's core
   Workflow API service
 
 
