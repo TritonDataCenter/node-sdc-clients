@@ -159,7 +159,29 @@ test('cnapi', function (tt) {
         t.end();
     });
 
-    tt.test(' list servers', function (t) {
+    tt.test(' list servers (paging)', function (t) {
+        cnapi.listServers(function (err, servers, req, res) {
+            t.ifError(err, err);
+            t.ok(Array.isArray(servers), 'got an array of servers');
+            t.ok(servers.length > 0, 'got at least one server');
+            t.ok(req, 'listServers returned the first req');
+            t.ok(res, 'listServers returned the first res');
+            t.end();
+        });
+    });
+
+    tt.test(' list servers (limit=1, one request)', function (t) {
+        cnapi.listServers({limit: 1}, function (err, servers, req, res) {
+            t.ifError(err, err);
+            t.ok(Array.isArray(servers), 'got an array of servers');
+            t.equal(servers.length, 1, 'limit=1 returned exactly one server');
+            t.ok(req, 'listServers returned the first req');
+            t.ok(res, 'listServers returned the first res');
+            t.end();
+        });
+    });
+
+    tt.test(' find server with which to test', function (t) {
         cnapi.listServers({ headnode: true }, function (err, servers) {
             t.ifError(err, err);
 

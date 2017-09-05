@@ -10,6 +10,11 @@
 
 (nothing yet)
 
+## 10.3.0
+
+- TOOLS-1854: Update `CNAPI.listServers` to use limit/offset to return all
+  servers.
+
 ## 10.2.1
 
 - SAPI-290 getApplicationObjects returns undefined instance list for known services
