@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright (c) 2017, Joyent, Inc.
  */
 
 var bunyan = require('bunyan');
@@ -150,7 +150,7 @@ test('cnapi', function (tt) {
                 minTimeout: 1000
             },
             log: new bunyan.createLogger({
-                name: 'cnapi_unit_test',
+                name: 'nodesdcclientstest-cnapi',
                 stream: process.stderr,
                 level: (process.env.LOG_LEVEL || 'info'),
                 serializers: bunyan.stdSerializers
@@ -161,9 +161,13 @@ test('cnapi', function (tt) {
 
     tt.test(' list servers', function (t) {
         cnapi.listServers({ headnode: true }, function (err, servers) {
-            t.ifError(err);
-            t.ok(servers);
-            SERVER = servers[0].uuid;
+            t.ifError(err, err);
+
+            // Choose a running server for subsequent tests.
+            SERVER = servers.filter(function (s) {
+                return (s.status === 'running');
+            })[0].uuid;
+
             t.end();
         });
     });
