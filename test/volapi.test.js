@@ -8,23 +8,30 @@
  * Copyright (c) 2017, Joyent, Inc.
  */
 
+var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var libuuid = require('libuuid');
 var restify = require('restify-clients');
 var test = require('tape');
 
+assert.ok(typeof (process.env.NAPI_IP) === 'string' &&
+    process.env.NAPI_IP !== '', 'NAPI_IP env var must be a non-empty string');
+assert.ok(typeof (process.env.VOLAPI_IP) === 'string' &&
+    process.env.VOLAPI_IP !== '',
+        'VOLAPI_IP env var must be a non-empty string');
+
 var NAPI = require('../lib/index').NAPI;
 
 var ADMIN_UUID = process.env.UFDS_ADMIN_UUID;
 var ADMIN_FABRIC_NETWORK_UUID;
-var NAPI_CLIENT;
+var napiClient;
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
 var TEST_VOLUME_NAME = 'node-sdc-clients-test-volapi-' + libuuid.create();
 var TEST_VOLUME_UUID;
 
 var VOLAPI = require('../lib/index').VOLAPI;
 
-var VOLAPI_IP = process.env.VOLAPI_IP || '10.99.99.70';
+var VOLAPI_IP = process.env.VOLAPI_IP;
 var VOLAPI_URL = 'http://' + VOLAPI_IP;
 
 var volApiClient;
@@ -69,7 +76,7 @@ test('volapi', function (tt) {
             serializers: bunyan.stdSerializers
         });
 
-        NAPI_CLIENT = new NAPI({
+        napiClient = new NAPI({
             url: NAPI_URL,
             retry: {
                 retries: 1,
@@ -78,7 +85,7 @@ test('volapi', function (tt) {
             log: log
         });
 
-        NAPI_CLIENT.listNetworks({
+        napiClient.listNetworks({
             owner_uuid: ADMIN_UUID,
             fabric: true
         }, function (listNetsErr, networks) {
@@ -121,8 +128,8 @@ test('volapi', function (tt) {
                     TEST_VOLUME_UUID = createdVol.uuid;
 
                     t.equal(createdVol.state, expectedVolState,
-                            'newly created volume\'s state should be ' +
-                                expectedVolState);
+                        'newly created volume\'s state should be ' +
+                            expectedVolState);
                 }
 
                 t.end();
@@ -157,7 +164,8 @@ test('volapi', function (tt) {
             uuid: TEST_VOLUME_UUID
         };
 
-        if (typeof (TEST_VOLUME_UUID) !== 'string') {
+        assert.optionalUuid(TEST_VOLUME_UUID, 'TEST_VOLUME_UUID');
+        if (!TEST_VOLUME_UUID) {
             t.end();
             return;
         }
@@ -182,7 +190,7 @@ test('volapi', function (tt) {
             t.ok(objs[0].size, 'expected value for size, got: ' + objs[0].size);
             t.equal(objs[0].type, expectedVolumeType,
                 'description should be ' + expectedVolumeType + ', got: ' +
-                    objs[0].description);
+                    objs[0].type);
             t.end();
         });
     });
@@ -221,7 +229,7 @@ test('volapi', function (tt) {
     });
 
     tt.test(' teardown', function (t) {
-        NAPI_CLIENT.close();
+        napiClient.close();
         volApiClient.close();
         t.end();
     });

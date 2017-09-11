@@ -342,7 +342,8 @@ peer.
 # VOLAPI Client
 
 VOLAPI is the Volumes API. More documentation about this API can be found in
-[its code repository](https://www.github.com/joyent/sdc-volapi).
+[its code repository](https://github.com/joyent/sdc-volapi) and in [RFD
+26](https://github.com/joyent/rfd/blob/master/rfd/0026).
 
 ## listVolumes(params, callback)
 
@@ -351,8 +352,8 @@ parameters are allowed:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| owner_uuid | UUID | VM Owner |
-| name | String | volume name  |
+| owner\_uuid | UUID | VM Owner |
+| name | String | volume name, unique per owner |
 | type | String | volume type (`'tritonnfs` is currently the only supported type) |
 | size | String | volume size  |
 | state| String | volume state |
@@ -393,7 +394,34 @@ The function callback takes the following form
 ## createVolumeAndWait(params, options, callback)
 
 Similar to `createVolume`, but waits for the volume to not be in state
-`creating` (not necessarily in state `running`) before calling `callback`.
+`creating` (not necessarily in state `ready`) before calling `callback`.
+
+If the volume transitions to state `ready`, `callback` is called with no error as its first parameter. If the volume transitions to the state `failed`, `callback` is called with an error as its first parameter.
+
+The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume. If not present, it is automatically generated |
+| name | String | Name of the volume |
+| owner_uuid | UUID | UUID the created volume's owner |
+| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+| networks | Array | An array of network UUIDs representing networks on which this volume will be reachable |
+| size | Number | The desired storage capacity for that volume in mebibytes. Default value is 10240 mebibytes (10 gibibytes) |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+| timeout | Number | the delay in miliseconds after which `callback` is called with an error as its first parameters regardless of the state of the volume |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error, volume) |
 
 ## getVolume(params, options, callback)
 
@@ -445,9 +473,33 @@ The function callback takes the following form
 Similar to `deleteVolume`, but waits for the volume to not be in state
 `deleting` (not necessarily deleted) before calling `callback`.
 
+If the volume cannot be found, `callback` is called with no error as its first parameter. If the volume transitions to the state `failed` or `ready`, `callback` is called with an error as its first parameter.
+
+The following params are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| uuid | String | UUID of the volume to delete |
+| owner_uuid | UUID | When present, the volume's owner UUID will be checked against this parameter. If it doesn't match, the request will result in an error  |
+| force | Boolean | `true` means that a volume will be deleted even if active VMs reference it. Default is `false`. |
+
+The following options are allowed:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| headers | Object | a set of headers to add to the request (e.g a request ID |
+| log | Object | a logger that will be used to log messages about this request |
+| timeout | Number | the delay in miliseconds after which `callback` is called with an error as its first parameters regardless of the state of the volume |
+
+The function callback takes the following form
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| callback | Function | fn(error) |
+
 ## updateVolume(params, options, callback)
 
-Updates a volume, currently only allows to change volumes' `name`.
+Updates a volume, currently only allows to change a volume's `name` property.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
