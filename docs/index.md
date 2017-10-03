@@ -17,7 +17,7 @@ parameters are allowed:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| owner_uuid | UUID | VM Owner |
+| owner_uuid | UUID | Volume owner account |
 | type | String | 'vm' or 'zone' |
 | alias | String | VM Alias |
 | state | String | running, stopped, active or destroyed |
@@ -354,7 +354,7 @@ parameters are allowed:
 | ---- | ---- | ----------- |
 | owner\_uuid | UUID | VM Owner |
 | name | String | volume name, unique per owner |
-| type | String | volume type (`'tritonnfs` is currently the only supported type) |
+| type | String | volume type ('tritonnfs' is currently the only supported type) |
 | size | String | volume size  |
 | state| String | volume state |
 | predicate | String | URL encoded JSON string representing a JavaScript object that can be used to build a LDAP filter. This LDAP filter can search for volumes on arbitrary (indexed) properties |
@@ -520,7 +520,7 @@ The function callback takes the following form
 | ---- | ---- | ----------- |
 | callback | Function | fn(error) |
 
-## reserveVolume(params, options, callback)
+## createVolumeReservation(params, options, callback)
 
 Reserves a volume. For more information on volume reservations, please refer to
 [the relevant section of RFD
@@ -546,7 +546,7 @@ The function callback takes the following form
 | ---- | ---- | ----------- |
 | callback | Function | fn(error) |
 
-## removeVolumeReservation(params, options, callback)
+## deleteVolumeReservation(params, options, callback)
 
 Removes a volume reservation. If `callback` is called without an error object as
 its first (and only) parameter, the volume associated with the volume reservation is no longer reserved.
