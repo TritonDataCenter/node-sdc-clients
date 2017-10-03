@@ -37,6 +37,9 @@ var VOLAPI_URL = 'http://' + VOLAPI_IP;
 var volApiClient;
 
 test('volapi', function (tt) {
+    var volumeResOwnerUuid;
+    var volumeResUuid;
+
     tt.test(' setup', function (t) {
         var log = bunyan.createLogger({
             name: 'volapi_unit_test',
@@ -195,37 +198,60 @@ test('volapi', function (tt) {
         });
     });
 
-    tt.test(' api version needs to be specified', function (t) {
-        var apiClient;
-        t.throws(function badClient() {
-            apiClient = new VOLAPI({
-                url: VOLAPI_URL,
-                userAgent: 'node-sdc-clients-volapi-tests'
-            });
+    tt.test(' create volume reservation', function (t) {
+        volApiClient.createVolumeReservation({
+            volume_name: 'foo',
+            vm_uuid: libuuid.create(),
+            job_uuid: libuuid.create(),
+            owner_uuid: libuuid.create()
+        }, function onVolResCreated(resCreatErr, res) {
+            t.ifError(resCreatErr,
+                'creating volume reservation should not error');
+
+            if (!resCreatErr) {
+                t.ok(typeof (res) === 'object' && res !== null,
+                    'response should be an object');
+
+                if (res) {
+                    volumeResOwnerUuid = res.owner_uuid;
+                    volumeResUuid = res.uuid;
+
+                    t.ok(res.uuid,
+                        'reservation object should have a uuid property');
+                    t.ok(res.volume_name,
+                        'reservation object should have a volume_name ' +
+                            'property');
+                    t.ok(res.vm_uuid,
+                        'reservation object should have a vm_uuid property');
+                    t.ok(res.job_uuid,
+                        'reservation object should have a job_uuid property');
+                    t.ok(res.owner_uuid,
+                        'reservation object should have a owner_uuid property');
+                    t.ok(res.create_timestamp,
+                        'reservation object should have a create_timestamp ' +
+                            'property');
+                }
+            }
+
+            t.end();
         });
-
-        if (apiClient) {
-            apiClient.close();
-        }
-
-        t.end();
     });
 
-    tt.test(' api version star not allowed', function (t) {
-        var apiClient;
-        t.throws(function badClient() {
-             apiClient = new VOLAPI({
-                url: VOLAPI_URL,
-                version: '*',
-                userAgent: 'node-sdc-clients-volapi-tests'
+    tt.test(' delete volume reservation', function (t) {
+        if (volumeResOwnerUuid && volumeResUuid) {
+            volApiClient.deleteVolumeReservation({
+                uuid: volumeResUuid,
+                owner_uuid: volumeResOwnerUuid
+            }, function onVolResDeleted(resDelErr) {
+                t.ifError(resDelErr, 'deleting volume reservation with UUID ' +
+                    volumeResUuid + ' should not error');
+                t.end();
             });
-        });
-
-        if (apiClient) {
-            apiClient.close();
+        } else {
+            t.fail('Missing volume reservation uuid or volume reservation ' +
+                'owner uuid');
+            t.end();
         }
-
-        t.end();
     });
 
     tt.test(' teardown', function (t) {
