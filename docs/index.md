@@ -17,7 +17,7 @@ parameters are allowed:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| owner_uuid | UUID | Volume owner account |
+| owner_uuid | UUID | VM Owner |
 | type | String | 'vm' or 'zone' |
 | alias | String | VM Alias |
 | state | String | running, stopped, active or destroyed |
@@ -352,7 +352,7 @@ parameters are allowed:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| owner\_uuid | UUID | VM Owner |
+| owner\_uuid | UUID | Volume owner account |
 | name | String | volume name, unique per owner |
 | type | String | volume type ('tritonnfs' is currently the only supported type) |
 | size | String | volume size  |
