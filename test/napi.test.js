@@ -136,13 +136,21 @@ test('napi', function (tt) {
     });
 
 
-    tt.test(' list network ips', function (t) {
+    /*
+     * We assume that the admin network will have multipe IPs
+     * provisioned for the following tests
+     */
+    tt.test(' list all network ips', function (t) {
         napi.listIPs(ADMIN.uuid, {}, function (err, ips) {
             t.ifError(err);
             t.ok(ips);
             t.ok(Array.isArray(ips));
-            t.ok(ips.length > 0);
-            if (ips.length > 0) {
+            /*
+             * Explicitly check for multiple ips being returned
+             * since other tests are issuing a {limit: 1}
+             */
+            t.ok(ips.length > 1);
+            if (ips.length > 1) {
                 IP = ips[0];
                 t.ok(IP.ip);
                 t.ok(IP.owner_uuid);
@@ -153,6 +161,35 @@ test('napi', function (tt) {
         });
     });
 
+    tt.test(' list single network ip', function (t) {
+        napi.listIPs(ADMIN.uuid, {limit: 1}, function (err, ips) {
+            t.ifError(err);
+            t.ok(ips);
+            t.ok(Array.isArray(ips));
+            t.equal(ips.length, 1, 'single ip returned');
+            if (ips.length === 1) {
+                IP = ips[0];
+                t.ok(IP.ip);
+                t.ok(IP.owner_uuid);
+                t.ok(IP.belongs_to_uuid);
+                t.ok(IP.belongs_to_type);
+            }
+            t.end();
+        });
+    });
+
+    tt.test(' list 2 network ips with offset 1', function (t) {
+        napi.listIPs(ADMIN.uuid, {limit: 2, offset: 1}, function (err, ips) {
+            t.ifError(err);
+            t.ok(ips);
+            t.ok(Array.isArray(ips));
+            t.equal(ips.length, 2, '2 ips are returned');
+            if (ips.length === 2) {
+                t.notEqual(ips[0], IP, 'offset ip not equal to previous ip');
+            }
+            t.end();
+        });
+    });
 
     tt.test(' get ip', function (t) {
         napi.getIP(ADMIN.uuid, IP.ip, function (err, ip) {

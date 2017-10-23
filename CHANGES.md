@@ -10,6 +10,11 @@
 
 (nothing yet)
 
+## 10.4.0
+
+- TOOLS-1867: Update `NAPI.listIPs` to use limit/offset to return all
+  servers.
+
 ## 10.3.0
 
 - TOOLS-1854: Update `CNAPI.listServers` to use limit/offset to return all
