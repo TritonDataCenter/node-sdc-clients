@@ -8,6 +8,8 @@
 
 ## not yet released
 
+## 10.4.0
+
 - Integration of [RFD 26](https://github.com/joyent/rfd/tree/master/rfd/0026)'s
   first "master integration" milestone. Adds support for Volume APIs provided by
   the new VOLAPI core service.
