@@ -17,11 +17,6 @@ var test = require('tape');
 assert.ok(typeof (process.env.NAPI_IP) === 'string' &&
     process.env.NAPI_IP !== '', 'NAPI_IP env var must be a non-empty string');
 
-if (!process.env.VOLAPI_IP) {
-    console.log('Could not find VOLAPI core service IP address, skipping.');
-    process.exit(0);
-}
-
 var NAPI = require('../lib/index').NAPI;
 
 var ADMIN_UUID = process.env.UFDS_ADMIN_UUID;
@@ -36,9 +31,16 @@ var VOLAPI = require('../lib/index').VOLAPI;
 var VOLAPI_IP = process.env.VOLAPI_IP;
 var VOLAPI_URL = 'http://' + VOLAPI_IP;
 
+var testOps = {
+    skip: !process.env.VOLAPI_IP
+};
 var volApiClient;
 
-test('volapi', function (tt) {
+if (testOps.skip) {
+    console.error('# Could not find VOLAPI core service IP address, skipping.');
+}
+
+test('volapi', testOps, function (tt) {
     var volumeResOwnerUuid;
     var volumeResUuid;
 

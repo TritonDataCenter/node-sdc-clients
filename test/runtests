@@ -116,6 +116,7 @@ if [[ -n "$opt_headnode" ]]; then
     export AMON_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json amon_admin_ips | cut -d, -f1')
     export CNAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json cnapi_admin_ips | cut -d, -f1')
     export CA_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json ca_admin_ips | cut -d, -f1')
+    export IMGAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json imgapi_admin_ips | cut -d, -f1')
     export NAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1')
     export VMAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1')
     export UFDS_ADMIN_UUID=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json ufds_admin_uuid')
