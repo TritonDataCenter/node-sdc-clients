@@ -149,16 +149,21 @@ fi
 echo ""
 echo "# Datacenter config:"
 echo "#     AMON_IP is $AMON_IP"
-echo "#     CNAPI_IP is $CNAPI_IP"
 echo "#     CA_IP is $CA_IP"
-echo "#     NAPI_IP is $NAPI_IP"
-echo "#     VMAPI_IP is $VMAPI_IP"
-echo "#     DSAPI_URL is $DSAPI_URL"
-echo "#     UFDS_ADMIN_UUID is $UFDS_ADMIN_UUID"
-echo "#     PAPI_IP is $PAPI_IP"
+echo "#     CNAPI_IP is $CNAPI_IP"
 echo "#     CNS_IP is $CNS_IP"
+echo "#     DSAPI_URL is $DSAPI_URL"
+echo "#     IMGAPI_IP is $IMGAPI_IP"
 echo "#     MORAY_IP is $MORAY_IP"
-
+echo "#     NAPI_IP is $NAPI_IP"
+echo "#     PAPI_IP is $PAPI_IP"
+echo "#     UFDS_ADMIN_UUID is $UFDS_ADMIN_UUID"
+echo "#     VMAPI_IP is $VMAPI_IP"
+if [[ -n "$VOLAPI_IP" ]]; then
+    echo "#     VOLAPI_IP is $VOLAPI_IP"
+else
+    echo "#     VOLAPI_IP is not set"
+fi
 
 echo ""
 cd $TOP
