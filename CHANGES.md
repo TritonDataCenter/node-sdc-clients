@@ -8,6 +8,10 @@
 
 ## not yet released
 
+## 10.4.1
+
+- DOCKER-1102 docker pull by manifest digest fails with an InternalError
+
 ## 10.4.0
 
 - Integration of [RFD 26](https://github.com/joyent/rfd/tree/master/rfd/0026)'s
