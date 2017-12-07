@@ -5,11 +5,11 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
-var libuuid = require('libuuid');
 var test = require('tape');
+var uuid = require('uuid');
 
 var Amon = require('../lib/index').Amon;
 
@@ -32,12 +32,12 @@ var MACHINE_UUID = process.env.MACHINE_UUID;
 // Monitor name needs to be 32 chars length max and first char must be
 // alpha always:
 var MONITOR = {
-    'name' : 'p' + libuuid.create().replace(/-/g, '').substring(1),
+    'name' : 'p' + uuid.v4().replace(/-/g, '').substring(1),
     'contacts': ['email']
 };
 
 var MONITOR_2 = {
-    'name': 'p' + libuuid.create().replace(/-/g, '').substring(1),
+    'name': 'p' + uuid.v4().replace(/-/g, '').substring(1),
     'contacts': ['email']
 };
 

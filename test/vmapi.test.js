@@ -5,17 +5,17 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 
 var assert = require('assert-plus');
 var ldapfilter = require('ldap-filter');
-var libuuid = require('libuuid');
 var bunyan = require('bunyan');
 var moray = require('moray');
 var test = require('tape');
 var util = require('util');
+var uuid = require('uuid');
 var vasync = require('vasync');
 
 var VMAPI = require('../lib/index').VMAPI;
@@ -172,7 +172,7 @@ function createTestVms(nbTestVms, vmProperties, callback) {
             }, 10);
 
             for (var i = 0; i < nbTestVms; ++i) {
-                addVmsQueue.push(libuuid.create());
+                addVmsQueue.push(uuid.v4());
             }
 
             addVmsQueue.close();

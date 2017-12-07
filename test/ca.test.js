@@ -5,13 +5,13 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 var bunyan = require('bunyan');
-var libuuid = require('libuuid');
 var test = require('tape');
 var util = require('util');
+var uuid = require('uuid');
 
 var CA = require('../lib/index').CA;
 
@@ -94,7 +94,7 @@ test('ca', function (tt) {
 
 
     tt.test(' list instrumentations bogus customer', function (t) {
-        ca.listInstrumentations(libuuid.create(), function (err, insts) {
+        ca.listInstrumentations(uuid.v4(), function (err, insts) {
             t.ifError(err);
             t.ok(insts);
             t.equal(insts.length, 0);
@@ -104,7 +104,7 @@ test('ca', function (tt) {
 
 
     tt.test(' get instrumentation bad', function (t) {
-        ca.getInstrumentation(customer, libuuid.create(), function (err, inst) {
+        ca.getInstrumentation(customer, uuid.v4(), function (err, inst) {
             t.ok(err);
             t.ok(!inst);
             t.equal(err.statusCode, 404);
@@ -134,7 +134,7 @@ test('ca', function (tt) {
 
 
     tt.test(' get heatmap bad', function (t) {
-        ca.getHeatmap(customer, libuuid.create(), function (err, heatmap) {
+        ca.getHeatmap(customer, uuid.v4(), function (err, heatmap) {
             t.ok(err);
             t.ok(!heatmap);
             t.equal(err.statusCode, 404);
@@ -147,7 +147,7 @@ test('ca', function (tt) {
 
 
     tt.test(' get heatmap details bad', function (t) {
-        ca.getHeatmapDetails(customer, libuuid.create(), {
+        ca.getHeatmapDetails(customer, uuid.v4(), {
             x: 10,
             y: 20
         }, function (err, heatmap) {
@@ -162,7 +162,7 @@ test('ca', function (tt) {
 
 
     tt.test(' delete instrumentation bad', function (t) {
-        ca.deleteInstrumentation(customer, libuuid.create(), function (err) {
+        ca.deleteInstrumentation(customer, uuid.v4(), function (err) {
             t.ok(err);
             t.equal(err.statusCode, 404);
             t.equal(err.restCode, 'ResourceNotFound');

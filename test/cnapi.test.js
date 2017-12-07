@@ -9,9 +9,9 @@
  */
 
 var bunyan = require('bunyan');
-var libuuid = require('libuuid');
 var test = require('tape');
 var util = require('util');
+var uuid = require('uuid');
 
 var CNAPI = require('../lib/index').CNAPI;
 
@@ -22,7 +22,7 @@ var CNAPI = require('../lib/index').CNAPI;
 var CNAPI_URL = 'http://' + (process.env.CNAPI_IP || '10.99.99.22');
 
 var SERVER = null;
-var testVmUuid = libuuid.create();
+var testVmUuid = uuid.v4();
 var testVmAlias = 'nodesdcclientstest-cnapi-' + testVmUuid.split('-')[0];
 var TASK = null;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;

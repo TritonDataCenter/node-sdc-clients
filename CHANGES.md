@@ -8,6 +8,10 @@
 
 ## not yet released
 
+## 10.4.2
+
+- TOOLS-1946 node-sdc-clients replace libuuid with uuid module
+
 ## 10.4.1
 
 - DOCKER-1102 docker pull by manifest digest fails with an InternalError

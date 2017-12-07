@@ -5,12 +5,12 @@
  */
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 var bunyan = require('bunyan');
-var libuuid = require('libuuid');
 var test = require('tape');
+var uuid = require('uuid');
 
 var NAPI = require('../lib/index').NAPI;
 
@@ -114,7 +114,7 @@ test('napi', function (tt) {
      * the `provisionable_by` property, which should return an error.
      */
     tt.test(' get unprovisionable network', function (t) {
-        var params = { provisionable_by: libuuid.create() };
+        var params = { provisionable_by: uuid.v4() };
 
         napi.getNetwork(ADMIN.uuid, { params: params },
                         function (err, network) {
@@ -182,7 +182,7 @@ test('napi', function (tt) {
 
 
     tt.test(' provision nic', function (t) {
-        NIC_UUID = libuuid.create();
+        NIC_UUID = uuid.v4();
         napi.provisionNic(ADMIN.uuid, {
             owner_uuid: process.env.UFDS_ADMIN_UUID,
             belongs_to_uuid: NIC_UUID,
@@ -203,7 +203,7 @@ test('napi', function (tt) {
 
 
     tt.test(' create new', function (t) {
-        var sUUID = libuuid.create(),
+        var sUUID = uuid.v4(),
             mac = pseudoRandomMac();
         napi.createNic(mac, {
             owner_uuid: process.env.UFDS_ADMIN_UUID,

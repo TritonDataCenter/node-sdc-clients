@@ -10,9 +10,9 @@
 
 var assert = require('assert-plus');
 var bunyan = require('bunyan');
-var libuuid = require('libuuid');
 var restify = require('restify-clients');
 var test = require('tape');
+var uuid = require('uuid');
 
 assert.ok(typeof (process.env.NAPI_IP) === 'string' &&
     process.env.NAPI_IP !== '', 'NAPI_IP env var must be a non-empty string');
@@ -23,7 +23,7 @@ var ADMIN_UUID = process.env.UFDS_ADMIN_UUID;
 var ADMIN_FABRIC_NETWORK_UUID;
 var napiClient;
 var NAPI_URL = 'http://' + (process.env.NAPI_IP || '10.99.99.10');
-var TEST_VOLUME_NAME = 'node-sdc-clients-test-volapi-' + libuuid.create();
+var TEST_VOLUME_NAME = 'node-sdc-clients-test-volapi-' + uuid.v4();
 var TEST_VOLUME_UUID;
 
 var VOLAPI = require('../lib/index').VOLAPI;
@@ -205,9 +205,9 @@ test('volapi', testOps, function (tt) {
     tt.test(' create volume reservation', function (t) {
         volApiClient.createVolumeReservation({
             volume_name: 'foo',
-            vm_uuid: libuuid.create(),
-            job_uuid: libuuid.create(),
-            owner_uuid: libuuid.create()
+            vm_uuid: uuid.v4(),
+            job_uuid: uuid.v4(),
+            owner_uuid: uuid.v4()
         }, function onVolResCreated(resCreatErr, res) {
             t.ifError(resCreatErr,
                 'creating volume reservation should not error');
