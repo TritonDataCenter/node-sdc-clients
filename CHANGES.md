@@ -8,6 +8,10 @@
 
 ## not yet released
 
+## 10.5.0
+
+- DOCKER-524 Implement docker push
+
 ## 10.4.2
 
 - TOOLS-1946 node-sdc-clients replace libuuid with uuid module
