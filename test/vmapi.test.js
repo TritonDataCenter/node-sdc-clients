@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright 2017 Joyent, Inc.
+ * Copyright (c) 2018, Joyent, Inc.
  */
 
 
@@ -409,6 +409,7 @@ test('vmapi', function (tt) {
             networks: [ ADMIN_NETWORK ],
             brand: 'joyent-minimal',
             ram: 64,
+            cpu_cap: 100,
             server_uuid: HEADNODE.uuid,
             origin: 'sdc-clients-test',
             owner_uuid: CUSTOMER,

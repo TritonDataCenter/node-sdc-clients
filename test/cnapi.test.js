@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2017, Joyent, Inc.
+ * Copyright (c) 2018, Joyent, Inc.
  */
 
 var bunyan = require('bunyan');
@@ -221,7 +221,8 @@ test('cnapi', function (tt) {
                     }
                 ]
             },
-            ram: 128
+            ram: 128,
+            cpu_cap: 100
         };
 
         cnapi.createVm(SERVER, opts, function (err, task) {
