@@ -284,8 +284,8 @@ test('vmapi', function (tt) {
 
             napi.listNetworks({ name: 'external' }, function (err2, nets2) {
                 t.ifError(err2);
-                t.ok(nets1);
-                EXTERNAL_NETWORK = nets1[0].uuid;
+                t.ok(nets2);
+                EXTERNAL_NETWORK = nets2[0].uuid;
                 t.end();
             });
         });
@@ -816,6 +816,7 @@ test('vmapi', function (tt) {
             t.ifError(err);
             t.ok(job);
             JOB_UUID = job.job_uuid;
+            t.ok(JOB_UUID, 'JOB_UUID is ' + JOB_UUID);
             t.end();
         });
     });
