@@ -8,10 +8,12 @@
  * Copyright (c) 2018, Joyent, Inc.
  */
 
+var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var test = require('tape');
 var util = require('util');
 var uuid = require('uuid');
+var vasync = require('vasync');
 
 var CNAPI = require('../lib/index').CNAPI;
 
@@ -27,115 +29,42 @@ var testVmAlias = 'nodesdcclientstest-cnapi-' + testVmUuid.split('-')[0];
 var TASK = null;
 var CUSTOMER = process.env.UFDS_ADMIN_UUID;
 
-
 // --- Helpers
 
-function waitForVmState(t, cnapi, state, callback) {
-    var finished = false;
-    var error;
+function waitForTaskAndCheckVmState(options, cb) {
+    assert.object(options, 'options');
+    assert.object(options.cnapiClient, 'options.cnapiClient');
+    assert.uuid(options.taskId, 'options.taskId');
+    assert.string(options.vmState, 'options.vmState');
+    assert.uuid(options.vmUuid, 'options.vmUuid');
+    assert.func(cb, 'cb');
 
-    var timeout = setTimeout(function () {
-        if (finished) {
-            return;
-        }
+    var cnapi = options.cnapiClient;
+    var taskId = options.taskId;
+    var vmState = options.vmState;
+    var vmUuid = options.vmUuid;
 
-        if (error) {
-            callback(error);
-            return;
-        } else {
-            callback(new Error('timed out waiting on vm state'));
-            return;
-        }
-    }, 30000);
-
-    function check() {
-        cnapi.getVm(SERVER, testVmUuid, function (err, vm) {
-            error = err;
-            if (err) {
-                setTimeout(check, 3000);
-                return;
-            }
-            t.comment('test VM ' + testVmUuid + ' state: ' + vm.state);
-
-            if (vm.state === state) {
-                clearTimeout(timeout);
-                callback();
-                return;
-            }
-
-            setTimeout(check, 3000);
-        });
-    }
-
-    check();
-}
-
-function waitForTask(t, cnapi, callback) {
-    var finished = false;
-    var error;
-
-    var tasktimeout;
-
-    var timeout = setTimeout(function () {
-        clearTimeout(tasktimeout);
-        if (finished) {
-            return;
-        }
-
-        if (error) {
-            callback(error);
-            return;
-        } else {
-            callback(new Error('timed out waiting on task at '
-                + (new Date()).toISOString()));
-            return;
-        }
-    }, 50000);
-
-    function check() {
-        cnapi.getTask(TASK, function (err, task) {
-            error = err;
-            if (finished) {
-                return;
-            }
-            if (err) {
-                t.comment('CNAPI getTask err: ' + err.message);
-                if (err.message === 'no such task found') {
-                    setTimeout(check, 3000);
+    vasync.pipeline({funcs: [
+        function waitForTask(_, next) {
+            cnapi.waitTask(taskId, {}, next);
+        },
+        function checkVmState(_, next) {
+            cnapi.getVm(SERVER, vmUuid, function (getVmErr, vm) {
+                if (getVmErr) {
+                    next(getVmErr);
                     return;
                 }
-                clearTimeout(timeout);
-                finished = true;
-                callback(err);
-                return;
-            }
 
-            t.comment('[' + (new Date()).toISOString() + '] CNAPI task '
-                + TASK + ' status: ' + task.status);
-
-            if (task.status == 'failure') {
-                clearTimeout(timeout);
-                finished = true;
-                callback(new Error(
-                    'Task failed ' + util.inspect(task, { depth: null })));
-                return;
-            }
-
-            if (task.status == 'complete') {
-                clearTimeout(timeout);
-                finished = true;
-                callback(null);
-                return;
-            }
-
-            tasktimeout = setTimeout(check, 3000);
-            return;
-        });
-    }
-
-    check();
+                if (!vm || vm.state !== vmState) {
+                    next(new Error('Expected state: ' + vmState + ', got: ' +
+                        (vm ? vm.state : undefined)));
+                } else {
+                    next();
+                }
+            });
+        }
+    ]}, cb);
 }
-
 
 // --- Tests
 
@@ -233,24 +162,23 @@ test('cnapi', function (tt) {
         });
     });
 
-    tt.test(' wait for running', function (t) {
-        waitForTask(t, cnapi, function (err) {
-            t.ifError(err);
-            waitForVmState(t, cnapi, 'running', function (stateErr) {
-                t.ifError(stateErr);
-                t.end();
-            });
+    tt.test(' get task', function (t) {
+        cnapi.getTask(TASK, function onGetTask(getTaskErr, task) {
+            t.ifError(getTaskErr);
+            t.end();
         });
     });
 
-    tt.test(' get vm', function (t) {
-        setTimeout(function () {
-            cnapi.getVm(SERVER, testVmUuid, function (err, vm) {
-                t.ifError(err);
-                t.ok(vm);
-                t.end();
-            });
-        }, 10000);
+    tt.test(' wait for running', function (t) {
+        waitForTaskAndCheckVmState({
+            taskId: TASK,
+            vmUuid: testVmUuid,
+            vmState: 'running',
+            cnapiClient: cnapi
+        }, function waitDone(waitErr) {
+            t.ifError(waitErr);
+            t.end();
+        });
     });
 
     tt.test(' stop vm', function (t) {
@@ -263,71 +191,71 @@ test('cnapi', function (tt) {
     });
 
     tt.test(' wait for stopped', function (t) {
-        waitForTask(t, cnapi, function (err) {
-            t.ifError(err);
-            waitForVmState(t, cnapi, 'stopped', function (err2) {
-                t.ifError(err2);
-                t.end();
-            });
+        waitForTaskAndCheckVmState({
+            taskId: TASK,
+            vmUuid: testVmUuid,
+            vmState: 'stopped',
+            cnapiClient: cnapi
+        }, function waitDone(waitErr) {
+            t.ifError(waitErr);
+            t.end();
         });
     });
 
     tt.test(' start vm', function (t) {
-        setTimeout(function () {
-            cnapi.startVm(SERVER, testVmUuid, function (err, task) {
-                t.ifError(err);
-                t.ok(task);
-                TASK = task.id;
-                t.end();
-            });
-        }, 6000);
+        cnapi.startVm(SERVER, testVmUuid, function (err, task) {
+            t.ifError(err);
+            t.ok(task);
+            TASK = task.id;
+            t.end();
+        });
     });
 
-    tt.test(' wait for started', function (t) {
-        waitForTask(t, cnapi, function (err) {
-            t.ifError(err);
-            waitForVmState(t, cnapi, 'running', function (err2) {
-                t.ifError(err2);
-                t.end();
-            });
+    tt.test(' wait for running', function (t) {
+        waitForTaskAndCheckVmState({
+            taskId: TASK,
+            vmUuid: testVmUuid,
+            vmState: 'running',
+            cnapiClient: cnapi
+        }, function waitDone(waitErr) {
+            t.ifError(waitErr);
+            t.end();
         });
     });
 
     tt.test(' reboot vm', function (t) {
-        setTimeout(function () {
-            cnapi.rebootVm(SERVER, testVmUuid, function (err, task) {
-                t.ifError(err);
-                t.ok(task);
-                TASK = task.id;
-                t.end();
-            });
-        }, 6000);
+        cnapi.rebootVm(SERVER, testVmUuid, function (err, task) {
+            t.ifError(err);
+            t.ok(task);
+            TASK = task.id;
+            t.end();
+        });
     });
 
-    tt.test(' wait for reboot', function (t) {
-        waitForTask(t, cnapi, function (err) {
-            t.ifError(err);
-            waitForVmState(t, cnapi, 'running', function (err2) {
-                t.ifError(err2);
-                t.end();
-            });
+    tt.test(' wait for running', function (t) {
+        waitForTaskAndCheckVmState({
+            taskId: TASK,
+            vmUuid: testVmUuid,
+            vmState: 'running',
+            cnapiClient: cnapi
+        }, function waitDone(waitErr) {
+            t.ifError(waitErr);
+            t.end();
         });
     });
 
     tt.test(' delete vm', function (t) {
-        setTimeout(function () {
-            cnapi.deleteVm(SERVER, testVmUuid, function (err, task) {
-                t.ifError(err);
-                t.ok(task);
-                TASK = task.id;
-                t.end();
-            });
-        }, 3000);
+        cnapi.deleteVm(SERVER, testVmUuid, function (err, task) {
+            t.ifError(err);
+            t.ok(task);
+            TASK = task.id;
+            t.end();
+        });
     });
 
     tt.test(' wait for deleted', function (t) {
-        waitForTask(t, cnapi, function (err) {
-            t.ifError(err);
+        cnapi.waitTask(TASK, {}, function onTaskDone(taskErr, task) {
+            t.ifError(taskErr);
             t.end();
         });
     });
