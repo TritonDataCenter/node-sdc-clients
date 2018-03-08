@@ -8,6 +8,10 @@
 
 ## not yet released
 
+## 11.1.0
+
+- PUBAPI-1378 Provide UpdateFabricNetwork endpoint
+
 ## 11.0.0
 
 - [Backward incompatible] Make `options.version` a required param to the SAPI
