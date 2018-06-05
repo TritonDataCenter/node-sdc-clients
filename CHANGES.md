@@ -8,6 +8,12 @@
 
 ## not yet released
 
+## 11.0.0
+
+- [Backward incompatible] Make `options.version` a required param to the SAPI
+  client constructor.
+- TRITON-399 Get rid of SAPI's history.
+
 ## 10.5.0
 
 - DOCKER-524 Implement docker push
