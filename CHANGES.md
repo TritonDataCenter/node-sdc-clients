@@ -8,6 +8,10 @@
 
 ## not yet released
 
+## 11.2.0
+
+- TRITON-53 x-account image clone. Adds the imgapi.cloneImage method.
+
 ## 11.1.0
 
 - PUBAPI-1378 Provide UpdateFabricNetwork endpoint
