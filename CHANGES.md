@@ -8,6 +8,11 @@
 
 ## not yet released
 
+## 11.3.0
+
+- TRITON-52 Add imgapi.importImageFromDatacenter method, which can be used to
+  copy an image between different datacenters in the same cloud.
+
 ## 11.2.0
 
 - TRITON-53 x-account image clone. Adds the imgapi.cloneImage method.
