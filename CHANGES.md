@@ -8,6 +8,11 @@
 
 ## not yet released
 
+## 11.3.1
+
+- TRITON-635 restify-clients usage has been updated to use the new 'contentMd5'
+  option to avoid cross-node version BadDigest errors.
+
 ## 11.3.0
 
 - TRITON-52 Add imgapi.importImageFromDatacenter method, which can be used to

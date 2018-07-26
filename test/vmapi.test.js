@@ -414,7 +414,12 @@ test('vmapi', function (tt) {
             origin: 'sdc-clients-test',
             owner_uuid: CUSTOMER,
             context: CONTEXT,
-            alias: 'node-sdc-clients-vmapi-test-zone'
+            alias: 'node-sdc-clients-vmapi-test-zone',
+            customer_metadata: {
+                // Test TRITON-635: that CreateVm, GetVm, et al work with
+                // non-ascii VM data.
+                nonascii: 'öhnoēs'
+            }
         };
 
         vmapi.createVm(opts, function (err, job) {
@@ -435,6 +440,7 @@ test('vmapi', function (tt) {
 
 
     tt.test(' wait for running job', function (t) {
+        t.ok(JOB_UUID, 'job is ' + JOB_UUID);
         waitForValue(vmapi.getJob, JOB_UUID, 'execution', 'succeeded',
           function (err) {
             t.ifError(err);
