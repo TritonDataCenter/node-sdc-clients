@@ -6,7 +6,11 @@
 
 # sdc-clients Changelog
 
-## not yet released
+## Not yet released
+
+## 12.0.0
+
+- TRITON-742 Remove dsapi client
 
 ## 11.3.1
 

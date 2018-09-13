@@ -120,7 +120,6 @@ if [[ -n "$opt_headnode" ]]; then
     export NAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1')
     export VMAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1')
     export UFDS_ADMIN_UUID=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json ufds_admin_uuid')
-    export DSAPI_URL=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json dsapi_url')
     export PAPI_IP=$(ssh $opt_headnode 'bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1')
     export CNS_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts cns -j | json 0.ip')
     export MORAY_IP=$(ssh $opt_headnode '/opt/smartdc/bin/sdcadm insts moray -j | json 0.ip')
@@ -135,7 +134,6 @@ else
     export NAPI_IP=$(bash /lib/sdc/config.sh -json | json napi_admin_ips | cut -d, -f1)
     export VMAPI_IP=$(bash /lib/sdc/config.sh -json | json vmapi_admin_ips | cut -d, -f1)
     export UFDS_ADMIN_UUID=$(bash /lib/sdc/config.sh -json | json ufds_admin_uuid)
-    export DSAPI_URL=$(bash /lib/sdc/config.sh -json | json dsapi_url)
     export PAPI_IP=$(bash /lib/sdc/config.sh -json | json papi_admin_ips | cut -d, -f1)
     export IMGAPI_IP=$(sdcadm insts imgapi -j | json 0.ip)
     export CNS_IP=$(sdcadm insts cns -j | json 0.ip)
@@ -152,7 +150,6 @@ echo "#     AMON_IP is $AMON_IP"
 echo "#     CA_IP is $CA_IP"
 echo "#     CNAPI_IP is $CNAPI_IP"
 echo "#     CNS_IP is $CNS_IP"
-echo "#     DSAPI_URL is $DSAPI_URL"
 echo "#     IMGAPI_IP is $IMGAPI_IP"
 echo "#     MORAY_IP is $MORAY_IP"
 echo "#     NAPI_IP is $NAPI_IP"
