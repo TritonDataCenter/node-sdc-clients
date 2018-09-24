@@ -31,7 +31,7 @@ function pseudoRandomMac() {
         var diff = maxVal - minVal + 1.0,
             val = Math.random() * diff;
         val += minVal;
-        return Math.round(val);
+        return Math.floor(val);
     }
     mac[3] = randomInt(0x00, 0x7f);
     mac[4] = randomInt(0x00, 0xff);
