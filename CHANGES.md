@@ -10,7 +10,12 @@
 
 ## 12.0.0
 
-- TRITON-742 Remove dsapi client
+- TRITON-886 Add support for `channel` option to IMGAPI client methods.
+  Typically the "channel" is set as an argument to the IMGAPI client
+  constructor. However, it can be useful to use an existing IMGAPI client
+  to make a call for a separate channel.
+
+- [Backward incompatible] TRITON-742 Remove dsapi client
 
 ## 11.3.1
 
