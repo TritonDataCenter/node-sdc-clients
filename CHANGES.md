@@ -8,6 +8,11 @@
 
 ## Not yet released
 
+## 12.1.0
+
+- TRITON-774 Add imgapi.addImageFileFromUrl method, used to add a image file
+  from a url.
+
 ## 12.0.0
 
 - TRITON-886 Add support for `channel` option to IMGAPI client methods.
