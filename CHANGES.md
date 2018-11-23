@@ -8,6 +8,12 @@
 
 ## Not yet released
 
+## 12.1.1
+
+- MANTA-4030 Drop unused lru-cache dep (and internal "lib/cache.js" lib) to
+  allow sdc-clients users to work around the transitive lru-cache@4.1.4
+  breakage to node 0.10 usage.
+
 ## 12.1.0
 
 - TRITON-774 Add imgapi.addImageFileFromUrl method, used to add a image file
