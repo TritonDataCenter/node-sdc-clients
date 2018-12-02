@@ -8,6 +8,9 @@
 
 ## Not yet released
 
+- TRITON-963 Add `CreateDisk`, `ResizeDisk` and `DeleteDisk` support to VMAPI's
+  client
+
 ## 12.1.1
 
 - MANTA-4030 Drop unused lru-cache dep (and internal "lib/cache.js" lib) to
