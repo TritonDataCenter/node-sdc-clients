@@ -1,7 +1,7 @@
 {
   "name": "sdc-clients",
   "description": "node.js client libraries for Triton core REST APIs.",
-  "version": "12.1.1",
+  "version": "12.2.0",
   "homepage": "http://www.joyent.com",
   "repository": {
     "type": "git",

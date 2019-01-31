@@ -8,6 +8,11 @@
 
 ## Not yet released
 
+(nothing)
+
+## 12.2.0
+
+- TRITON-1173 Add `CNAPI.prototype.{installAgent,uninstallAgents}` methods.
 - TRITON-963 Add `CreateDisk`, `ResizeDisk` and `DeleteDisk` support to VMAPI's
   client
 
