@@ -8,7 +8,7 @@
 
 ## Not yet released
 
-(nothing)
+- TRITON-1266 Allow a disk_uuid arg to `CreateDisk`.
 
 ## 12.2.0
 
