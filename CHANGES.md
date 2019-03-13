@@ -8,7 +8,12 @@
 
 ## Not yet released
 
-- TRITON-1266 Allow a disk_uuid arg to `CreateDisk`.
+(nothing yet)
+
+## 13.0.0
+
+- [Backward incompatible] TRITON-884 Remove the Cloud Analytics (CA) client lib.
+- TRITON-1266 Allow a `disk_uuid` arg to `CreateDisk`.
 
 ## 12.2.0
 
