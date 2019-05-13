@@ -10,6 +10,11 @@
 
 (nothing yet)
 
+## 13.0.1
+
+- TRITON-1659 bump node-trace-provider transitive dependency by way of
+  smartdc-auth
+
 ## 13.0.0
 
 - [Backward incompatible] TRITON-884 Remove the Cloud Analytics (CA) client lib.
