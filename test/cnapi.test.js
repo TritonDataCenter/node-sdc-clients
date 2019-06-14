@@ -283,7 +283,7 @@ test('cnapi', function (tt) {
     // run with a standup containing multiple CNs. With a standup of only COAL,
     // this test is ambiguous.
     tt.test(' capacity 1', function (t) {
-        var headers = { 'x-request-id': 12345 };
+        var headers = { 'x-request-id': uuid.v4() };
 
         cnapi.capacity([SERVER], { headers: headers }, function (err, body) {
             t.ifError(err);
