@@ -8,5 +8,6 @@ cscope.po.out
 cscope.out
 .lvimrc
 *.vim
+.history
 npm-shrinkwrap.json.old
 .DS_Store
