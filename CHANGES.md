@@ -5,10 +5,20 @@
 -->
 
 <!--
-    Copyright (c) 2014, Joyent, Inc.
+    Copyright 2019 Joyent, Inc.
 -->
 
 # sdc-clients Changelog
+
+## sdc-clients 8.2.0
+
+- Backport of channel support (TRITON-886) from v12.0.0
+
+## sdc-clients 8.1.5
+
+- CNAPI-568: new waitTask, pollTask methods
+- PUBAPI-1068: fabric networks support
+- ZAPI-608: addition of vmapi.createVmAndWait funct
 
 ## sdc-clients 8.1.4
 
