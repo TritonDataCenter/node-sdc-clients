@@ -5,14 +5,14 @@
 -->
 
 <!--
-    Copyright (c) 2016, Joyent, Inc.
+    Copyright 2019 Joyent, Inc.
 -->
 
 # node-sdc-clients
 
 This repository is part of the Joyent Triton project. See the [contribution
-guidelines](https://github.com/joyent/triton/blob/master/CONTRIBUTING.md) --
-*Triton does not use GitHub PRs* -- and general documentation at the main
+guidelines](https://github.com/joyent/triton/blob/master/CONTRIBUTING.md)
+and general documentation at the main
 [Triton project](https://github.com/joyent/triton) page.
 
 This repository holds Node.js client libraries for many of the core Triton REST APIs:
@@ -48,9 +48,6 @@ To run a single one of the files use the `-f FILTER` option, e.g.
 Before commit, ensure that the following checks are clean:
 
     make prepush
-
-Also see the note at the top that cr.joyent.us is used for code review for
-this repo.
 
 
 ## Releases
