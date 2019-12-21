@@ -10,6 +10,10 @@
 
 (nothing yet)
 
+## 13.0.2
+
+- TRITON-2020 VMAPI.resizeDisk is broken for `dangerous_allow_shrink` param
+
 ## 13.0.1
 
 - TRITON-1659 bump node-trace-provider transitive dependency by way of
