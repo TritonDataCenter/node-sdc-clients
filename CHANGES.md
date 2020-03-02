@@ -10,6 +10,10 @@
 
 (nothing yet)
 
+## 13.0.3
+
+- TRITON-2079 CNAPI should provide information regarding Platform OS
+
 ## 13.0.2
 
 - TRITON-2020 VMAPI.resizeDisk is broken for `dangerous_allow_shrink` param
