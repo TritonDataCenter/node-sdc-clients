@@ -5,10 +5,23 @@
 -->
 
 <!--
-    Copyright (c) 2014, Joyent, Inc.
+    Copyright 2020 Joyent, Inc.
 -->
 
 # sdc-clients Changelog
+
+## sdc-clients 8.2.0
+
+- TRITON-886 Add support for `channel` option to IMGAPI client methods.
+  Typically the "channel" is set as an argument to the IMGAPI client
+  constructor. However, it can be useful to use an existing IMGAPI client
+  to make a call for a separate channel.  (Backported from v12.0.0.)
+
+## sdc-clients 8.1.5
+
+- CNAPI-568: new waitTask, pollTask methods
+- PUBAPI-1068: fabric networks support
+- ZAPI-608: addition of vmapi.createVmAndWait funct
 
 ## sdc-clients 8.1.4
 
