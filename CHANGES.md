@@ -10,6 +10,10 @@
 
 (nothing yet)
 
+## 13.0.4
+
+- TRITON-XXX VPC support
+
 ## 13.0.3
 
 - TRITON-2079 CNAPI should provide information regarding Platform OS
