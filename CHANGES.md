@@ -10,6 +10,10 @@
 
 (nothing yet)
 
+## 13.0.4
+
+- TRITON-2191 Initial support of AWS style VPCs
+
 ## 13.0.3
 
 - TRITON-2079 CNAPI should provide information regarding Platform OS
