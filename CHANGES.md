@@ -12,7 +12,7 @@
 
 ## 13.0.4
 
-- TRITON-XXX VPC support
+- TRITON-2191 Initial support of AWS style VPCs
 
 ## 13.0.3
 
