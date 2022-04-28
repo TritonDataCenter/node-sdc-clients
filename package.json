@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "ldap-filter": "^0.3.1",
-    "moray": "git+https://github.com/joyent/node-moray.git#fd5781bc25a9bfe2ba82167664639753fb9f0ca5",
+    "moray": "git+https://github.com/joyent/node-moray.git#v1.0.3",
     "tape": "^4.6.0",
     "uuid": "3.1.0"
   },
