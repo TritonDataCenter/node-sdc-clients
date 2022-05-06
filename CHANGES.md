@@ -8,7 +8,11 @@
 
 ## Not yet released
 
-(nothing yet)
+- TRITON-2304 New image server names
+
+## 13.0.5
+
+- TOOLS-2525 Everything needs to stop cloning with git:// URLs
 
 ## 13.0.4
 
