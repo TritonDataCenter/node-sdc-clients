@@ -8,7 +8,13 @@
 
 ## Not yet released
 
+(nothing yet)
+
+## 13.0.6
+
 - TRITON-2304 New image server names
+- TRITON-2327 CVE-2018-3737: Regular Expression Denial of Service in sshpk
+- TRITON-2325 CVE-2021-3918: json-schema is vulnerable to Prototype Pollution
 
 ## 13.0.5
 
