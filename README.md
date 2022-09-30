@@ -10,20 +10,20 @@
 
 # node-sdc-clients
 
-This repository is part of the Joyent Triton project. See the [contribution
-guidelines](https://github.com/joyent/triton/blob/master/CONTRIBUTING.md)
+This repository is part of the Triton project. See the [contribution
+guidelines](https://github.com/TritonDataCenter/triton/blob/master/CONTRIBUTING.md)
 and general documentation at the main
-[Triton project](https://github.com/joyent/triton) page.
+[Triton project](https://github.com/TritonDataCenter/triton) page.
 
 This repository holds Node.js client libraries for many of the core Triton REST APIs:
 Amon, CA, CNS, CNAPI, FWAPI, IMGAPI, NAPI, PAPI, SAPI, VMAPI.
 
 Node.js client libraries for other Triton APIs are in other repos. For example see:
-- [node-ufds](https://github.com/joyent/node-ufds): client for Triton's core UFDS service
-- [node-moray](https://github.com/joyent/node-moray): client for Triton's core Moray service
-- [node-triton](https://github.com/joyent/node-triton): Triton CloudAPI client and CLI
-- [node-manta](https://github.com/joyent/node-manta): Manta client and CLI
-- [wf-client](https://github.com/joyent/sdc-wf-client): client for Triton's core
+- [node-ufds](https://github.com/TritonDataCenter/node-ufds): client for Triton's core UFDS service
+- [node-moray](https://github.com/TritonDataCenter/node-moray): client for Triton's core Moray service
+- [node-triton](https://github.com/TritonDataCenter/node-triton): Triton CloudAPI client and CLI
+- [node-manta](https://github.com/TritonDataCenter/node-manta): Manta client and CLI
+- [wf-client](https://github.com/TritonDataCenter/sdc-wf-client): client for Triton's core
   Workflow API service
 
 
