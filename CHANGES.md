@@ -10,6 +10,10 @@
 
 (nothing yet)
 
+## 13.1.0
+
+- TRITON-2553 For diskCreate, plumb through block_size. Now part of createDisk in VMAPI.
+
 ## 13.0.6
 
 - TRITON-2304 New image server names
